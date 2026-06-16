@@ -2,7 +2,9 @@ package com.jasmin.security.detekt
 
 import com.jasmin.security.detekt.a01.DropwizardMissingAuthRule
 import com.jasmin.security.detekt.a01.DropwizardOpenRedirectRule
+import com.jasmin.security.detekt.a02.DropwizardUnencryptedJwtSecretRule
 import com.jasmin.security.detekt.a02.InsecureTlsProtocolRule
+import com.jasmin.security.detekt.a03.DropwizardSelfValidatingELRule
 import com.jasmin.security.detekt.a05.InsecureCookieRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.RuleSet
@@ -27,6 +29,9 @@ class DropwizardRuleSetProvider : RuleSetProvider {
             DropwizardOpenRedirectRule(config.subConfig("DropwizardOpenRedirect")),
             // A02 Cryptographic Failures
             InsecureTlsProtocolRule(config.subConfig("InsecureTlsProtocol")),
+            DropwizardUnencryptedJwtSecretRule(config.subConfig("DropwizardUnencryptedJwtSecret")),
+            // A03 Injection
+            DropwizardSelfValidatingELRule(config.subConfig("DropwizardSelfValidatingEL")),
             // A05 Security Misconfiguration
             InsecureCookieRule(config.subConfig("InsecureCookie")),
         )

@@ -19,6 +19,7 @@ import com.jasmin.security.detekt.a03.XpathInjectionRule
 import com.jasmin.security.detekt.a03.XxeInjectionRule
 import com.jasmin.security.detekt.a07.HardcodedCredentialsRule
 import com.jasmin.security.detekt.a07.InsecureRandomRule
+import com.jasmin.security.detekt.a06.RegexDenialOfServiceRule
 import com.jasmin.security.detekt.a08.InsecureDeserializationRule
 import com.jasmin.security.detekt.a08.JacksonUnsafeDeserializationRule
 import com.jasmin.security.detekt.a08.XmlMapperUnsafeRule
@@ -62,6 +63,8 @@ class CoreRuleSetProvider : RuleSetProvider {
             CommandInjectionRule(config.subConfig("CommandInjection")),
             XxeInjectionRule(config.subConfig("XxeInjection")),
             GroovyScriptInjectionRule(config.subConfig("GroovyScriptInjection")),
+            // A06 Vulnerable Components / ReDoS
+            RegexDenialOfServiceRule(config.subConfig("RegexDenialOfService")),
             // A07 Authentication Failures
             HardcodedCredentialsRule(config.subConfig("HardcodedCredentials")),
             InsecureRandomRule(config.subConfig("InsecureRandom")),

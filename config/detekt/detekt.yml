@@ -144,6 +144,9 @@ security-core:
     active: true
   GroovyScriptInjection:
     active: true
+  # A06 Vulnerable Components / ReDoS
+  RegexDenialOfService:
+    active: true
   # A07 Authentication Failures
   HardcodedCredentials:
     active: true
@@ -236,6 +239,11 @@ security-dropwizard:
     active: true
   # A02 Cryptographic Failures
   InsecureTlsProtocol:
+    active: true
+  DropwizardUnencryptedJwtSecret:
+    active: true
+  # A03 Injection
+  DropwizardSelfValidatingEL:
     active: true
   # A05 Security Misconfiguration
   InsecureCookie:
