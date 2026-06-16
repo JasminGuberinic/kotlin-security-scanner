@@ -220,4 +220,60 @@ object DetectionPatterns {
         "setEnabledProtocols",
         "setSslProtocol",
     )
+
+    // ── A02 JWT ───────────────────────────────────────────────────────────────
+
+    const val JWT_SIGN_WITH_METHOD = "signWith"
+    val JWT_HMAC_METHODS = setOf("HMAC256", "HMAC384", "HMAC512")
+    const val JWT_NONE_METHOD = "none"
+    const val JWT_NONE_ALGORITHM_TEXT = "NONE"
+    const val AUTH0_ALGORITHM_CLASS = "Algorithm"
+
+    // ── A02 Cipher ────────────────────────────────────────────────────────────
+
+    const val UNSAFE_CBC_PADDING = "AES/CBC/PKCS5Padding"
+
+    // ── A08 Jackson ───────────────────────────────────────────────────────────
+
+    val JACKSON_UNSAFE_TYPING_METHODS = setOf("enableDefaultTyping", "activateDefaultTyping")
+    const val JACKSON_TYPE_INFO_ANNOTATION = "JsonTypeInfo"
+    const val XML_MAPPER_CLASS = "XmlMapper"
+
+    // ── A06 ReDoS ─────────────────────────────────────────────────────────────
+
+    val REGEX_CONSTRUCTORS = setOf("Regex", "toRegex")
+    val REDOS_PATTERNS = listOf(
+        Regex("""\(.*\+\)\+"""),
+        Regex("""\(\[.*\]\+\)\*"""),
+        Regex("""\(.*\|.*\)\+"""),
+        Regex("""\(.*\+\)\*"""),
+    )
+
+    // ── A10 WebClient SSRF ────────────────────────────────────────────────────
+
+    const val WEB_CLIENT_CREATE = "create"
+    const val WEB_CLIENT_CLASS = "WebClient"
+
+    // ── A02 Redis TLS ─────────────────────────────────────────────────────────
+
+    val REDIS_CONNECTION_CONSTRUCTORS = setOf(
+        "RedisStandaloneConfiguration",
+        "LettuceConnectionFactory",
+        "JedisConnectionFactory",
+        "RedisSentinelConfiguration",
+        "RedisClusterConfiguration",
+    )
+
+    // ── A03 MongoDB ───────────────────────────────────────────────────────────
+
+    const val MONGO_CRITERIA_WHERE = "where"
+    const val MONGO_CRITERIA_CLASS = "Criteria"
+
+    // ── A03 Dropwizard constraint EL ──────────────────────────────────────────
+
+    const val DW_CONSTRAINT_VIOLATION_TEMPLATE = "buildConstraintViolationWithTemplate"
+
+    // ── A02 Dropwizard JWT ────────────────────────────────────────────────────
+
+    const val DW_JWT_SECRET_PROVIDER = "setSecretProvider"
 }

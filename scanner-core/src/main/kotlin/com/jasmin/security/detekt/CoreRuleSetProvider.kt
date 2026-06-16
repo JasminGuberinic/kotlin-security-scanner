@@ -1,7 +1,10 @@
 package com.jasmin.security.detekt
 
 import com.jasmin.security.detekt.a02.HardcodedIvRule
+import com.jasmin.security.detekt.a02.JwtNoneAlgorithmRule
+import com.jasmin.security.detekt.a02.JwtWeakSecretRule
 import com.jasmin.security.detekt.a02.TrustAllCertsRule
+import com.jasmin.security.detekt.a02.UnsafeCryptoPaddingOracleRule
 import com.jasmin.security.detekt.a02.WeakCipherModeRule
 import com.jasmin.security.detekt.a02.WeakHashAlgorithmRule
 import com.jasmin.security.detekt.a02.WeakRsaKeyRule
@@ -17,6 +20,8 @@ import com.jasmin.security.detekt.a03.XxeInjectionRule
 import com.jasmin.security.detekt.a07.HardcodedCredentialsRule
 import com.jasmin.security.detekt.a07.InsecureRandomRule
 import com.jasmin.security.detekt.a08.InsecureDeserializationRule
+import com.jasmin.security.detekt.a08.JacksonUnsafeDeserializationRule
+import com.jasmin.security.detekt.a08.XmlMapperUnsafeRule
 import com.jasmin.security.detekt.a09.SensitiveDataLoggingRule
 import com.jasmin.security.detekt.a10.SsrfRule
 import io.gitlab.arturbosch.detekt.api.Config
@@ -44,6 +49,9 @@ class CoreRuleSetProvider : RuleSetProvider {
             TrustAllCertsRule(config.subConfig("TrustAllCerts")),
             HardcodedIvRule(config.subConfig("HardcodedIv")),
             WeakRsaKeyRule(config.subConfig("WeakRsaKey")),
+            JwtNoneAlgorithmRule(config.subConfig("JwtNoneAlgorithm")),
+            JwtWeakSecretRule(config.subConfig("JwtWeakSecret")),
+            UnsafeCryptoPaddingOracleRule(config.subConfig("UnsafeCryptoPaddingOracle")),
             // A03 Injection
             SqlInjectionRule(config.subConfig("SqlInjection")),
             LdapInjectionRule(config.subConfig("LdapInjection")),
@@ -59,6 +67,8 @@ class CoreRuleSetProvider : RuleSetProvider {
             InsecureRandomRule(config.subConfig("InsecureRandom")),
             // A08 Software and Data Integrity
             InsecureDeserializationRule(config.subConfig("InsecureDeserialization")),
+            JacksonUnsafeDeserializationRule(config.subConfig("JacksonUnsafeDeserialization")),
+            XmlMapperUnsafeRule(config.subConfig("XmlMapperUnsafe")),
             // A09 Logging Failures
             SensitiveDataLoggingRule(config.subConfig("SensitiveDataLogging")),
             // A10 Server-Side Request Forgery

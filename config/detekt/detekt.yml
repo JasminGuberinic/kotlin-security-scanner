@@ -119,6 +119,12 @@ security-core:
     active: true
   WeakRsaKey:
     active: true
+  JwtNoneAlgorithm:
+    active: true
+  JwtWeakSecret:
+    active: true
+  UnsafeCryptoPaddingOracle:
+    active: true
   # A03 Injection
   SqlInjection:
     active: true
@@ -145,6 +151,10 @@ security-core:
     active: true
   # A08 Software and Data Integrity
   InsecureDeserialization:
+    active: true
+  JacksonUnsafeDeserialization:
+    active: true
+  XmlMapperUnsafe:
     active: true
   # A09 Logging Failures
   SensitiveDataLogging:
