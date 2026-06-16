@@ -175,8 +175,14 @@ security-spring-boot:
     active: true
   CsrfTokenLeak:
     active: true
+  CoroutineSecurityContextLoss:
+    active: true
   # A02 Cryptographic Failures
   InsecurePasswordEncoder:
+    active: true
+  MissingHttpsRedirect:
+    active: true
+  InsecureRedisConnection:
     active: true
   # A03 Injection
   SpelInjection:
@@ -185,6 +191,8 @@ security-spring-boot:
     active: true
   ELInjection:
     active: true
+  SpringDataMongoInjection:
+    active: true
   # A04 Insecure Design
   MassAssignment:
     active: true
@@ -192,6 +200,9 @@ security-spring-boot:
   SpringCsrfDisabled:
     active: true
   PermissiveCors:
+    active: true
+  # A10 Server-Side Request Forgery
+  WebClientSSRF:
     active: true
 
 # ─── QUARKUS SECURITY RULES (scanner-quarkus) ────────────────────────────────
