@@ -7,6 +7,7 @@ import com.jasmin.security.detekt.a01.MissingAuthorizationRule
 import com.jasmin.security.detekt.a01.OpenRedirectRule
 import com.jasmin.security.detekt.a02.InsecurePasswordEncoderRule
 import com.jasmin.security.detekt.a02.InsecureRedisConnectionRule
+import com.jasmin.security.detekt.a02.InsecureSmtpConfigRule
 import com.jasmin.security.detekt.a02.MissingHttpsRedirectRule
 import com.jasmin.security.detekt.a03.ELInjectionRule
 import com.jasmin.security.detekt.a03.ResponseSplittingRule
@@ -14,6 +15,7 @@ import com.jasmin.security.detekt.a03.SpelInjectionRule
 import com.jasmin.security.detekt.a03.SpringDataMongoInjectionRule
 import com.jasmin.security.detekt.a03.ThymeleafSSTIRule
 import com.jasmin.security.detekt.a04.MassAssignmentRule
+import com.jasmin.security.detekt.a05.InsecureActuatorExposureRule
 import com.jasmin.security.detekt.a05.PermissiveCorsRule
 import com.jasmin.security.detekt.a05.SpringCsrfDisabledRule
 import com.jasmin.security.detekt.a10.WebClientSSRFRule
@@ -43,6 +45,7 @@ class SpringBootRuleSetProvider : RuleSetProvider {
             InsecurePasswordEncoderRule(config.subConfig("InsecurePasswordEncoder")),
             MissingHttpsRedirectRule(config.subConfig("MissingHttpsRedirect")),
             InsecureRedisConnectionRule(config.subConfig("InsecureRedisConnection")),
+            InsecureSmtpConfigRule(config.subConfig("InsecureSmtpConfig")),
             // A03 Injection
             SpelInjectionRule(config.subConfig("SpelInjection")),
             ResponseSplittingRule(config.subConfig("ResponseSplitting")),
@@ -54,6 +57,7 @@ class SpringBootRuleSetProvider : RuleSetProvider {
             // A05 Security Misconfiguration
             SpringCsrfDisabledRule(config.subConfig("SpringCsrfDisabled")),
             PermissiveCorsRule(config.subConfig("PermissiveCors")),
+            InsecureActuatorExposureRule(config.subConfig("InsecureActuatorExposure")),
             // A10 Server-Side Request Forgery
             WebClientSSRFRule(config.subConfig("WebClientSSRF")),
         )

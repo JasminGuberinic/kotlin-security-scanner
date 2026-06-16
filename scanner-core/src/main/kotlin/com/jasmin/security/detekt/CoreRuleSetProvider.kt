@@ -18,9 +18,9 @@ import com.jasmin.security.detekt.a03.ReflectionInjectionRule
 import com.jasmin.security.detekt.a03.SqlInjectionRule
 import com.jasmin.security.detekt.a03.XpathInjectionRule
 import com.jasmin.security.detekt.a03.XxeInjectionRule
+import com.jasmin.security.detekt.a06.RegexDenialOfServiceRule
 import com.jasmin.security.detekt.a07.HardcodedCredentialsRule
 import com.jasmin.security.detekt.a07.InsecureRandomRule
-import com.jasmin.security.detekt.a06.RegexDenialOfServiceRule
 import com.jasmin.security.detekt.a08.InsecureDeserializationRule
 import com.jasmin.security.detekt.a08.JacksonUnsafeDeserializationRule
 import com.jasmin.security.detekt.a08.XmlMapperUnsafeRule
