@@ -1,6 +1,8 @@
 package com.jasmin.security.detekt
 
 import com.jasmin.security.detekt.a01.QuarkusMissingAuthRule
+import com.jasmin.security.detekt.a01.QuarkusPermitAllSensitiveRule
+import com.jasmin.security.detekt.a03.PanacheRawQueryRule
 import com.jasmin.security.detekt.a07.QuarkusHardcodedConfigSecretRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.RuleSet
@@ -23,6 +25,9 @@ class QuarkusRuleSetProvider : RuleSetProvider {
         listOf(
             // A01 Broken Access Control
             QuarkusMissingAuthRule(config.subConfig("QuarkusMissingAuth")),
+            QuarkusPermitAllSensitiveRule(config.subConfig("QuarkusPermitAllSensitive")),
+            // A03 Injection
+            PanacheRawQueryRule(config.subConfig("PanacheRawQuery")),
             // A07 Identification and Authentication Failures
             QuarkusHardcodedConfigSecretRule(config.subConfig("QuarkusHardcodedConfigSecret")),
         )

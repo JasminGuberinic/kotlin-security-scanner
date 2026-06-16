@@ -1,8 +1,10 @@
 package com.jasmin.security.detekt
 
 import com.jasmin.security.detekt.a01.MissingAuthorizationRule
+import com.jasmin.security.detekt.a01.OpenRedirectRule
 import com.jasmin.security.detekt.a02.InsecurePasswordEncoderRule
 import com.jasmin.security.detekt.a03.SpelInjectionRule
+import com.jasmin.security.detekt.a04.MassAssignmentRule
 import com.jasmin.security.detekt.a05.PermissiveCorsRule
 import com.jasmin.security.detekt.a05.SpringCsrfDisabledRule
 import io.gitlab.arturbosch.detekt.api.Config
@@ -23,10 +25,13 @@ class SpringBootRuleSetProvider : RuleSetProvider {
         listOf(
             // A01 Broken Access Control
             MissingAuthorizationRule(config.subConfig("MissingAuthorization")),
+            OpenRedirectRule(config.subConfig("OpenRedirect")),
             // A02 Cryptographic Failures
             InsecurePasswordEncoderRule(config.subConfig("InsecurePasswordEncoder")),
             // A03 Injection
             SpelInjectionRule(config.subConfig("SpelInjection")),
+            // A04 Insecure Design
+            MassAssignmentRule(config.subConfig("MassAssignment")),
             // A05 Security Misconfiguration
             SpringCsrfDisabledRule(config.subConfig("SpringCsrfDisabled")),
             PermissiveCorsRule(config.subConfig("PermissiveCors")),

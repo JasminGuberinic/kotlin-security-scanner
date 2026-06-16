@@ -35,14 +35,14 @@ HardcodedCredentialsRule, InsecureRandomRule, SensitiveDataLoggingRule, SsrfRule
 | `[x]` | InsecureRandomRule | A07 | PREDICTABLE_RANDOM | `Random()`, `ThreadLocalRandom()` |
 | `[x]` | SensitiveDataLoggingRule | A09 | INFORMATION_EXPOSURE | log call + interpolated sensitive keyword |
 | `[x]` | SsrfRule | A10 | URLCONNECTION_SSRF_FD | `URL(var)`, `URI(var)` non-literal |
-| `[ ]` | CommandInjectionRule | A03 | COMMAND_INJECTION | `Runtime.getRuntime().exec(var)`, `ProcessBuilder(listOf(var))` — flag when arg is not all-literal |
-| `[ ]` | XxeInjectionRule | A03 | XXE_DTD, XXE_SAXPARSER | `DocumentBuilderFactory.newInstance()` / `SAXParserFactory.newInstance()` without `setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)` |
-| `[ ]` | InsecureDeserializationRule | A08 | OBJECT_DESERIALIZATION | `ObjectInputStream(...)` constructor call |
-| `[ ]` | WeakHashAlgorithmRule | A02 | WEAK_MESSAGE_DIGEST_MD5, WEAK_MESSAGE_DIGEST_SHA1 | `MessageDigest.getInstance("MD5"\|"SHA-1"\|"SHA1")` |
-| `[ ]` | LdapInjectionRule | A03 | LDAP_INJECTION | string interpolation / `+` inside `search(`, `bind(` call argument |
+| `[x]` | CommandInjectionRule | A03 | COMMAND_INJECTION | `Runtime.getRuntime().exec(var)`, `ProcessBuilder(listOf(var))` — flag when arg is not all-literal |
+| `[x]` | XxeInjectionRule | A03 | XXE_DTD, XXE_SAXPARSER | `DocumentBuilderFactory.newInstance()` / `SAXParserFactory.newInstance()` without `setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)` |
+| `[x]` | InsecureDeserializationRule | A08 | OBJECT_DESERIALIZATION | `ObjectInputStream(...)` constructor call |
+| `[x]` | WeakHashAlgorithmRule | A02 | WEAK_MESSAGE_DIGEST_MD5, WEAK_MESSAGE_DIGEST_SHA1 | `MessageDigest.getInstance("MD5"\|"SHA-1"\|"SHA1")` |
+| `[x]` | LdapInjectionRule | A03 | LDAP_INJECTION | string interpolation / `+` inside `search(`, `bind(` call argument |
 | `[ ]` | XpathInjectionRule | A03 | XPATH_INJECTION | string interpolation / `+` passed to `xpath.evaluate(`, `compile(` |
-| `[ ]` | TrustAllCertsRule | A02 | WEAK_TRUST_MANAGER | anonymous `X509TrustManager` with empty `checkClientTrusted`/`checkServerTrusted` |
-| `[ ]` | HardcodedIvRule | A02 | STATIC_IV | `IvParameterSpec(byteArrayOf(...))` with literal byte array — IV must be random |
+| `[x]` | TrustAllCertsRule | A02 | WEAK_TRUST_MANAGER | anonymous `X509TrustManager` with empty `checkClientTrusted`/`checkServerTrusted` |
+| `[x]` | HardcodedIvRule | A02 | STATIC_IV | `IvParameterSpec(byteArrayOf(...))` with literal byte array — IV must be random |
 
 ---
 
@@ -55,12 +55,12 @@ Existing: MissingAuthorizationRule, SpringCsrfDisabledRule, PermissiveCorsRule
 | `[x]` | MissingAuthorizationRule | A01 | SPRING_ENDPOINT | `@GetMapping` etc. without `@PreAuthorize`/`@Secured` |
 | `[x]` | SpringCsrfDisabledRule | A05 | SPRING_CSRF_PROTECTION_DISABLED | `.csrf { disable() }` / `.csrf().disable()` |
 | `[x]` | PermissiveCorsRule | A05 | PERMISSIVE_CORS | `allowedOrigins("*")` |
-| `[ ]` | SpelInjectionRule | A03 | SPEL_INJECTION | `ExpressionParser.parseExpression(var)` or `SpelExpressionParser().parseExpression(var)` where arg is non-literal |
-| `[ ]` | InsecurePasswordEncoderRule | A02 | WEAK_PASSWORD_ENCODER | `NoOpPasswordEncoder.getInstance()`, `new Md5PasswordEncoder()`, `new ShaPasswordEncoder()` |
-| `[ ]` | MassAssignmentRule | A04 | MASS_ASSIGNMENT | `@RequestBody` on a `@Entity`-annotated class (domain entity used directly as DTO) |
+| `[x]` | SpelInjectionRule | A03 | SPEL_INJECTION | `ExpressionParser.parseExpression(var)` or `SpelExpressionParser().parseExpression(var)` where arg is non-literal |
+| `[x]` | InsecurePasswordEncoderRule | A02 | WEAK_PASSWORD_ENCODER | `NoOpPasswordEncoder.getInstance()`, `new Md5PasswordEncoder()`, `new ShaPasswordEncoder()` |
+| `[x]` | MassAssignmentRule | A04 | MASS_ASSIGNMENT | `@RequestBody` on a `@Entity`-annotated class (domain entity used directly as DTO) |
 | `[ ]` | ActuatorEndpointExposedRule | A05 | SPRING_ACTUATOR | `management.endpoints.web.exposure.include=*` in properties — flag `"*"` string literal in `@Value` or config class |
 | `[ ]` | HttpsNotEnforcedRule | A05 | INSECURE_CHANNEL | `HttpSecurity` config block that never calls `.requiresChannel()` or `.redirectToHttps()` |
-| `[ ]` | OpenRedirectRule | A01 | SPRING_UNVALIDATED_REDIRECT | `return "redirect:" + variable` in a `@Controller` method |
+| `[x]` | OpenRedirectRule | A01 | SPRING_UNVALIDATED_REDIRECT | `return "redirect:" + variable` in a `@Controller` method |
 | `[ ]` | ResponseSplittingRule | A03 | HTTP_RESPONSE_SPLITTING | `response.addHeader(name, variable)` or `response.setHeader(name, variable)` where value is non-literal |
 
 ---
@@ -87,23 +87,22 @@ Existing: QuarkusMissingAuthRule, QuarkusHardcodedConfigSecretRule
 |--------|------|-------|----------------|-----------------|
 | `[x]` | QuarkusMissingAuthRule | A01 | JAXRS_ENDPOINT | JAX-RS without `@RolesAllowed`/`@Authenticated`/`@PermitAll`/`@DenyAll` |
 | `[x]` | QuarkusHardcodedConfigSecretRule | A07 | HARD_CODE_PASSWORD | `@ConfigProperty(name="secret", defaultValue="hardcoded")` |
-| `[ ]` | QuarkusPermitAllSensitiveRule | A01 | JAXRS_ENDPOINT | `@PermitAll` combined with `@DELETE`/`@PUT` — explicitly public write operations |
+| `[x]` | QuarkusPermitAllSensitiveRule | A01 | JAXRS_ENDPOINT | `@PermitAll` combined with `@DELETE`/`@PUT` — explicitly public write operations |
 | `[ ]` | QuarkusReflectionUnsafeRule | A08 | OBJECT_DESERIALIZATION | `@RegisterForReflection` on class that implements `Serializable` and overrides `readObject` |
-| `[ ]` | PanacheRawQueryRule | A03 | SQL_INJECTION_JPA | `PanacheEntity.find(string_with_interpolation)` or `PanacheRepository.find(var)` — Panache raw query with non-literal |
+| `[x]` | PanacheRawQueryRule | A03 | SQL_INJECTION_JPA | `PanacheEntity.find(string_with_interpolation)` or `PanacheRepository.find(var)` — Panache raw query with non-literal |
 
 ---
 
 ## Priority order for next session
 
-1. `CommandInjectionRule` (core) — highest severity, very visible
-2. `XxeInjectionRule` (core) — extremely common in enterprise Kotlin
-3. `InsecureDeserializationRule` (core) — OWASP A08 still unimplemented
-4. `SpelInjectionRule` (spring-boot) — Spring-specific, exciting for community
-5. `InsecurePasswordEncoderRule` (spring-boot) — catches real beginner mistakes
-6. `WeakHashAlgorithmRule` (core) — many MD5 usages in the wild
-7. `TrustAllCertsRule` (core) — often introduced as "quick fix" in dev, forgotten in prod
-8. `PanacheRawQueryRule` (quarkus) — Quarkus-specific, high community value
-9. `OpenRedirectRule` (spring-boot) — classic web vulnerability
+1. `XpathInjectionRule` (core) — A03, completes the injection family
+2. `ResponseSplittingRule` (spring-boot) — A03, HTTP header injection
+3. `ActuatorEndpointExposedRule` (spring-boot) — A05, Spring Boot actuator leakage
+4. `HttpsNotEnforcedRule` (spring-boot) — A05, cleartext traffic
+5. `DropwizardSensitiveHeaderRule` (dropwizard) — A02, insecure cookie flags
+6. `JaxRsSqlInjectionRule` (dropwizard) — A03, SQL injection via JAX-RS params
+7. `DropwizardOpenRedirectRule` (dropwizard) — A01, open redirect in JAX-RS
+8. `QuarkusReflectionUnsafeRule` (quarkus) — A08, unsafe deserialization via reflection
 
 ---
 

@@ -113,8 +113,14 @@ security-core:
     active: true
   WeakHashAlgorithm:
     active: true
+  TrustAllCerts:
+    active: true
+  HardcodedIv:
+    active: true
   # A03 Injection
   SqlInjection:
+    active: true
+  LdapInjection:
     active: true
   PathTraversal:
     active: true
@@ -143,11 +149,16 @@ security-spring-boot:
   # A01 Broken Access Control
   MissingAuthorization:
     active: true
+  OpenRedirect:
+    active: true
   # A02 Cryptographic Failures
   InsecurePasswordEncoder:
     active: true
   # A03 Injection
   SpelInjection:
+    active: true
+  # A04 Insecure Design
+  MassAssignment:
     active: true
   # A05 Security Misconfiguration
   SpringCsrfDisabled:
@@ -160,6 +171,11 @@ security-quarkus:
   active: true
   # A01 Broken Access Control
   QuarkusMissingAuth:
+    active: true
+  QuarkusPermitAllSensitive:
+    active: true
+  # A03 Injection
+  PanacheRawQuery:
     active: true
   # A07 Identification and Authentication Failures
   QuarkusHardcodedConfigSecret:

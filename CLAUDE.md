@@ -61,21 +61,33 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | OWASP 2021 | Rule | Module | FindSecBugs ID | Status |
 |---|---|---|---|---|
 | A01 Broken Access Control | `MissingAuthorizationRule` | spring-boot | SPRING_ENDPOINT | ✅ |
+| A01 Broken Access Control | `OpenRedirectRule` | spring-boot | SPRING_UNVALIDATED_REDIRECT | ✅ |
 | A01 Broken Access Control | `DropwizardMissingAuthRule` | dropwizard | JAXRS_ENDPOINT | ✅ |
-| A02 Cryptographic Failures | `WeakCipherModeRule` + `ForbiddenMethodCall` (MD5/SHA1) | core | ECB_MODE, DES_USAGE | ✅ |
+| A01 Broken Access Control | `QuarkusMissingAuthRule` | quarkus | JAXRS_ENDPOINT | ✅ |
+| A01 Broken Access Control | `QuarkusPermitAllSensitiveRule` | quarkus | JAXRS_ENDPOINT | ✅ |
+| A02 Cryptographic Failures | `WeakCipherModeRule` | core | ECB_MODE, DES_USAGE | ✅ |
+| A02 Cryptographic Failures | `WeakHashAlgorithmRule` | core | WEAK_MESSAGE_DIGEST_MD5 | ✅ |
+| A02 Cryptographic Failures | `TrustAllCertsRule` | core | WEAK_TRUST_MANAGER | ✅ |
+| A02 Cryptographic Failures | `HardcodedIvRule` | core | STATIC_IV | ✅ |
+| A02 Cryptographic Failures | `InsecurePasswordEncoderRule` | spring-boot | WEAK_PASSWORD_ENCODER | ✅ |
 | A02 Cryptographic Failures | `InsecureTlsProtocolRule` | dropwizard | SSL_CONTEXT | ✅ |
 | A03 Injection — SQL | `SqlInjectionRule` | core | SQL_INJECTION_JPA | ✅ |
+| A03 Injection — LDAP | `LdapInjectionRule` | core | LDAP_INJECTION | ✅ |
 | A03 Injection — Path Traversal | `PathTraversalRule` | core | PATH_TRAVERSAL_IN | ✅ |
-| A03 Injection — Command | `ForbiddenImport` (Runtime) | core | COMMAND_INJECTION | ✅ partial |
+| A03 Injection — Command | `CommandInjectionRule` | core | COMMAND_INJECTION | ✅ |
+| A03 Injection — XXE | `XxeInjectionRule` | core | XXE_DTD | ✅ |
+| A03 Injection — SpEL | `SpelInjectionRule` | spring-boot | SPEL_INJECTION | ✅ |
+| A03 Injection — Panache | `PanacheRawQueryRule` | quarkus | SQL_INJECTION_JPA | ✅ |
+| A04 Insecure Design | `MassAssignmentRule` | spring-boot | MASS_ASSIGNMENT | ✅ |
 | A05 CSRF | `SpringCsrfDisabledRule` | spring-boot | SPRING_CSRF_PROTECTION_DISABLED | ✅ |
 | A05 CORS | `PermissiveCorsRule` | spring-boot | PERMISSIVE_CORS | ✅ |
 | A07 Hardcoded Secrets | `HardcodedCredentialsRule` | core | HARD_CODE_PASSWORD | ✅ |
-| A07 Insecure Random | `InsecureRandomRule` + `ForbiddenImport` | core | PREDICTABLE_RANDOM | ✅ |
+| A07 Hardcoded Secrets | `QuarkusHardcodedConfigSecretRule` | quarkus | HARD_CODE_PASSWORD | ✅ |
+| A07 Insecure Random | `InsecureRandomRule` | core | PREDICTABLE_RANDOM | ✅ |
+| A08 Deserialization | `InsecureDeserializationRule` | core | OBJECT_DESERIALIZATION | ✅ |
 | A09 Sensitive Logging | `SensitiveDataLoggingRule` | core | INFORMATION_EXPOSURE | ✅ |
 | A10 SSRF | `SsrfRule` | core | URLCONNECTION_SSRF_FD | ✅ |
-| A04 Insecure Design | — | — | — | TODO |
 | A06 Vulnerable Components | — | — | — | TODO |
-| A08 Deserialization | `InsecureDeserializationRule` | core | OBJECT_DESERIALIZATION | TODO |
 
 ---
 

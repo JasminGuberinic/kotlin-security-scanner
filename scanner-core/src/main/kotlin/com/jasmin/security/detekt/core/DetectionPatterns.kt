@@ -17,6 +17,11 @@ object DetectionPatterns {
         Regex("""^SHA-?1$""", RegexOption.IGNORE_CASE),
     )
 
+    val TRUST_CHECK_METHODS = setOf("checkClientTrusted", "checkServerTrusted")
+
+    const val IV_CONSTRUCTOR = "IvParameterSpec"
+    const val BYTE_ARRAY_LITERAL = "byteArrayOf"
+
     val WEAK_PASSWORD_ENCODERS = setOf(
         "NoOpPasswordEncoder",
         "Md5PasswordEncoder",
@@ -39,6 +44,17 @@ object DetectionPatterns {
 
     val COMMAND_EXEC_METHODS = setOf("exec")
     const val PROCESS_BUILDER_CLASS = "ProcessBuilder"
+
+    val LDAP_OPERATION_METHODS = setOf("search", "bind", "lookup", "modifyAttributes", "rename")
+
+    const val REDIRECT_PREFIX = "redirect:"
+
+    val PANACHE_QUERY_METHODS = setOf("find", "list", "stream", "count", "delete", "update")
+
+    val JAXRS_WRITE_METHODS = setOf("DELETE", "PUT", "PATCH")
+
+    const val SPRING_REQUEST_BODY_ANNOTATION = "RequestBody"
+    val ENTITY_ANNOTATIONS = setOf("Entity", "Document", "Table")
 
     val XXE_FACTORY_CLASSES = setOf(
         "DocumentBuilderFactory",

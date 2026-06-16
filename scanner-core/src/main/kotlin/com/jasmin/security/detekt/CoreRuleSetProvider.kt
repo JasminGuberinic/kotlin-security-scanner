@@ -1,8 +1,11 @@
 package com.jasmin.security.detekt
 
+import com.jasmin.security.detekt.a02.HardcodedIvRule
+import com.jasmin.security.detekt.a02.TrustAllCertsRule
 import com.jasmin.security.detekt.a02.WeakCipherModeRule
 import com.jasmin.security.detekt.a02.WeakHashAlgorithmRule
 import com.jasmin.security.detekt.a03.CommandInjectionRule
+import com.jasmin.security.detekt.a03.LdapInjectionRule
 import com.jasmin.security.detekt.a03.PathTraversalRule
 import com.jasmin.security.detekt.a03.SqlInjectionRule
 import com.jasmin.security.detekt.a03.XxeInjectionRule
@@ -33,8 +36,11 @@ class CoreRuleSetProvider : RuleSetProvider {
             // A02 Cryptographic Failures
             WeakCipherModeRule(config.subConfig("WeakCipherMode")),
             WeakHashAlgorithmRule(config.subConfig("WeakHashAlgorithm")),
+            TrustAllCertsRule(config.subConfig("TrustAllCerts")),
+            HardcodedIvRule(config.subConfig("HardcodedIv")),
             // A03 Injection
             SqlInjectionRule(config.subConfig("SqlInjection")),
+            LdapInjectionRule(config.subConfig("LdapInjection")),
             PathTraversalRule(config.subConfig("PathTraversal")),
             CommandInjectionRule(config.subConfig("CommandInjection")),
             XxeInjectionRule(config.subConfig("XxeInjection")),
