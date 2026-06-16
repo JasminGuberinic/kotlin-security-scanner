@@ -12,6 +12,19 @@ object DetectionPatterns {
 
     // ── A02 Cryptographic Failures ────────────────────────────────────────────
 
+    val WEAK_HASH_ALGORITHMS = listOf(
+        Regex("""^MD5$""", RegexOption.IGNORE_CASE),
+        Regex("""^SHA-?1$""", RegexOption.IGNORE_CASE),
+    )
+
+    val WEAK_PASSWORD_ENCODERS = setOf(
+        "NoOpPasswordEncoder",
+        "Md5PasswordEncoder",
+        "ShaPasswordEncoder",
+        "LdapShaPasswordEncoder",
+        "MessageDigestPasswordEncoder",
+    )
+
     val WEAK_CIPHER_ALGORITHMS = listOf(
         Regex("""/ECB/""", RegexOption.IGNORE_CASE),
         Regex("""^DES[^e]""", RegexOption.IGNORE_CASE),
@@ -23,6 +36,26 @@ object DetectionPatterns {
     )
 
     // ── A03 Injection ─────────────────────────────────────────────────────────
+
+    val COMMAND_EXEC_METHODS = setOf("exec")
+    const val PROCESS_BUILDER_CLASS = "ProcessBuilder"
+
+    val XXE_FACTORY_CLASSES = setOf(
+        "DocumentBuilderFactory",
+        "SAXParserFactory",
+        "XMLInputFactory",
+        "TransformerFactory",
+        "SchemaFactory",
+    )
+
+    // ── A08 Software and Data Integrity ───────────────────────────────────────
+
+    val UNSAFE_DESERIALIZERS = setOf(
+        "ObjectInputStream",
+        "XMLDecoder",
+    )
+
+    // ── A03 (continued) ───────────────────────────────────────────────────────
 
     val SQL_KEYWORDS = listOf("SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "JOIN")
 
@@ -74,6 +107,10 @@ object DetectionPatterns {
         "credential", "privatekey", "private_key", "accesskey", "access_key",
         "clientsecret", "client_secret", "authorization", "bearer"
     )
+
+    // ── A03 Spring SpEL Injection ─────────────────────────────────────────────
+
+    val SPEL_PARSER_METHODS = setOf("parseExpression", "parseRaw")
 
     // ── A01 Broken Access Control ─────────────────────────────────────────────
 

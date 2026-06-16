@@ -1,10 +1,14 @@
 package com.jasmin.security.detekt
 
 import com.jasmin.security.detekt.a02.WeakCipherModeRule
+import com.jasmin.security.detekt.a02.WeakHashAlgorithmRule
+import com.jasmin.security.detekt.a03.CommandInjectionRule
 import com.jasmin.security.detekt.a03.PathTraversalRule
 import com.jasmin.security.detekt.a03.SqlInjectionRule
+import com.jasmin.security.detekt.a03.XxeInjectionRule
 import com.jasmin.security.detekt.a07.HardcodedCredentialsRule
 import com.jasmin.security.detekt.a07.InsecureRandomRule
+import com.jasmin.security.detekt.a08.InsecureDeserializationRule
 import com.jasmin.security.detekt.a09.SensitiveDataLoggingRule
 import com.jasmin.security.detekt.a10.SsrfRule
 import io.gitlab.arturbosch.detekt.api.Config
@@ -28,12 +32,17 @@ class CoreRuleSetProvider : RuleSetProvider {
         listOf(
             // A02 Cryptographic Failures
             WeakCipherModeRule(config.subConfig("WeakCipherMode")),
+            WeakHashAlgorithmRule(config.subConfig("WeakHashAlgorithm")),
             // A03 Injection
             SqlInjectionRule(config.subConfig("SqlInjection")),
             PathTraversalRule(config.subConfig("PathTraversal")),
+            CommandInjectionRule(config.subConfig("CommandInjection")),
+            XxeInjectionRule(config.subConfig("XxeInjection")),
             // A07 Authentication Failures
             HardcodedCredentialsRule(config.subConfig("HardcodedCredentials")),
             InsecureRandomRule(config.subConfig("InsecureRandom")),
+            // A08 Software and Data Integrity
+            InsecureDeserializationRule(config.subConfig("InsecureDeserialization")),
             // A09 Logging Failures
             SensitiveDataLoggingRule(config.subConfig("SensitiveDataLogging")),
             // A10 Server-Side Request Forgery
