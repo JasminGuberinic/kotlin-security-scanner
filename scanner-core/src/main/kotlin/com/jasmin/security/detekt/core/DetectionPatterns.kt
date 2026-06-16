@@ -93,6 +93,17 @@ object DetectionPatterns {
         "RolesAllowed",
     )
 
+    // ── A01 Quarkus / MicroProfile Access Control ─────────────────────────────
+
+    // Quarkus uses the standard JAX-RS HTTP method annotations (same as Dropwizard)
+    // but adds @Authenticated from io.quarkus.security as an alternative to @RolesAllowed.
+    val QUARKUS_AUTH_ANNOTATIONS = setOf(
+        "RolesAllowed",
+        "DenyAll",
+        "PermitAll",
+        "Authenticated", // io.quarkus.security.Authenticated
+    )
+
     // ── A01 Dropwizard / JAX-RS Access Control ────────────────────────────────
 
     val JAXRS_HTTP_METHODS = setOf(

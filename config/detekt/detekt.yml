@@ -140,6 +140,16 @@ security-spring-boot:
   PermissiveCors:
     active: true
 
+# ─── QUARKUS SECURITY RULES (scanner-quarkus) ────────────────────────────────
+security-quarkus:
+  active: true
+  # A01 Broken Access Control
+  QuarkusMissingAuth:
+    active: true
+  # A07 Identification and Authentication Failures
+  QuarkusHardcodedConfigSecret:
+    active: true
+
 # ─── DROPWIZARD SECURITY RULES (scanner-dropwizard) ──────────────────────────
 security-dropwizard:
   active: true
