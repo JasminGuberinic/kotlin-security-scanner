@@ -125,6 +125,8 @@ security-core:
     active: true
   UnsafeCryptoPaddingOracle:
     active: true
+  InsecurePasswordStorage:
+    active: true
   # A03 Injection
   SqlInjection:
     active: true
@@ -195,6 +197,8 @@ security-spring-boot:
   ELInjection:
     active: true
   SpringDataMongoInjection:
+    active: true
+  ThymeleafSSTI:
     active: true
   # A04 Insecure Design
   MassAssignment:

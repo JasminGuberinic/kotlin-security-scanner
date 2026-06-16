@@ -1,6 +1,7 @@
 package com.jasmin.security.detekt
 
 import com.jasmin.security.detekt.a02.HardcodedIvRule
+import com.jasmin.security.detekt.a02.InsecurePasswordStorageRule
 import com.jasmin.security.detekt.a02.JwtNoneAlgorithmRule
 import com.jasmin.security.detekt.a02.JwtWeakSecretRule
 import com.jasmin.security.detekt.a02.TrustAllCertsRule
@@ -53,6 +54,7 @@ class CoreRuleSetProvider : RuleSetProvider {
             JwtNoneAlgorithmRule(config.subConfig("JwtNoneAlgorithm")),
             JwtWeakSecretRule(config.subConfig("JwtWeakSecret")),
             UnsafeCryptoPaddingOracleRule(config.subConfig("UnsafeCryptoPaddingOracle")),
+            InsecurePasswordStorageRule(config.subConfig("InsecurePasswordStorage")),
             // A03 Injection
             SqlInjectionRule(config.subConfig("SqlInjection")),
             LdapInjectionRule(config.subConfig("LdapInjection")),

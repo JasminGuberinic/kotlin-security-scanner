@@ -12,6 +12,7 @@ import com.jasmin.security.detekt.a03.ELInjectionRule
 import com.jasmin.security.detekt.a03.ResponseSplittingRule
 import com.jasmin.security.detekt.a03.SpelInjectionRule
 import com.jasmin.security.detekt.a03.SpringDataMongoInjectionRule
+import com.jasmin.security.detekt.a03.ThymeleafSSTIRule
 import com.jasmin.security.detekt.a04.MassAssignmentRule
 import com.jasmin.security.detekt.a05.PermissiveCorsRule
 import com.jasmin.security.detekt.a05.SpringCsrfDisabledRule
@@ -47,6 +48,7 @@ class SpringBootRuleSetProvider : RuleSetProvider {
             ResponseSplittingRule(config.subConfig("ResponseSplitting")),
             ELInjectionRule(config.subConfig("ELInjection")),
             SpringDataMongoInjectionRule(config.subConfig("SpringDataMongoInjection")),
+            ThymeleafSSTIRule(config.subConfig("ThymeleafSSTI")),
             // A04 Insecure Design
             MassAssignmentRule(config.subConfig("MassAssignment")),
             // A05 Security Misconfiguration

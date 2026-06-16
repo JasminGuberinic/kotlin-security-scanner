@@ -276,4 +276,19 @@ object DetectionPatterns {
     // ── A02 Dropwizard JWT ────────────────────────────────────────────────────
 
     const val DW_JWT_SECRET_PROVIDER = "setSecretProvider"
+
+    // ── A02 Password Storage ──────────────────────────────────────────────────
+
+    // Algorithms that are cryptographically weak OR lack work-factor/salting for passwords
+    val PASSWORD_WEAK_HASH_ALGORITHMS = setOf("MD5", "SHA", "SHA-1", "SHA-256", "SHA-384", "SHA-512")
+    val PASSWORD_FUNCTION_KEYWORDS = setOf("password", "passwd", "pwd", "credential")
+    const val MESSAGE_DIGEST_GET_INSTANCE = "getInstance"
+    const val MESSAGE_DIGEST_CLASS = "MessageDigest"
+    val DIGEST_UTILS_METHODS = setOf("md5Hex", "sha1Hex", "sha256Hex", "sha384Hex", "sha512Hex")
+    const val DIGEST_UTILS_CLASS = "DigestUtils"
+
+    // ── A03 Thymeleaf SSTI ────────────────────────────────────────────────────
+
+    const val THYMELEAF_PROCESS_METHOD = "process"
+    val THYMELEAF_ENGINE_RECEIVERS = setOf("templateengine", "thymeleaf")
 }
