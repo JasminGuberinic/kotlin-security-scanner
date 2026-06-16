@@ -3,6 +3,7 @@ package com.jasmin.security.detekt
 import com.jasmin.security.detekt.a01.MissingAuthorizationRule
 import com.jasmin.security.detekt.a01.OpenRedirectRule
 import com.jasmin.security.detekt.a02.InsecurePasswordEncoderRule
+import com.jasmin.security.detekt.a03.ResponseSplittingRule
 import com.jasmin.security.detekt.a03.SpelInjectionRule
 import com.jasmin.security.detekt.a04.MassAssignmentRule
 import com.jasmin.security.detekt.a05.PermissiveCorsRule
@@ -30,6 +31,7 @@ class SpringBootRuleSetProvider : RuleSetProvider {
             InsecurePasswordEncoderRule(config.subConfig("InsecurePasswordEncoder")),
             // A03 Injection
             SpelInjectionRule(config.subConfig("SpelInjection")),
+            ResponseSplittingRule(config.subConfig("ResponseSplitting")),
             // A04 Insecure Design
             MassAssignmentRule(config.subConfig("MassAssignment")),
             // A05 Security Misconfiguration

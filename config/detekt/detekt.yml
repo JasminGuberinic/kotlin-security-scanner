@@ -122,6 +122,8 @@ security-core:
     active: true
   LdapInjection:
     active: true
+  XpathInjection:
+    active: true
   PathTraversal:
     active: true
   CommandInjection:
@@ -157,6 +159,8 @@ security-spring-boot:
   # A03 Injection
   SpelInjection:
     active: true
+  ResponseSplitting:
+    active: true
   # A04 Insecure Design
   MassAssignment:
     active: true
@@ -180,6 +184,9 @@ security-quarkus:
   # A07 Identification and Authentication Failures
   QuarkusHardcodedConfigSecret:
     active: true
+  # A08 Software and Data Integrity
+  QuarkusReflectionUnsafe:
+    active: true
 
 # ─── DROPWIZARD SECURITY RULES (scanner-dropwizard) ──────────────────────────
 security-dropwizard:
@@ -187,6 +194,11 @@ security-dropwizard:
   # A01 Broken Access Control
   DropwizardMissingAuth:
     active: true
+  DropwizardOpenRedirect:
+    active: true
   # A02 Cryptographic Failures
   InsecureTlsProtocol:
+    active: true
+  # A05 Security Misconfiguration
+  InsecureCookie:
     active: true

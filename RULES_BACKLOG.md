@@ -40,7 +40,7 @@ HardcodedCredentialsRule, InsecureRandomRule, SensitiveDataLoggingRule, SsrfRule
 | `[x]` | InsecureDeserializationRule | A08 | OBJECT_DESERIALIZATION | `ObjectInputStream(...)` constructor call |
 | `[x]` | WeakHashAlgorithmRule | A02 | WEAK_MESSAGE_DIGEST_MD5, WEAK_MESSAGE_DIGEST_SHA1 | `MessageDigest.getInstance("MD5"\|"SHA-1"\|"SHA1")` |
 | `[x]` | LdapInjectionRule | A03 | LDAP_INJECTION | string interpolation / `+` inside `search(`, `bind(` call argument |
-| `[ ]` | XpathInjectionRule | A03 | XPATH_INJECTION | string interpolation / `+` passed to `xpath.evaluate(`, `compile(` |
+| `[x]` | XpathInjectionRule | A03 | XPATH_INJECTION | string interpolation / `+` passed to `xpath.evaluate(`, `compile(` |
 | `[x]` | TrustAllCertsRule | A02 | WEAK_TRUST_MANAGER | anonymous `X509TrustManager` with empty `checkClientTrusted`/`checkServerTrusted` |
 | `[x]` | HardcodedIvRule | A02 | STATIC_IV | `IvParameterSpec(byteArrayOf(...))` with literal byte array — IV must be random |
 
@@ -61,7 +61,7 @@ Existing: MissingAuthorizationRule, SpringCsrfDisabledRule, PermissiveCorsRule
 | `[ ]` | ActuatorEndpointExposedRule | A05 | SPRING_ACTUATOR | `management.endpoints.web.exposure.include=*` in properties — flag `"*"` string literal in `@Value` or config class |
 | `[ ]` | HttpsNotEnforcedRule | A05 | INSECURE_CHANNEL | `HttpSecurity` config block that never calls `.requiresChannel()` or `.redirectToHttps()` |
 | `[x]` | OpenRedirectRule | A01 | SPRING_UNVALIDATED_REDIRECT | `return "redirect:" + variable` in a `@Controller` method |
-| `[ ]` | ResponseSplittingRule | A03 | HTTP_RESPONSE_SPLITTING | `response.addHeader(name, variable)` or `response.setHeader(name, variable)` where value is non-literal |
+| `[x]` | ResponseSplittingRule | A03 | HTTP_RESPONSE_SPLITTING | `response.addHeader(name, variable)` or `response.setHeader(name, variable)` where value is non-literal |
 
 ---
 
@@ -73,9 +73,9 @@ Existing: DropwizardMissingAuthRule, InsecureTlsProtocolRule
 |--------|------|-------|----------------|-----------------|
 | `[x]` | DropwizardMissingAuthRule | A01 | JAXRS_ENDPOINT | JAX-RS `@GET` etc. without `@RolesAllowed`/`@Auth`/`@DenyAll` |
 | `[x]` | InsecureTlsProtocolRule | A02 | SSL_CONTEXT | `setSupportedProtocols("TLSv1.0"\|"SSLv3"...)` |
-| `[ ]` | DropwizardSensitiveHeaderRule | A02 | INSECURE_COOKIE | `Response.ok().header("Set-Cookie", value)` without `Secure` or `HttpOnly` flags in literal |
+| `[x]` | InsecureCookieRule | A05 | INSECURE_COOKIE | `NewCookie(name, value)` 2-arg constructor or 8-arg with `secure=false` |
 | `[ ]` | JaxRsSqlInjectionRule | A03 | SQL_INJECTION_JPA | Same as core but specifically in `@GET`/`@POST` resource methods with `@QueryParam`-derived values passed to DB calls |
-| `[ ]` | DropwizardOpenRedirectRule | A01 | UNVALIDATED_REDIRECT | `Response.seeOther(URI(variable))` where variable comes from request param |
+| `[x]` | DropwizardOpenRedirectRule | A01 | UNVALIDATED_REDIRECT | `Response.seeOther(URI(variable))` where variable comes from request param |
 
 ---
 
@@ -88,21 +88,16 @@ Existing: QuarkusMissingAuthRule, QuarkusHardcodedConfigSecretRule
 | `[x]` | QuarkusMissingAuthRule | A01 | JAXRS_ENDPOINT | JAX-RS without `@RolesAllowed`/`@Authenticated`/`@PermitAll`/`@DenyAll` |
 | `[x]` | QuarkusHardcodedConfigSecretRule | A07 | HARD_CODE_PASSWORD | `@ConfigProperty(name="secret", defaultValue="hardcoded")` |
 | `[x]` | QuarkusPermitAllSensitiveRule | A01 | JAXRS_ENDPOINT | `@PermitAll` combined with `@DELETE`/`@PUT` — explicitly public write operations |
-| `[ ]` | QuarkusReflectionUnsafeRule | A08 | OBJECT_DESERIALIZATION | `@RegisterForReflection` on class that implements `Serializable` and overrides `readObject` |
+| `[x]` | QuarkusReflectionUnsafeRule | A08 | OBJECT_DESERIALIZATION | `@RegisterForReflection` on class that implements `Serializable` and overrides `readObject` |
 | `[x]` | PanacheRawQueryRule | A03 | SQL_INJECTION_JPA | `PanacheEntity.find(string_with_interpolation)` or `PanacheRepository.find(var)` — Panache raw query with non-literal |
 
 ---
 
 ## Priority order for next session
 
-1. `XpathInjectionRule` (core) — A03, completes the injection family
-2. `ResponseSplittingRule` (spring-boot) — A03, HTTP header injection
-3. `ActuatorEndpointExposedRule` (spring-boot) — A05, Spring Boot actuator leakage
-4. `HttpsNotEnforcedRule` (spring-boot) — A05, cleartext traffic
-5. `DropwizardSensitiveHeaderRule` (dropwizard) — A02, insecure cookie flags
-6. `JaxRsSqlInjectionRule` (dropwizard) — A03, SQL injection via JAX-RS params
-7. `DropwizardOpenRedirectRule` (dropwizard) — A01, open redirect in JAX-RS
-8. `QuarkusReflectionUnsafeRule` (quarkus) — A08, unsafe deserialization via reflection
+1. `JaxRsSqlInjectionRule` (dropwizard) — A03, SQL injection in JAX-RS @QueryParam methods
+2. `ActuatorEndpointExposedRule` (spring-boot) — A05, Spring Boot actuator exposure
+3. `HttpsNotEnforcedRule` (spring-boot) — A05, cleartext HTTP allowed in SecurityFilterChain
 
 ---
 

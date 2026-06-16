@@ -63,6 +63,7 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | A01 Broken Access Control | `MissingAuthorizationRule` | spring-boot | SPRING_ENDPOINT | ✅ |
 | A01 Broken Access Control | `OpenRedirectRule` | spring-boot | SPRING_UNVALIDATED_REDIRECT | ✅ |
 | A01 Broken Access Control | `DropwizardMissingAuthRule` | dropwizard | JAXRS_ENDPOINT | ✅ |
+| A01 Broken Access Control | `DropwizardOpenRedirectRule` | dropwizard | UNVALIDATED_REDIRECT | ✅ |
 | A01 Broken Access Control | `QuarkusMissingAuthRule` | quarkus | JAXRS_ENDPOINT | ✅ |
 | A01 Broken Access Control | `QuarkusPermitAllSensitiveRule` | quarkus | JAXRS_ENDPOINT | ✅ |
 | A02 Cryptographic Failures | `WeakCipherModeRule` | core | ECB_MODE, DES_USAGE | ✅ |
@@ -71,12 +72,15 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | A02 Cryptographic Failures | `HardcodedIvRule` | core | STATIC_IV | ✅ |
 | A02 Cryptographic Failures | `InsecurePasswordEncoderRule` | spring-boot | WEAK_PASSWORD_ENCODER | ✅ |
 | A02 Cryptographic Failures | `InsecureTlsProtocolRule` | dropwizard | SSL_CONTEXT | ✅ |
+| A05 Security Misconfiguration | `InsecureCookieRule` | dropwizard | INSECURE_COOKIE | ✅ |
 | A03 Injection — SQL | `SqlInjectionRule` | core | SQL_INJECTION_JPA | ✅ |
 | A03 Injection — LDAP | `LdapInjectionRule` | core | LDAP_INJECTION | ✅ |
+| A03 Injection — XPath | `XpathInjectionRule` | core | XPATH_INJECTION | ✅ |
 | A03 Injection — Path Traversal | `PathTraversalRule` | core | PATH_TRAVERSAL_IN | ✅ |
 | A03 Injection — Command | `CommandInjectionRule` | core | COMMAND_INJECTION | ✅ |
 | A03 Injection — XXE | `XxeInjectionRule` | core | XXE_DTD | ✅ |
 | A03 Injection — SpEL | `SpelInjectionRule` | spring-boot | SPEL_INJECTION | ✅ |
+| A03 Injection — Response Splitting | `ResponseSplittingRule` | spring-boot | HTTP_RESPONSE_SPLITTING | ✅ |
 | A03 Injection — Panache | `PanacheRawQueryRule` | quarkus | SQL_INJECTION_JPA | ✅ |
 | A04 Insecure Design | `MassAssignmentRule` | spring-boot | MASS_ASSIGNMENT | ✅ |
 | A05 CSRF | `SpringCsrfDisabledRule` | spring-boot | SPRING_CSRF_PROTECTION_DISABLED | ✅ |
@@ -85,6 +89,7 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | A07 Hardcoded Secrets | `QuarkusHardcodedConfigSecretRule` | quarkus | HARD_CODE_PASSWORD | ✅ |
 | A07 Insecure Random | `InsecureRandomRule` | core | PREDICTABLE_RANDOM | ✅ |
 | A08 Deserialization | `InsecureDeserializationRule` | core | OBJECT_DESERIALIZATION | ✅ |
+| A08 Deserialization | `QuarkusReflectionUnsafeRule` | quarkus | OBJECT_DESERIALIZATION | ✅ |
 | A09 Sensitive Logging | `SensitiveDataLoggingRule` | core | INFORMATION_EXPOSURE | ✅ |
 | A10 SSRF | `SsrfRule` | core | URLCONNECTION_SSRF_FD | ✅ |
 | A06 Vulnerable Components | — | — | — | TODO |

@@ -8,6 +8,7 @@ import com.jasmin.security.detekt.a03.CommandInjectionRule
 import com.jasmin.security.detekt.a03.LdapInjectionRule
 import com.jasmin.security.detekt.a03.PathTraversalRule
 import com.jasmin.security.detekt.a03.SqlInjectionRule
+import com.jasmin.security.detekt.a03.XpathInjectionRule
 import com.jasmin.security.detekt.a03.XxeInjectionRule
 import com.jasmin.security.detekt.a07.HardcodedCredentialsRule
 import com.jasmin.security.detekt.a07.InsecureRandomRule
@@ -41,6 +42,7 @@ class CoreRuleSetProvider : RuleSetProvider {
             // A03 Injection
             SqlInjectionRule(config.subConfig("SqlInjection")),
             LdapInjectionRule(config.subConfig("LdapInjection")),
+            XpathInjectionRule(config.subConfig("XpathInjection")),
             PathTraversalRule(config.subConfig("PathTraversal")),
             CommandInjectionRule(config.subConfig("CommandInjection")),
             XxeInjectionRule(config.subConfig("XxeInjection")),

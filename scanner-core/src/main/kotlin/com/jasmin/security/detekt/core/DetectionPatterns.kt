@@ -47,6 +47,10 @@ object DetectionPatterns {
 
     val LDAP_OPERATION_METHODS = setOf("search", "bind", "lookup", "modifyAttributes", "rename")
 
+    val XPATH_EXPRESSION_METHODS = setOf("evaluate", "selectNodes", "selectSingleNode")
+
+    val HTTP_HEADER_SETTER_METHODS = setOf("addHeader", "setHeader")
+
     const val REDIRECT_PREFIX = "redirect:"
 
     val PANACHE_QUERY_METHODS = setOf("find", "list", "stream", "count", "delete", "update")
@@ -175,6 +179,18 @@ object DetectionPatterns {
         "Auth",
         "PermitAll",
     )
+
+    // ── A01 Dropwizard open redirect ─────────────────────────────────────────
+
+    val JAXRS_REDIRECT_METHODS = setOf("seeOther", "temporaryRedirect")
+
+    // ── A05 Dropwizard insecure cookie ────────────────────────────────────────
+
+    const val NEW_COOKIE = "NewCookie"
+
+    // ── A08 Quarkus reflection ────────────────────────────────────────────────
+
+    const val REGISTER_FOR_REFLECTION = "RegisterForReflection"
 
     // ── A02 Dropwizard insecure TLS ───────────────────────────────────────────
 
