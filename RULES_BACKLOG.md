@@ -45,6 +45,8 @@ HardcodedCredentialsRule, InsecureRandomRule, SensitiveDataLoggingRule, SsrfRule
 | `[x]` | ReflectionInjectionRule | A03 | REFLECTOR_BASED_INJECTION | `Class.forName(var)` with non-literal — attacker-chosen class loading |
 | `[x]` | TrustAllCertsRule | A02 | WEAK_TRUST_MANAGER | anonymous `X509TrustManager` with empty `checkClientTrusted`/`checkServerTrusted` |
 | `[x]` | HardcodedIvRule | A02 | STATIC_IV | `IvParameterSpec(byteArrayOf(...))` with literal byte array — IV must be random |
+| `[x]` | WeakRsaKeyRule | A02 | WEAK_KEY_SIZE | `KeyPairGenerator.initialize(size)` where size ≤ 1024 |
+| `[x]` | GroovyScriptInjectionRule | A03 | SCRIPT_ENGINE_INJECTION | `GroovyShell().evaluate(var)` / `ScriptEngine.eval(var)` with non-literal |
 
 ---
 
@@ -65,6 +67,8 @@ Existing: MissingAuthorizationRule, SpringCsrfDisabledRule, PermissiveCorsRule
 | `[ ]` | HttpsNotEnforcedRule | A05 | INSECURE_CHANNEL | `HttpSecurity` config block that never calls `.requiresChannel()` or `.redirectToHttps()` |
 | `[x]` | OpenRedirectRule | A01 | SPRING_UNVALIDATED_REDIRECT | `return "redirect:" + variable` in a `@Controller` method |
 | `[x]` | ResponseSplittingRule | A03 | HTTP_RESPONSE_SPLITTING | `response.addHeader(name, variable)` or `response.setHeader(name, variable)` where value is non-literal |
+| `[x]` | ELInjectionRule | A03 | EL_INJECTION | `ELProcessor().eval(var)` / `factory.createValueExpression(var, ...)` with non-literal |
+| `[x]` | CsrfTokenLeakRule | A01 | CSRF_TOKEN_INTROSPECTION | `model.addAttribute("csrf\|xsrf...", token)` — CSRF token exposed via model |
 
 ---
 
@@ -93,17 +97,24 @@ Existing: QuarkusMissingAuthRule, QuarkusHardcodedConfigSecretRule
 | `[x]` | QuarkusPermitAllSensitiveRule | A01 | JAXRS_ENDPOINT | `@PermitAll` combined with `@DELETE`/`@PUT` — explicitly public write operations |
 | `[x]` | QuarkusReflectionUnsafeRule | A08 | OBJECT_DESERIALIZATION | `@RegisterForReflection` on class that implements `Serializable` and overrides `readObject` |
 | `[x]` | PanacheRawQueryRule | A03 | SQL_INJECTION_JPA | `PanacheEntity.find(string_with_interpolation)` or `PanacheRepository.find(var)` — Panache raw query with non-literal |
+| `[x]` | QuarkusUnsafeHeaderRule | A05 | HTTP_RESPONSE_SPLITTING | `Response.header(name, var)` where value is non-literal — CR/LF enables response splitting |
 
 ---
 
 ## Priority order for next session
 
-Backlog is nearly exhausted — suggest new community-attractive rules:
-1. `WeakRsaKeyRule` (core/A02) — `KeyPairGenerator.initialize(size)` where size ≤ 1024
-2. `GroovyScriptInjectionRule` (core/A03) — `GroovyShell().evaluate(userInput)` / `ScriptEngine.eval(var)`
-3. `ELInjectionRule` (spring-boot/A03) — `ELProcessor().eval(var)` / JUEL `ExpressionFactory.eval(var)`
-4. `CsrfTokenLeakRule` (spring-boot/A01) — CSRF token logged or returned in response body
-5. `QuarkusUnsafeHeaderRule` (quarkus/A05) — `@Produces` on endpoint returning dynamic `MediaType`
+All planned rules are done. Total: 30 rules across 4 modules.
+Backlog is exhausted — suggest new community-attractive rules:
+- `ActuatorEndpointExposedRule` (spring-boot/A05) — requires negative config detection
+- `HttpsNotEnforcedRule` (spring-boot/A05) — requires absence-of-call detection
+- `JaxRsSqlInjectionRule` (dropwizard/A03) — overlaps too much with core SqlInjectionRule
+
+Recently added (this session):
+1. `WeakRsaKeyRule` (core/A02) ✅
+2. `GroovyScriptInjectionRule` (core/A03) ✅
+3. `ELInjectionRule` (spring-boot/A03) ✅
+4. `CsrfTokenLeakRule` (spring-boot/A01) ✅
+5. `QuarkusUnsafeHeaderRule` (quarkus/A05) ✅
 
 ---
 

@@ -54,6 +54,14 @@ object DetectionPatterns {
     const val CLASS_FOR_NAME_METHOD = "forName"
     const val CLASS_FOR_NAME_RECEIVER = "Class"
 
+    const val KEY_GEN_INIT_METHOD = "initialize"
+
+    val SCRIPT_EVAL_METHODS = setOf("evaluate", "eval")
+
+    val EL_EVAL_METHODS = setOf("eval", "createValueExpression")
+
+    val CSRF_TOKEN_KEYWORDS = setOf("csrf", "xsrf")
+
     val HTTP_HEADER_SETTER_METHODS = setOf("addHeader", "setHeader")
 
     const val REDIRECT_PREFIX = "redirect:"

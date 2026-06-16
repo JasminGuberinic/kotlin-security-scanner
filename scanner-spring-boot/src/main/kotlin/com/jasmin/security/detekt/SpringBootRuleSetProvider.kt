@@ -1,9 +1,11 @@
 package com.jasmin.security.detekt
 
+import com.jasmin.security.detekt.a01.CsrfTokenLeakRule
 import com.jasmin.security.detekt.a01.DisabledHttpSecurityRule
 import com.jasmin.security.detekt.a01.MissingAuthorizationRule
 import com.jasmin.security.detekt.a01.OpenRedirectRule
 import com.jasmin.security.detekt.a02.InsecurePasswordEncoderRule
+import com.jasmin.security.detekt.a03.ELInjectionRule
 import com.jasmin.security.detekt.a03.ResponseSplittingRule
 import com.jasmin.security.detekt.a03.SpelInjectionRule
 import com.jasmin.security.detekt.a04.MassAssignmentRule
@@ -29,11 +31,13 @@ class SpringBootRuleSetProvider : RuleSetProvider {
             MissingAuthorizationRule(config.subConfig("MissingAuthorization")),
             OpenRedirectRule(config.subConfig("OpenRedirect")),
             DisabledHttpSecurityRule(config.subConfig("DisabledHttpSecurity")),
+            CsrfTokenLeakRule(config.subConfig("CsrfTokenLeak")),
             // A02 Cryptographic Failures
             InsecurePasswordEncoderRule(config.subConfig("InsecurePasswordEncoder")),
             // A03 Injection
             SpelInjectionRule(config.subConfig("SpelInjection")),
             ResponseSplittingRule(config.subConfig("ResponseSplitting")),
+            ELInjectionRule(config.subConfig("ELInjection")),
             // A04 Insecure Design
             MassAssignmentRule(config.subConfig("MassAssignment")),
             // A05 Security Misconfiguration

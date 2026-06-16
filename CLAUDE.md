@@ -71,6 +71,7 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | A02 Cryptographic Failures | `WeakHashAlgorithmRule` | core | WEAK_MESSAGE_DIGEST_MD5 | ✅ |
 | A02 Cryptographic Failures | `TrustAllCertsRule` | core | WEAK_TRUST_MANAGER | ✅ |
 | A02 Cryptographic Failures | `HardcodedIvRule` | core | STATIC_IV | ✅ |
+| A02 Cryptographic Failures | `WeakRsaKeyRule` | core | WEAK_KEY_SIZE | ✅ |
 | A02 Cryptographic Failures | `InsecurePasswordEncoderRule` | spring-boot | WEAK_PASSWORD_ENCODER | ✅ |
 | A02 Cryptographic Failures | `InsecureTlsProtocolRule` | dropwizard | SSL_CONTEXT | ✅ |
 | A05 Security Misconfiguration | `InsecureCookieRule` | dropwizard | INSECURE_COOKIE | ✅ |
@@ -85,9 +86,13 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | A03 Injection — SpEL | `SpelInjectionRule` | spring-boot | SPEL_INJECTION | ✅ |
 | A03 Injection — Response Splitting | `ResponseSplittingRule` | spring-boot | HTTP_RESPONSE_SPLITTING | ✅ |
 | A03 Injection — Panache | `PanacheRawQueryRule` | quarkus | SQL_INJECTION_JPA | ✅ |
+| A03 Injection — Groovy Script | `GroovyScriptInjectionRule` | core | SCRIPT_ENGINE_INJECTION | ✅ |
+| A03 Injection — EL | `ELInjectionRule` | spring-boot | EL_INJECTION | ✅ |
 | A04 Insecure Design | `MassAssignmentRule` | spring-boot | MASS_ASSIGNMENT | ✅ |
+| A01 CSRF Token Leak | `CsrfTokenLeakRule` | spring-boot | CSRF_TOKEN_INTROSPECTION | ✅ |
 | A05 CSRF | `SpringCsrfDisabledRule` | spring-boot | SPRING_CSRF_PROTECTION_DISABLED | ✅ |
 | A05 CORS | `PermissiveCorsRule` | spring-boot | PERMISSIVE_CORS | ✅ |
+| A05 Security Misconfiguration | `QuarkusUnsafeHeaderRule` | quarkus | HTTP_RESPONSE_SPLITTING | ✅ |
 | A07 Hardcoded Secrets | `HardcodedCredentialsRule` | core | HARD_CODE_PASSWORD | ✅ |
 | A07 Hardcoded Secrets | `QuarkusHardcodedConfigSecretRule` | quarkus | HARD_CODE_PASSWORD | ✅ |
 | A07 Insecure Random | `InsecureRandomRule` | core | PREDICTABLE_RANDOM | ✅ |

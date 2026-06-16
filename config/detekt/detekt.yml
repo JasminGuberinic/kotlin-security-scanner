@@ -117,6 +117,8 @@ security-core:
     active: true
   HardcodedIv:
     active: true
+  WeakRsaKey:
+    active: true
   # A03 Injection
   SqlInjection:
     active: true
@@ -133,6 +135,8 @@ security-core:
   CommandInjection:
     active: true
   XxeInjection:
+    active: true
+  GroovyScriptInjection:
     active: true
   # A07 Authentication Failures
   HardcodedCredentials:
@@ -159,6 +163,8 @@ security-spring-boot:
     active: true
   DisabledHttpSecurity:
     active: true
+  CsrfTokenLeak:
+    active: true
   # A02 Cryptographic Failures
   InsecurePasswordEncoder:
     active: true
@@ -166,6 +172,8 @@ security-spring-boot:
   SpelInjection:
     active: true
   ResponseSplitting:
+    active: true
+  ELInjection:
     active: true
   # A04 Insecure Design
   MassAssignment:
@@ -186,6 +194,9 @@ security-quarkus:
     active: true
   # A03 Injection
   PanacheRawQuery:
+    active: true
+  # A05 Security Misconfiguration
+  QuarkusUnsafeHeader:
     active: true
   # A07 Identification and Authentication Failures
   QuarkusHardcodedConfigSecret:

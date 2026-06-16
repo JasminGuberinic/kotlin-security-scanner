@@ -3,6 +3,7 @@ package com.jasmin.security.detekt
 import com.jasmin.security.detekt.a01.QuarkusMissingAuthRule
 import com.jasmin.security.detekt.a01.QuarkusPermitAllSensitiveRule
 import com.jasmin.security.detekt.a03.PanacheRawQueryRule
+import com.jasmin.security.detekt.a05.QuarkusUnsafeHeaderRule
 import com.jasmin.security.detekt.a07.QuarkusHardcodedConfigSecretRule
 import com.jasmin.security.detekt.a08.QuarkusReflectionUnsafeRule
 import io.gitlab.arturbosch.detekt.api.Config
@@ -31,6 +32,8 @@ class QuarkusRuleSetProvider : RuleSetProvider {
             PanacheRawQueryRule(config.subConfig("PanacheRawQuery")),
             // A07 Identification and Authentication Failures
             QuarkusHardcodedConfigSecretRule(config.subConfig("QuarkusHardcodedConfigSecret")),
+            // A05 Security Misconfiguration
+            QuarkusUnsafeHeaderRule(config.subConfig("QuarkusUnsafeHeader")),
             // A08 Software and Data Integrity
             QuarkusReflectionUnsafeRule(config.subConfig("QuarkusReflectionUnsafe")),
         )

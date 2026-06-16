@@ -4,7 +4,9 @@ import com.jasmin.security.detekt.a02.HardcodedIvRule
 import com.jasmin.security.detekt.a02.TrustAllCertsRule
 import com.jasmin.security.detekt.a02.WeakCipherModeRule
 import com.jasmin.security.detekt.a02.WeakHashAlgorithmRule
+import com.jasmin.security.detekt.a02.WeakRsaKeyRule
 import com.jasmin.security.detekt.a03.CommandInjectionRule
+import com.jasmin.security.detekt.a03.GroovyScriptInjectionRule
 import com.jasmin.security.detekt.a03.JndiInjectionRule
 import com.jasmin.security.detekt.a03.LdapInjectionRule
 import com.jasmin.security.detekt.a03.PathTraversalRule
@@ -41,6 +43,7 @@ class CoreRuleSetProvider : RuleSetProvider {
             WeakHashAlgorithmRule(config.subConfig("WeakHashAlgorithm")),
             TrustAllCertsRule(config.subConfig("TrustAllCerts")),
             HardcodedIvRule(config.subConfig("HardcodedIv")),
+            WeakRsaKeyRule(config.subConfig("WeakRsaKey")),
             // A03 Injection
             SqlInjectionRule(config.subConfig("SqlInjection")),
             LdapInjectionRule(config.subConfig("LdapInjection")),
@@ -50,6 +53,7 @@ class CoreRuleSetProvider : RuleSetProvider {
             PathTraversalRule(config.subConfig("PathTraversal")),
             CommandInjectionRule(config.subConfig("CommandInjection")),
             XxeInjectionRule(config.subConfig("XxeInjection")),
+            GroovyScriptInjectionRule(config.subConfig("GroovyScriptInjection")),
             // A07 Authentication Failures
             HardcodedCredentialsRule(config.subConfig("HardcodedCredentials")),
             InsecureRandomRule(config.subConfig("InsecureRandom")),
