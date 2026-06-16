@@ -276,12 +276,107 @@ fun KtAnnotationEntry.literalArg(name: String): String? {
 
 ---
 
-## Backlog — next 5 rules (pre-researched, ready to implement)
+## Backlog — Phase 2 rules (pre-researched, ready to implement)
 
-| Rule | Module | OWASP | FindSecBugs | Detection pattern |
-|------|--------|-------|-------------|-------------------|
-| `WeakRsaKeyRule` | core | A02 | BLOWFISH_KEY_SIZE, RSA_KEY_SIZE | `callee == "initialize"` + first arg is `KtConstantExpression` ≤ 1024; add `@Suppress("MagicNumber")`. Add `const val KEY_GEN_INIT = "initialize"` to patterns. |
-| `GroovyScriptInjectionRule` | core | A03 | GROOVY_SHELL | `callee == "evaluate"` + arg is non-literal; OR `callee == "eval"` + receiver contains "ScriptEngine". Add `val SCRIPT_EVAL_METHODS = setOf("evaluate", "eval")`. |
-| `ELInjectionRule` | spring-boot | A03 | EL_INJECTION | `callee == "eval"` + receiver ends with "ELProcessor"; OR `callee == "createValueExpression"` + first arg non-literal. Add `val EL_EVAL_METHODS = setOf("eval", "createValueExpression")`. |
-| `CsrfTokenLeakRule` | spring-boot | A01 | SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING | `callee == "addAttribute"` + first arg literal containing "csrf" or "token" + second arg non-literal. Flag when CSRF token is exposed in model attributes. Add `val CSRF_TOKEN_KEYWORDS = setOf("csrf", "_csrf", "csrfToken")`. |
-| `QuarkusUnsafeHeaderRule` | quarkus | A05 | HTTP_RESPONSE_SPLITTING | `callee == "header"` + second arg is non-literal; scoped to JAX-RS `Response` builder chain — check receiver text contains "Response" or parent is dot-qualified expression. Reuse `HTTP_HEADER_SETTER_METHODS` from core DetectionPatterns. |
+All rules below are verified absent from free Kotlin security tools. Full detection notes in `RULES_BACKLOG.md`.
+Pick from Priority 1 first — those are unique to this tool. Properties-file rules (Priority 2) need `FileProcessListener`.
+
+### Priority 1 — Unique (Kotlin-only, PSI-based)
+
+| Rule | Module | OWASP | Key pattern |
+|------|--------|-------|-------------|
+| `CoroutineSecurityContextLossRule` | spring-boot | A01 | `visitNamedFunction` → `annotationNames()` contains "PreAuthorize"/"PostAuthorize" + function has `suspend` modifier (`modifierList?.hasModifier(KtTokens.SUSPEND_KEYWORD) == true`) |
+| `ThymeleafSSTIRule` | spring-boot | A03 | `visitNamedFunction` → has `@GetMapping`/`@PostMapping`/`@RequestMapping` + return type is `String` + body contains string `+` or interpolation with `@RequestParam`/`@PathVariable` param names |
+| `JacksonUnsafeDeserializationRule` | core | A08 | `visitCallExpression` callee in `setOf("enableDefaultTyping","activateDefaultTyping")` → flag always. Also `visitAnnotationEntry` shortName == "JsonTypeInfo" + `literalArg("use")` == "Id.CLASS" |
+| `JwtNoneAlgorithmRule` | core | A02 | `visitCallExpression` callee == "signWith" + first arg text contains "NONE"; OR callee == "none" + `receiverText()` ends with "Algorithm" |
+| `QuarkusJsonBeforeAuthRule` | quarkus | A01 | `visitClass` → has `@Path` + no class-level `@RolesAllowed`/`@Authenticated` + has method with body param (not annotated) |
+
+### Priority 2 — Properties-file scanning
+
+**Different approach — NOT a `Rule` subclass. Use `FileProcessListener`:**
+
+```kotlin
+class InsecureActuatorExposureListener : FileProcessListener {
+    override fun onProcess(file: KtFile, bindingContext: BindingContext) {
+        // Only process .properties / .yml files
+        // Check raw file.text for the bad pattern
+    }
+}
+```
+Register in: `META-INF/services/io.gitlab.arturbosch.detekt.api.FileProcessListener`
+
+| Rule | Module | OWASP | Property key to scan |
+|------|--------|-------|---------------------|
+| `InsecureActuatorExposureRule` | spring-boot | A05 | `management.endpoints.web.exposure.include` value == `*` |
+| `QuarkusBuildTimeSecretLeakRule` | quarkus | A05 | key matches `*password*`/`*secret*`/`*token*` + value NOT `${...}` in `%prod` section |
+| `QuarkusOidcInsecureConfigRule` | quarkus | A07 | `quarkus.oidc.token.issuer=any` or missing `quarkus.oidc.auth-server-url` |
+| `InsecureSmtpConfigRule` | spring-boot | A02 | `spring.mail.properties.mail.smtp.starttls.enable=false` |
+
+### Priority 3 — Coverage gaps
+
+| Rule | Module | OWASP | Key pattern |
+|------|--------|-------|-------------|
+| `JwtWeakSecretRule` | core | A02 | `visitCallExpression` callee in `setOf("HMAC256","HMAC384","HMAC512","signWith")` + arg `firstArgIsLiteral()` |
+| `WebClientSSRFRule` | spring-boot | A10 | callee == "create"/"uri" + `receiverText()` contains "WebClient" + arg NOT literal |
+| `SpringDataMongoInjectionRule` | spring-boot | A03 | callee == "where" + `receiverText()` contains "Criteria" + arg non-literal |
+| `DropwizardSelfValidatingELRule` | dropwizard | A03 | callee == "buildConstraintViolationWithTemplate" + arg non-literal |
+| `MissingHttpsRedirectRule` | spring-boot | A02 | `visitNamedFunction` → `@Bean` + return type `SecurityFilterChain` + body does NOT contain "requiresChannel"/"requiresSecure" |
+| `InsecureRedisConnectionRule` | spring-boot | A02 | callee == "RedisStandaloneConfiguration"/"LettuceConnectionFactory" → flag unless chained `.useSsl(true)` found |
+| `UnsafeCryptoPaddingOracleRule` | core | A02 | callee == "getInstance" + arg literal == "AES/CBC/PKCS5Padding" → flag always (use GCM instead) |
+| `RegexDenialOfServiceRule` | core | A06 | callee == "Regex"/"toRegex" + literal arg matches `\(.*\+\).*\+` or `\(\[.*\]\*\).*` ReDoS patterns |
+| `XmlMapperUnsafeRule` | core | A08 | callee == "XmlMapper" (constructor call, no receiver) → flag always |
+| `InsecurePasswordStorageRule` | core | A02 | callee == "getInstance"/"sha256Hex" + receiver/callee context near "password"/"passwd" variable → flag |
+| `DropwizardUnencryptedJwtSecretRule` | dropwizard | A02 | callee == "setSecretProvider" + arg `firstArgIsLiteral()` |
+
+---
+
+## New PSI patterns for Phase 2 rules
+
+### Check for `suspend` modifier on a function
+```kotlin
+override fun visitNamedFunction(function: KtNamedFunction) {
+    super.visitNamedFunction(function)
+    if (!function.hasModifier(KtTokens.SUSPEND_KEYWORD)) return
+    val annotations = function.annotationNames()
+    if ("PreAuthorize" !in annotations && "PostAuthorize" !in annotations) return
+    reportAt(function, "...")
+}
+// Import: import org.jetbrains.kotlin.lexer.KtTokens
+```
+
+### Check annotations on a class (vs method)
+```kotlin
+override fun visitClass(klass: KtClass) {
+    super.visitClass(klass)
+    val classAnnotations = klass.annotationEntries
+        .mapNotNull { it.shortName?.asString() }.toSet()
+    val methodAnnotations = klass.declarations
+        .filterIsInstance<KtNamedFunction>()
+        .flatMap { it.annotationEntries }
+        .mapNotNull { it.shortName?.asString() }.toSet()
+}
+```
+
+### Detect absence of a call in a function body
+```kotlin
+override fun visitNamedFunction(function: KtNamedFunction) {
+    super.visitNamedFunction(function)
+    if ("Bean" !in function.annotationNames()) return
+    val bodyText = function.bodyExpression?.text ?: return
+    if ("requiresChannel" in bodyText || "requiresSecure" in bodyText) return
+    reportAt(function, "SecurityFilterChain missing HTTPS redirect enforcement")
+}
+```
+
+### visitAnnotationEntry (for @JsonTypeInfo check)
+```kotlin
+override fun visitAnnotationEntry(annotationEntry: KtAnnotationEntry) {
+    super.visitAnnotationEntry(annotationEntry)
+    if (annotationEntry.shortName?.asString() != "JsonTypeInfo") return
+    val useArg = annotationEntry.literalArg("use") ?: return
+    if ("CLASS" in useArg || "MINIMAL_CLASS" in useArg) {
+        reportAt(annotationEntry, "...")
+    }
+}
+// Import: import org.jetbrains.kotlin.psi.KtAnnotationEntry
+```

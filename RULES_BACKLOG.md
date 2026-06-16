@@ -101,20 +101,111 @@ Existing: QuarkusMissingAuthRule, QuarkusHardcodedConfigSecretRule
 
 ---
 
-## Priority order for next session
+## Phase 2 — Research-backed rules (ready to implement, 2026-06-16)
 
-All planned rules are done. Total: 30 rules across 4 modules.
-Backlog is exhausted — suggest new community-attractive rules:
-- `ActuatorEndpointExposedRule` (spring-boot/A05) — requires negative config detection
-- `HttpsNotEnforcedRule` (spring-boot/A05) — requires absence-of-call detection
-- `JaxRsSqlInjectionRule` (dropwizard/A03) — overlaps too much with core SqlInjectionRule
+Research sources: FindSecBugs patterns, real CVEs (listed per rule), competitive gap analysis.
+All rules verified absent from free Kotlin tooling ecosystem.
+Total after Phase 2: 55 rules across 4 modules.
 
-Recently added (this session):
-1. `WeakRsaKeyRule` (core/A02) ✅
-2. `GroovyScriptInjectionRule` (core/A03) ✅
-3. `ELInjectionRule` (spring-boot/A03) ✅
-4. `CsrfTokenLeakRule` (spring-boot/A01) ✅
-5. `QuarkusUnsafeHeaderRule` (quarkus/A05) ✅
+**Implementation order:** Priority 1 → Priority 2 → Priority 3.
+**Properties-file scanning rules** (Priority 2) require a new visitor — see cheat sheet below.
+
+---
+
+### Priority 1 — Kotlin-unique (bytecode tools structurally cannot detect these)
+
+| Status | Rule | Module | OWASP | FindSecBugs ID | Detection target |
+|--------|------|-------|-------|----------------|-----------------|
+| `[ ]` | `CoroutineSecurityContextLossRule` | spring-boot | A01 | — | `suspend fun` annotated with `@PreAuthorize`/`@PostAuthorize` — security context silently dropped. Spring Security issue #10810. `visitNamedFunction` → check `annotationNames()` contains "PreAuthorize"/"PostAuthorize" AND function has `suspend` modifier |
+| `[ ]` | `ThymeleafSSTIRule` | spring-boot | A03 | — | `@Controller`/`@GetMapping` method returns `String` built from `@RequestParam`/`@PathVariable` via `+` or interpolation → Thymeleaf SSTI → RCE. CVE 2024 (modzero). `visitNamedFunction` → check `@GetMapping`/`@PostMapping` present + return expression contains string concat with param name |
+| `[ ]` | `JacksonUnsafeDeserializationRule` | core | A08 | JACKSON_UNSAFE_DESERIALIZATION | `ObjectMapper().enableDefaultTyping(...)` or `ObjectMapper().activateDefaultTyping(...)` → flag always. Also `@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)` annotation → `visitCallExpression` callee == "enableDefaultTyping"/"activateDefaultTyping"; also `visitAnnotationEntry` shortName == "JsonTypeInfo" + arg "use" == "Id.CLASS" |
+| `[ ]` | `JwtNoneAlgorithmRule` | core | A02 | — | `.signWith(SignatureAlgorithm.NONE, ...)` (jjwt) or `Algorithm.none()` (auth0 java-jwt). `visitCallExpression` callee == "signWith" + first arg contains "NONE"; OR callee == "none" receiver ends with "Algorithm" |
+| `[ ]` | `QuarkusJsonBeforeAuthRule` | quarkus | A01 | — | CVE-2023-6267: `@Path` class where `@RolesAllowed` is on methods (not class) + has unannotated body param. `visitClass` → check `@Path` present + class has no class-level `@RolesAllowed`/`@Authenticated` + has method with unannotated request body param |
+
+---
+
+### Priority 2 — Properties-file scanning (new capability, zero competition)
+
+**Note:** These rules need a different detection approach. Options:
+- A) Implement as Detekt `FileProcessListener` (scans raw file content)
+- B) Implement as `visitStringTemplateExpression` catching `@Value("${...}")` usages
+- C) Implement as standalone Gradle task (separate from detekt rules)
+- **Recommended:** Option A — `FileProcessListener` gives access to `.properties`/`.yml` raw text
+
+| Status | Rule | Module | OWASP | FindSecBugs ID | Detection target |
+|--------|------|-------|-------|----------------|-----------------|
+| `[ ]` | `InsecureActuatorExposureRule` | spring-boot | A05 | — | `application.properties`/`.yml` contains `management.endpoints.web.exposure.include=*` or `include: "*"`. Real breach: 9TB GPS data via `/actuator/heapdump`. Scan property value == "*" |
+| `[ ]` | `QuarkusBuildTimeSecretLeakRule` | quarkus | A05 | — | CVE-2024-2700: `application.properties` contains literal (non-`${...}`) value under key matching `*password*`/`*secret*`/`*token*`/`*key*` in `%prod` profile section |
+| `[ ]` | `QuarkusOidcInsecureConfigRule` | quarkus | A07 | — | CVE-2023-1584: `application.properties` contains `quarkus.oidc.token.issuer=any` or is missing `quarkus.oidc.auth-server-url` entirely when `quarkus.oidc.enabled=true` |
+| `[ ]` | `InsecureSmtpConfigRule` | spring-boot | A02 | INSECURE_SMTP_SSL | `application.properties` contains `spring.mail.properties.mail.smtp.starttls.enable=false` or `spring.mail.properties.mail.smtp.auth=false` |
+
+---
+
+### Priority 3 — Coverage gaps in existing tools
+
+| Status | Rule | Module | OWASP | FindSecBugs ID | Detection target |
+|--------|------|-------|-------|----------------|-----------------|
+| `[ ]` | `JwtWeakSecretRule` | core | A02 | HARD_CODE_KEY | `Algorithm.HMAC256(literal)` or `Jwts.builder().signWith(literal)` where literal is a string constant. `visitCallExpression` callee == "HMAC256"/"HMAC384"/"HMAC512"/"signWith" + arg is `KtStringTemplateExpression && !hasInterpolation()` |
+| `[ ]` | `WebClientSSRFRule` | spring-boot | A10 | URLCONNECTION_SSRF_FD | `WebClient.create(url)` or `webClient.get().uri(url)` where `url` is a function parameter/non-literal. Companion to existing `SsrfRule` which covers `RestTemplate`/`URL`. `visitCallExpression` callee == "create"/"uri" receiver contains "WebClient" + arg not literal |
+| `[ ]` | `SpringDataMongoInjectionRule` | spring-boot | A03 | SQL_INJECTION_JPA | `Criteria.where(field).is(userInput)` where either arg is non-literal. NoSQL injection. `visitCallExpression` callee == "where"/"is" on Criteria chain + arg non-literal |
+| `[ ]` | `DropwizardSelfValidatingELRule` | dropwizard | A03 | EL_INJECTION | CVE-2020-5245 + CVE-2020-11002: `@SelfValidating` class + `buildConstraintViolationWithTemplate(nonLiteral)`. `visitCallExpression` callee == "buildConstraintViolationWithTemplate" + arg non-literal |
+| `[ ]` | `MissingHttpsRedirectRule` | spring-boot | A02 | — | `SecurityFilterChain` bean (function annotated `@Bean` returning `SecurityFilterChain`) without `requiresChannel` call in body. Absence detection — `visitNamedFunction` → check `@Bean` + return type + scan body for missing `requiresChannel`/`requiresSecure` |
+| `[ ]` | `InsecureRedisConnectionRule` | spring-boot | A02 | UNENCRYPTED_SOCKET | `RedisStandaloneConfiguration(...)` or `LettuceConnectionFactory(...)` without `.useSsl(true)` or `RedisSSLContext`. `visitCallExpression` callee == "RedisStandaloneConfiguration"/"LettuceConnectionFactory" → check no chained `useSsl(true)` in parent |
+| `[ ]` | `UnsafeCryptoPaddingOracleRule` | core | A02 | PADDING_ORACLE | `Cipher.getInstance("AES/CBC/PKCS5Padding")` without `Mac.getInstance("HmacSHA256")` in same scope. Flag `AES/CBC/PKCS5Padding` always (safe alternative is GCM). `visitCallExpression` callee == "getInstance" + arg literal == "AES/CBC/PKCS5Padding" |
+| `[ ]` | `RegexDenialOfServiceRule` | core | A06 | REDOS | `Regex(pattern)` or `"...".toRegex()` where pattern literal contains catastrophic backtracking: `(a+)+`, `([a-z]+)*`, `(a\|aa)+`. `visitCallExpression` callee == "Regex"/"toRegex" + literal arg matches ReDoS Regex patterns |
+| `[ ]` | `XmlMapperUnsafeRule` | core | A08 | JACKSON_UNSAFE_DESERIALIZATION | `XmlMapper()` constructor call without subsequent `configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)`. `visitCallExpression` callee == "XmlMapper" (constructor) → flag always with "disable DTD / set FAIL_ON_UNKNOWN_PROPERTIES" message |
+| `[ ]` | `InsecurePasswordStorageRule` | core | A02 | WEAK_MESSAGE_DIGEST_MD5 | `MessageDigest.getInstance("SHA-256")` / `DigestUtils.sha256Hex(arg)` used for password hashing (detected by proximity to "password"/"passwd" variable names). Distinct from `WeakHashAlgorithmRule` which catches MD5/SHA1 — this catches SHA-256 WITHOUT salt |
+| `[ ]` | `DropwizardUnencryptedJwtSecretRule` | dropwizard | A02 | HARD_CODE_KEY | `JwtAuthFilter.Builder<>().setSecretProvider(literal)` where literal is string. `visitCallExpression` callee == "setSecretProvider" + arg is literal |
+
+---
+
+## Phase 2 detection cheat sheet (new patterns)
+
+### Properties-file scanning — FileProcessListener approach
+```kotlin
+// Implement FileProcessListener (NOT a Rule subclass)
+// Register in: META-INF/services/io.gitlab.arturbosch.detekt.api.FileProcessListener
+class InsecureActuatorExposureListener : FileProcessListener {
+    override fun onProcess(file: KtFile, bindingContext: BindingContext) { }
+    override fun onProcessComplete(
+        file: KtFile,
+        findings: Map<String, List<Finding>>,
+        bindingContext: BindingContext
+    ) { }
+}
+// Alternative: scan non-Kotlin files in a custom Gradle task
+```
+
+### Check `suspend` modifier on a function
+```kotlin
+import org.jetbrains.kotlin.lexer.KtTokens
+function.hasModifier(KtTokens.SUSPEND_KEYWORD)
+```
+
+### Detect absence of a call in function body
+```kotlin
+val bodyText = function.bodyExpression?.text ?: return
+if ("requiresChannel" !in bodyText) reportAt(function, "...")
+```
+
+### visitAnnotationEntry (e.g. @JsonTypeInfo)
+```kotlin
+override fun visitAnnotationEntry(entry: KtAnnotationEntry) {
+    super.visitAnnotationEntry(entry)
+    if (entry.shortName?.asString() != "JsonTypeInfo") return
+    // entry.literalArg("use") → "Id.CLASS" etc.
+}
+```
+
+### ReDoS literal pattern check
+```kotlin
+val reDoSPatterns = listOf(
+    Regex("""\(.*\+\)\+"""),         // (a+)+
+    Regex("""\(\[.*]\+\)\*"""),      // ([a-z]+)*
+    Regex("""\(.*\|.*\)\+"""),       // (a|aa)+
+)
+fun String.hasReDoSPattern() = reDoSPatterns.any { it.containsMatchIn(this) }
+```
 
 ---
 
