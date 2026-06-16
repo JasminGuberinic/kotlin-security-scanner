@@ -21,6 +21,14 @@ repositories {
 	mavenCentral()
 }
 
+configurations.all {
+	exclude(group = "org.slf4j", module = "slf4j-simple")
+}
+
+configurations.testRuntimeClasspath {
+	exclude(group = "org.jetbrains.kotlin", module = "kotlin-main-kts")
+}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
@@ -33,7 +41,9 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation("io.gitlab.arturbosch.detekt:detekt-test:1.23.7")
 
+	compileOnly("io.gitlab.arturbosch.detekt:detekt-api:1.23.7")
 	detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
 }
 

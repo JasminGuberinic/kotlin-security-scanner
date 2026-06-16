@@ -108,9 +108,22 @@ naming:
 # ─── CUSTOM SECURITY RULES (SecurityRuleSetProvider) ─────────────────────────
 security-custom:
   active: true
-  HardcodedCredentials:
+  # A02 Cryptographic Failures
+  WeakCipherMode:
     active: true
+  # A03 Injection
   SqlInjection:
     active: true
+  PathTraversal:
+    active: true
+  # A05 Security Misconfiguration
+  SpringCsrfDisabled:
+    active: true
+  # A07 Authentication Failures
+  HardcodedCredentials:
+    active: true
   InsecureRandom:
+    active: true
+  # A09 Logging Failures
+  SensitiveDataLogging:
     active: true

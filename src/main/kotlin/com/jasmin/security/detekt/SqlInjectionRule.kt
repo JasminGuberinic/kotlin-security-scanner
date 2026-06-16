@@ -16,7 +16,7 @@ class SqlInjectionRule(config: Config = Config.empty) : Rule(config) {
         id = "SqlInjection",
         severity = Severity.Security,
         description = "Possible SQL injection — use parameterized queries or Spring Data @Query with :params",
-        debt = Debt.THIRTY_MINS
+        debt = Debt.TWENTY_MINS
     )
 
     private val sqlKeywords = listOf("SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "JOIN")
@@ -38,7 +38,7 @@ class SqlInjectionRule(config: Config = Config.empty) : Rule(config) {
     @Suppress("ReturnCount")
     override fun visitBinaryExpression(expression: KtBinaryExpression) {
         super.visitBinaryExpression(expression)
-        if (expression.operationToken.text != "+") return
+        if (expression.operationReference.text != "+") return
         val left = expression.left?.text?.uppercase() ?: return
         if (sqlKeywords.none { left.contains(it) }) return
         if (expression.right is KtStringTemplateExpression) return
