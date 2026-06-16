@@ -1,4 +1,4 @@
-package com.jasmin.security.detekt
+package com.jasmin.security.detekt.a05
 
 import io.gitlab.arturbosch.detekt.test.assertThat
 import io.gitlab.arturbosch.detekt.test.lint

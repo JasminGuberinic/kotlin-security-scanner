@@ -1,128 +1,164 @@
 # Add Security Rule
 
-Creates a new Detekt security rule for Kotlin/Spring Boot vulnerability detection.
+**AI-driven workflow** for adding a new Detekt security rule.
+Before writing any code, Claude fetches live documentation to ensure
+the rule matches a real-world vulnerability pattern.
 
 ## Usage
 
 ```
-/add-security-rule <RuleName> "<short description>" <OWASP-category>
+/add-security-rule <RuleName> "<description>" <A0X>
 ```
 
 Example:
 ```
-/add-security-rule SsrfRule "Detects server-side request forgery via user-controlled URLs" A10
+/add-security-rule InsecureDeserializationRule "Flags ObjectInputStream.readObject on untrusted data" A08
 ```
 
-## Steps to execute
+---
 
-**Before writing any code**, fetch the latest FindSecBugs documentation for the vulnerability type:
-- https://find-sec-bugs.github.io/bugs.htm — look up the specific bug pattern ID
-- Check `CLAUDE.md` OWASP coverage map to avoid duplicating existing rules
+## Step 1 — Research (always do this first)
 
-**1. Create the rule class** at `src/main/kotlin/com/jasmin/security/detekt/<RuleName>.kt`:
+Fetch the FindSecBugs pattern for this vulnerability type:
+- `https://find-sec-bugs.github.io/bugs.htm` — look up the Bug Pattern ID
+- `https://owasp.org/Top10/2021/` — confirm the OWASP category
+
+Confirm the rule doesn't already exist in `DetectionPatterns.kt` or any `a0X/` package.
+
+---
+
+## Step 2 — Add patterns to `DetectionPatterns.kt`
+
+Add any new constants to `src/main/kotlin/com/jasmin/security/detekt/core/DetectionPatterns.kt`
+under the correct OWASP section comment. No detection logic goes here — only raw data.
 
 ```kotlin
-package com.jasmin.security.detekt
+// ── A08 Software and Data Integrity ───────────────────────────────────────────
+val UNSAFE_DESERIALIZERS = setOf("ObjectInputStream", "XMLDecoder")
+```
 
+---
+
+## Step 3 — Create the rule class
+
+File: `src/main/kotlin/com/jasmin/security/detekt/a0X/<RuleName>.kt`
+
+```kotlin
+package com.jasmin.security.detekt.a0X
+
+import com.jasmin.security.detekt.core.DetectionPatterns.<PATTERN>
+import com.jasmin.security.detekt.core.SecurityRule
 import io.gitlab.arturbosch.detekt.api.*
-import org.jetbrains.kotlin.psi.<RelevantPsiType>
+import org.jetbrains.kotlin.psi.<PsiType>
 
-class <RuleName>(config: Config = Config.empty) : Rule(config) {
+// FindSecBugs: <BUG_PATTERN_ID> — OWASP A0X
+class <RuleName>(config: Config = Config.empty) : SecurityRule(config) {
 
     override val issue = Issue(
-        id = "<RuleName>",
+        id = "<RuleName without 'Rule' suffix>",
         severity = Severity.Security,
-        description = "<description — what is vulnerable and what to use instead>",
+        description = "<what is dangerous and what to use instead>",
         debt = Debt.TWENTY_MINS
     )
 
-    companion object {
-        // Extract any numeric constants here (avoids MagicNumber rule)
+    // Keep each method to one concern.
+    // Detection logic: visitXxx → guard clauses → named private predicate → reportAt
+    override fun visitCallExpression(expression: KtCallExpression) {
+        super.visitCallExpression(expression)
+        // ...
     }
 
-    override fun visit<PsiNode>(node: <PsiNode>) {
-        super.visit<PsiNode>(node)
-        // Detection logic
-        // report(CodeSmell(issue, Entity.from(node), "message"))
+    private fun isVulnerablePattern(expression: KtCallExpression): Boolean {
+        // named predicate — reads like prose
     }
 }
 ```
 
-**2. Create the test class** at `src/test/kotlin/com/jasmin/security/detekt/<RuleName>Test.kt`:
+**Code style rules (enforced by Detekt itself):**
+- `@Suppress("ReturnCount")` on any function with > 2 early returns
+- Numeric constants go in `companion object`, not inline
+- No cross-rule imports — only import from `core/`
+- Max ~40 lines per rule file; extract private predicates if longer
+
+---
+
+## Step 4 — Create the test class
+
+File: `src/test/kotlin/com/jasmin/security/detekt/a0X/<RuleName>Test.kt`
+
+**Required test structure:**
 
 ```kotlin
-package com.jasmin.security.detekt
+package com.jasmin.security.detekt.a0X
 
-import io.gitlab.arturbosch.detekt.test.lint
 import io.gitlab.arturbosch.detekt.test.assertThat
+import io.gitlab.arturbosch.detekt.test.lint
 import org.junit.jupiter.api.Test
 
 class <RuleName>Test {
 
     private val rule = <RuleName>()
 
-    // POSITIVE TESTS — code that MUST be flagged
-    @Test
-    fun `flags <vulnerable pattern description>`() {
-        val code = """
-            <minimal code that triggers the rule>
-        """.trimIndent()
-        assertThat(rule.lint(code)).hasSize(1)
-    }
+    // POSITIVE — at least 3 variants of the vulnerability
+    @Test fun `flags <variant 1>`() { ... }
+    @Test fun `flags <variant 2>`() { ... }
+    @Test fun `flags <variant 3>`() { ... }
 
-    // Add at least 2-3 positive test cases covering different forms of the vulnerability
+    // NEGATIVE — safe equivalents that must NOT be flagged
+    @Test fun `ignores <safe pattern 1>`() { ... }
+    @Test fun `ignores <safe pattern 2>`() { ... }
 
-    // NEGATIVE TESTS — safe code that must NOT be flagged
-    @Test
-    fun `ignores <safe pattern description>`() {
-        val code = """
-            <safe equivalent code>
-        """.trimIndent()
-        assertThat(rule.lint(code)).isEmpty()
-    }
-
-    // Add at least 2 negative test cases
-
-    // ISOLATION TEST — rule must not flag code from OTHER rules' test fixtures
-    @Test
-    fun `does not flag unrelated code`() {
-        val code = """
-            <copy a positive test fixture from a DIFFERENT rule>
-        """.trimIndent()
-        // This rule should NOT find the other rule's vulnerability
-        // (verify they are truly independent)
-        assertThat(rule.lint(code)).isEmpty()
-    }
+    // ISOLATION — copy a positive fixture from a DIFFERENT rule and assert empty
+    @Test fun `does not interfere with <other rule> code`() { ... }
 }
 ```
 
-**3. Register in `SecurityRuleSetProvider.kt`** — add to the `listOf(...)`:
+---
+
+## Step 5 — Register the rule
+
+In `SecurityRuleSetProvider.kt`, add under the correct OWASP comment:
+
 ```kotlin
-<RuleName>(config.subConfig("<RuleName>")),
+<RuleName>(config.subConfig("<RuleId>")),
 ```
 
-**4. Add to `config/detekt/detekt.yml`** under `security-custom:`:
+In `config/detekt/detekt.yml` under `security-custom:`:
+
 ```yaml
-  <RuleName>:
+  # A0X <OWASP Category>
+  <RuleId>:
     active: true
 ```
 
-**5. Add to `VulnerableExamples.kt`** — add a commented example showing what gets caught.
+---
 
-**6. Update `CLAUDE.md`** OWASP coverage map — mark the rule as ✅.
+## Step 6 — Update coverage map
 
-**7. Run validation**:
+In `CLAUDE.md`, update the OWASP coverage table: change TODO → ✅.
+
+---
+
+## Step 7 — Verify
+
 ```bash
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21
 ./gradlew test detekt
 ```
 
-Both must pass. If `detekt` fails due to the new rule flagging itself or existing code, that is a rule isolation bug — fix it by adjusting the rule's detection logic or adding `excludes` in the config.
+Both must pass with zero new failures. `detekt` finding its own rule
+files is a rule isolation bug — fix by adjusting detection logic or
+adding an `excludes` pattern in `detekt.yml`.
 
-## Key constraints (always follow)
+---
 
-- **No circular detection**: A rule must never flag code in another rule's implementation file. Detekt rule files live in `com.jasmin.security.detekt` — add package-level excludes if needed.
-- **Positive + negative tests**: Every rule needs both. A rule with only positive tests may have false positives in production.
-- **FindSecBugs alignment**: Map each rule to a FindSecBugs bug pattern ID in the rule's `issue.description`.
-- **`companion object` for constants**: Numeric literals in rule logic go in `companion object` to avoid triggering `MagicNumber`.
-- **No cross-imports between rules**: Rules must compile independently.
+## Community contribution checklist
+
+Before submitting a PR:
+- [ ] FindSecBugs pattern ID referenced in the rule comment
+- [ ] OWASP category correct and in the right `a0X/` package
+- [ ] Pattern constants added to `DetectionPatterns.kt`
+- [ ] `SecurityRule` base class used (not raw `Rule`)
+- [ ] Positive, negative, and isolation tests present
+- [ ] CLAUDE.md coverage table updated
+- [ ] `./gradlew test detekt` passes clean

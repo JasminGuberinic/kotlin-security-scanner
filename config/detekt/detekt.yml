@@ -108,6 +108,9 @@ naming:
 # ─── CUSTOM SECURITY RULES (SecurityRuleSetProvider) ─────────────────────────
 security-custom:
   active: true
+  # A01 Broken Access Control
+  MissingAuthorization:
+    active: true
   # A02 Cryptographic Failures
   WeakCipherMode:
     active: true
@@ -119,6 +122,8 @@ security-custom:
   # A05 Security Misconfiguration
   SpringCsrfDisabled:
     active: true
+  PermissiveCors:
+    active: true
   # A07 Authentication Failures
   HardcodedCredentials:
     active: true
@@ -126,4 +131,7 @@ security-custom:
     active: true
   # A09 Logging Failures
   SensitiveDataLogging:
+    active: true
+  # A10 Server-Side Request Forgery
+  Ssrf:
     active: true
