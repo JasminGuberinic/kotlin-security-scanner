@@ -61,6 +61,7 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | OWASP 2021 | Rule | Module | FindSecBugs ID | Status |
 |---|---|---|---|---|
 | A01 Broken Access Control | `MissingAuthorizationRule` | spring-boot | SPRING_ENDPOINT | ✅ |
+| A01 Broken Access Control | `DisabledHttpSecurityRule` | spring-boot | SPRING_CSRF_PROTECTION_DISABLED | ✅ |
 | A01 Broken Access Control | `OpenRedirectRule` | spring-boot | SPRING_UNVALIDATED_REDIRECT | ✅ |
 | A01 Broken Access Control | `DropwizardMissingAuthRule` | dropwizard | JAXRS_ENDPOINT | ✅ |
 | A01 Broken Access Control | `DropwizardOpenRedirectRule` | dropwizard | UNVALIDATED_REDIRECT | ✅ |
@@ -76,6 +77,8 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | A03 Injection — SQL | `SqlInjectionRule` | core | SQL_INJECTION_JPA | ✅ |
 | A03 Injection — LDAP | `LdapInjectionRule` | core | LDAP_INJECTION | ✅ |
 | A03 Injection — XPath | `XpathInjectionRule` | core | XPATH_INJECTION | ✅ |
+| A03 Injection — JNDI | `JndiInjectionRule` | core | JNDI_INJECTION | ✅ |
+| A03 Injection — Reflection | `ReflectionInjectionRule` | core | REFLECTOR_BASED_INJECTION | ✅ |
 | A03 Injection — Path Traversal | `PathTraversalRule` | core | PATH_TRAVERSAL_IN | ✅ |
 | A03 Injection — Command | `CommandInjectionRule` | core | COMMAND_INJECTION | ✅ |
 | A03 Injection — XXE | `XxeInjectionRule` | core | XXE_DTD | ✅ |

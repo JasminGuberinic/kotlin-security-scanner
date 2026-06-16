@@ -5,8 +5,10 @@ import com.jasmin.security.detekt.a02.TrustAllCertsRule
 import com.jasmin.security.detekt.a02.WeakCipherModeRule
 import com.jasmin.security.detekt.a02.WeakHashAlgorithmRule
 import com.jasmin.security.detekt.a03.CommandInjectionRule
+import com.jasmin.security.detekt.a03.JndiInjectionRule
 import com.jasmin.security.detekt.a03.LdapInjectionRule
 import com.jasmin.security.detekt.a03.PathTraversalRule
+import com.jasmin.security.detekt.a03.ReflectionInjectionRule
 import com.jasmin.security.detekt.a03.SqlInjectionRule
 import com.jasmin.security.detekt.a03.XpathInjectionRule
 import com.jasmin.security.detekt.a03.XxeInjectionRule
@@ -42,7 +44,9 @@ class CoreRuleSetProvider : RuleSetProvider {
             // A03 Injection
             SqlInjectionRule(config.subConfig("SqlInjection")),
             LdapInjectionRule(config.subConfig("LdapInjection")),
+            JndiInjectionRule(config.subConfig("JndiInjection")),
             XpathInjectionRule(config.subConfig("XpathInjection")),
+            ReflectionInjectionRule(config.subConfig("ReflectionInjection")),
             PathTraversalRule(config.subConfig("PathTraversal")),
             CommandInjectionRule(config.subConfig("CommandInjection")),
             XxeInjectionRule(config.subConfig("XxeInjection")),

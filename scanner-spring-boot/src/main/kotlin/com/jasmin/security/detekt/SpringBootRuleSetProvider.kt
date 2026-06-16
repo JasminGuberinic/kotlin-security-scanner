@@ -1,5 +1,6 @@
 package com.jasmin.security.detekt
 
+import com.jasmin.security.detekt.a01.DisabledHttpSecurityRule
 import com.jasmin.security.detekt.a01.MissingAuthorizationRule
 import com.jasmin.security.detekt.a01.OpenRedirectRule
 import com.jasmin.security.detekt.a02.InsecurePasswordEncoderRule
@@ -27,6 +28,7 @@ class SpringBootRuleSetProvider : RuleSetProvider {
             // A01 Broken Access Control
             MissingAuthorizationRule(config.subConfig("MissingAuthorization")),
             OpenRedirectRule(config.subConfig("OpenRedirect")),
+            DisabledHttpSecurityRule(config.subConfig("DisabledHttpSecurity")),
             // A02 Cryptographic Failures
             InsecurePasswordEncoderRule(config.subConfig("InsecurePasswordEncoder")),
             // A03 Injection

@@ -41,6 +41,8 @@ HardcodedCredentialsRule, InsecureRandomRule, SensitiveDataLoggingRule, SsrfRule
 | `[x]` | WeakHashAlgorithmRule | A02 | WEAK_MESSAGE_DIGEST_MD5, WEAK_MESSAGE_DIGEST_SHA1 | `MessageDigest.getInstance("MD5"\|"SHA-1"\|"SHA1")` |
 | `[x]` | LdapInjectionRule | A03 | LDAP_INJECTION | string interpolation / `+` inside `search(`, `bind(` call argument |
 | `[x]` | XpathInjectionRule | A03 | XPATH_INJECTION | string interpolation / `+` passed to `xpath.evaluate(`, `compile(` |
+| `[x]` | JndiInjectionRule | A03 | JNDI_INJECTION | `ctx.lookup(var)` / `ctx.rebind(var)` with any non-literal — remote URL RCE risk |
+| `[x]` | ReflectionInjectionRule | A03 | REFLECTOR_BASED_INJECTION | `Class.forName(var)` with non-literal — attacker-chosen class loading |
 | `[x]` | TrustAllCertsRule | A02 | WEAK_TRUST_MANAGER | anonymous `X509TrustManager` with empty `checkClientTrusted`/`checkServerTrusted` |
 | `[x]` | HardcodedIvRule | A02 | STATIC_IV | `IvParameterSpec(byteArrayOf(...))` with literal byte array — IV must be random |
 
@@ -58,6 +60,7 @@ Existing: MissingAuthorizationRule, SpringCsrfDisabledRule, PermissiveCorsRule
 | `[x]` | SpelInjectionRule | A03 | SPEL_INJECTION | `ExpressionParser.parseExpression(var)` or `SpelExpressionParser().parseExpression(var)` where arg is non-literal |
 | `[x]` | InsecurePasswordEncoderRule | A02 | WEAK_PASSWORD_ENCODER | `NoOpPasswordEncoder.getInstance()`, `new Md5PasswordEncoder()`, `new ShaPasswordEncoder()` |
 | `[x]` | MassAssignmentRule | A04 | MASS_ASSIGNMENT | `@RequestBody` on a `@Entity`-annotated class (domain entity used directly as DTO) |
+| `[x]` | DisabledHttpSecurityRule | A01 | SPRING_CSRF_PROTECTION_DISABLED | `anyRequest().permitAll()` in Spring Security config |
 | `[ ]` | ActuatorEndpointExposedRule | A05 | SPRING_ACTUATOR | `management.endpoints.web.exposure.include=*` in properties — flag `"*"` string literal in `@Value` or config class |
 | `[ ]` | HttpsNotEnforcedRule | A05 | INSECURE_CHANNEL | `HttpSecurity` config block that never calls `.requiresChannel()` or `.redirectToHttps()` |
 | `[x]` | OpenRedirectRule | A01 | SPRING_UNVALIDATED_REDIRECT | `return "redirect:" + variable` in a `@Controller` method |
@@ -95,9 +98,12 @@ Existing: QuarkusMissingAuthRule, QuarkusHardcodedConfigSecretRule
 
 ## Priority order for next session
 
-1. `JaxRsSqlInjectionRule` (dropwizard) — A03, SQL injection in JAX-RS @QueryParam methods
-2. `ActuatorEndpointExposedRule` (spring-boot) — A05, Spring Boot actuator exposure
-3. `HttpsNotEnforcedRule` (spring-boot) — A05, cleartext HTTP allowed in SecurityFilterChain
+Backlog is nearly exhausted — suggest new community-attractive rules:
+1. `WeakRsaKeyRule` (core/A02) — `KeyPairGenerator.initialize(size)` where size ≤ 1024
+2. `GroovyScriptInjectionRule` (core/A03) — `GroovyShell().evaluate(userInput)` / `ScriptEngine.eval(var)`
+3. `ELInjectionRule` (spring-boot/A03) — `ELProcessor().eval(var)` / JUEL `ExpressionFactory.eval(var)`
+4. `CsrfTokenLeakRule` (spring-boot/A01) — CSRF token logged or returned in response body
+5. `QuarkusUnsafeHeaderRule` (quarkus/A05) — `@Produces` on endpoint returning dynamic `MediaType`
 
 ---
 

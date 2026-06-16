@@ -49,6 +49,11 @@ object DetectionPatterns {
 
     val XPATH_EXPRESSION_METHODS = setOf("evaluate", "selectNodes", "selectSingleNode")
 
+    val JNDI_METHODS = setOf("lookup", "rebind")
+
+    const val CLASS_FOR_NAME_METHOD = "forName"
+    const val CLASS_FOR_NAME_RECEIVER = "Class"
+
     val HTTP_HEADER_SETTER_METHODS = setOf("addHeader", "setHeader")
 
     const val REDIRECT_PREFIX = "redirect:"

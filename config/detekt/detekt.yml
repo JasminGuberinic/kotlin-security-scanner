@@ -122,7 +122,11 @@ security-core:
     active: true
   LdapInjection:
     active: true
+  JndiInjection:
+    active: true
   XpathInjection:
+    active: true
+  ReflectionInjection:
     active: true
   PathTraversal:
     active: true
@@ -152,6 +156,8 @@ security-spring-boot:
   MissingAuthorization:
     active: true
   OpenRedirect:
+    active: true
+  DisabledHttpSecurity:
     active: true
   # A02 Cryptographic Failures
   InsecurePasswordEncoder:
