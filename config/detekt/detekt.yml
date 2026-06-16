@@ -1,0 +1,116 @@
+build:
+  maxIssues: 100
+
+config:
+  validation: false
+  warningsAsErrors: false
+
+# ─── POTENTIAL BUGS ───────────────────────────────────────────────────────────
+potential-bugs:
+  active: true
+  UnsafeCallOnNullableType:
+    active: true
+  UnsafeCast:
+    active: true
+  DontDowncastCollectionTypes:
+    active: true
+  IgnoredReturnValue:
+    active: true
+  UnreachableCode:
+    active: true
+
+# ─── STYLE (security-relevant) ────────────────────────────────────────────────
+style:
+  active: true
+
+  ForbiddenComment:
+    active: true
+    comments:
+      - reason: 'Hardcoded credentials marker'
+        value: 'TODO: remove password'
+      - reason: 'Hardcoded credentials marker'
+        value: 'TODO: remove secret'
+      - reason: 'Hardcoded credentials marker'
+        value: 'TODO: remove token'
+    excludes: ['**/test/**']
+
+  ForbiddenImport:
+    active: true
+    imports:
+      # Insecure XML parsers (XXE vulnerable)
+      - reason: 'Use secure XML parser — DocumentBuilderFactory is XXE-vulnerable by default'
+        value: 'javax.xml.parsers.DocumentBuilderFactory'
+      - reason: 'Use secure XML parser — SAXParserFactory is XXE-vulnerable by default'
+        value: 'javax.xml.parsers.SAXParserFactory'
+      # Weak crypto
+      - reason: 'DES is broken — use AES-256-GCM instead'
+        value: 'javax.crypto.spec.DESKeySpec'
+      - reason: 'DESede (3DES) is deprecated — use AES-256-GCM instead'
+        value: 'javax.crypto.spec.DESedeKeySpec'
+      # Insecure random
+      - reason: 'Use SecureRandom for security-sensitive randomness'
+        value: 'java.util.Random'
+      # Deprecated HTTP client
+      - reason: 'DefaultHttpClient is deprecated and insecure — use OkHttp or WebClient'
+        value: 'org.apache.http.impl.client.DefaultHttpClient'
+      # Process execution (command injection risk)
+      - reason: 'Runtime.exec() with user input leads to command injection'
+        value: 'java.lang.Runtime'
+
+  ForbiddenMethodCall:
+    active: true
+    methods:
+      # Weak hash algorithms
+      - reason: 'MD5 is cryptographically broken — use SHA-256 or bcrypt for passwords'
+        value: 'java.security.MessageDigest.getInstance("MD5")'
+      - reason: 'SHA-1 is cryptographically broken — use SHA-256 or stronger'
+        value: 'java.security.MessageDigest.getInstance("SHA-1")'
+      - reason: 'SHA-1 is cryptographically broken — use SHA-256 or stronger'
+        value: 'java.security.MessageDigest.getInstance("SHA1")'
+      # Insecure deserialization
+      - reason: 'ObjectInputStream.readObject() is unsafe with untrusted data'
+        value: 'java.io.ObjectInputStream.readObject'
+      # System exit
+      - reason: 'System.exit() should not be called in Spring Boot apps'
+        value: 'java.lang.System.exit'
+
+# ─── COMPLEXITY ───────────────────────────────────────────────────────────────
+complexity:
+  active: true
+  LongMethod:
+    active: true
+    threshold: 60
+  LongParameterList:
+    active: true
+    functionThreshold: 6
+    constructorThreshold: 7
+
+# ─── PERFORMANCE ──────────────────────────────────────────────────────────────
+performance:
+  active: true
+
+# ─── EXCEPTIONS ───────────────────────────────────────────────────────────────
+exceptions:
+  active: true
+  SwallowedException:
+    active: true
+  TooGenericExceptionCaught:
+    active: true
+  TooGenericExceptionThrown:
+    active: true
+  PrintStackTrace:
+    active: true
+
+# ─── NAMING ───────────────────────────────────────────────────────────────────
+naming:
+  active: true
+
+# ─── CUSTOM SECURITY RULES (SecurityRuleSetProvider) ─────────────────────────
+security-custom:
+  active: true
+  HardcodedCredentials:
+    active: true
+  SqlInjection:
+    active: true
+  InsecureRandom:
+    active: true
