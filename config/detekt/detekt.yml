@@ -105,12 +105,9 @@ exceptions:
 naming:
   active: true
 
-# ─── CUSTOM SECURITY RULES (SecurityRuleSetProvider) ─────────────────────────
-security-custom:
+# ─── CORE SECURITY RULES (scanner-core) ──────────────────────────────────────
+security-core:
   active: true
-  # A01 Broken Access Control
-  MissingAuthorization:
-    active: true
   # A02 Cryptographic Failures
   WeakCipherMode:
     active: true
@@ -118,11 +115,6 @@ security-custom:
   SqlInjection:
     active: true
   PathTraversal:
-    active: true
-  # A05 Security Misconfiguration
-  SpringCsrfDisabled:
-    active: true
-  PermissiveCors:
     active: true
   # A07 Authentication Failures
   HardcodedCredentials:
@@ -134,4 +126,26 @@ security-custom:
     active: true
   # A10 Server-Side Request Forgery
   Ssrf:
+    active: true
+
+# ─── SPRING BOOT SECURITY RULES (scanner-spring-boot) ────────────────────────
+security-spring-boot:
+  active: true
+  # A01 Broken Access Control
+  MissingAuthorization:
+    active: true
+  # A05 Security Misconfiguration
+  SpringCsrfDisabled:
+    active: true
+  PermissiveCors:
+    active: true
+
+# ─── DROPWIZARD SECURITY RULES (scanner-dropwizard) ──────────────────────────
+security-dropwizard:
+  active: true
+  # A01 Broken Access Control
+  DropwizardMissingAuth:
+    active: true
+  # A02 Cryptographic Failures
+  InsecureTlsProtocol:
     active: true

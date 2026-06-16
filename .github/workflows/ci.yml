@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  security-events: write  # SARIF upload to Code Scanning
+  checks: write           # test-reporter
+
+jobs:
+  build:
+    name: Test & Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Grant execute permission to gradlew
+        run: chmod +x gradlew
+
+      - name: Run tests
+        run: ./gradlew test --continue
+
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: JUnit Results
+          path: '**/build/test-results/test/TEST-*.xml'
+          reporter: java-junit
+
+      - name: Run detekt
+        run: ./gradlew detekt --continue
+
+      - name: Collect SARIF reports
+        if: always()
+        run: |
+          mkdir -p sarif-results
+          find . -path '**/build/reports/detekt/*.sarif' -exec cp {} sarif-results/ \;
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: sarif-results
+          category: detekt
+
+      - name: Upload HTML reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: detekt-reports
+          path: '**/build/reports/detekt/*.html'
+          retention-days: 30

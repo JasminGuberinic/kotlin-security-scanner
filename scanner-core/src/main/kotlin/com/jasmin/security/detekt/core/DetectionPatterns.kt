@@ -1,0 +1,130 @@
+package com.jasmin.security.detekt.core
+
+/**
+ * Single source of truth for all vulnerability detection patterns.
+ *
+ * Grouping by OWASP category makes it easy to find, extend, or
+ * tune a pattern without touching the rule logic itself.
+ * Community contributions: add new patterns here first, then wire
+ * them into the relevant rule.
+ */
+object DetectionPatterns {
+
+    // ── A02 Cryptographic Failures ────────────────────────────────────────────
+
+    val WEAK_CIPHER_ALGORITHMS = listOf(
+        Regex("""/ECB/""", RegexOption.IGNORE_CASE),
+        Regex("""^DES[^e]""", RegexOption.IGNORE_CASE),
+        Regex("""^DESede""", RegexOption.IGNORE_CASE),
+        Regex("""^RC2""", RegexOption.IGNORE_CASE),
+        Regex("""^RC4""", RegexOption.IGNORE_CASE),
+        Regex("""^Blowfish""", RegexOption.IGNORE_CASE),
+        Regex("""NullCipher""", RegexOption.IGNORE_CASE),
+    )
+
+    // ── A03 Injection ─────────────────────────────────────────────────────────
+
+    val SQL_KEYWORDS = listOf("SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "JOIN")
+
+    val FILE_CONSTRUCTORS = setOf(
+        "File",
+        "FileInputStream",
+        "FileOutputStream",
+        "FileReader",
+        "FileWriter",
+    )
+
+    val PATH_METHODS = setOf("get", "of", "resolve")
+
+    val SSRF_CONSTRUCTORS = setOf("URL", "URI")
+
+    // ── A05 Security Misconfiguration ─────────────────────────────────────────
+
+    val CSRF_DISABLE_CALLEE_NAMES = setOf("csrf", "disable")
+
+    val CORS_WILDCARD = setOf("*", "allowedOrigins")
+
+    // ── A07 Authentication Failures ───────────────────────────────────────────
+
+    val CREDENTIAL_VARIABLE_KEYWORDS = setOf(
+        "password", "passwd", "pwd", "secret", "apikey", "api_key",
+        "token", "auth", "credential", "private_key", "privatekey",
+        "access_key", "accesskey", "client_secret", "clientsecret"
+    )
+
+    val SAFE_CREDENTIAL_PLACEHOLDERS = listOf(
+        Regex("""^\$\{.*}$"""),
+        Regex("""^#\{.*}$"""),
+        Regex("""^\*+$"""),
+        Regex("""^$"""),
+        Regex("""^\s+$"""),
+        Regex("changeme", RegexOption.IGNORE_CASE),
+        Regex("placeholder", RegexOption.IGNORE_CASE),
+        Regex("your[-_]?.*here", RegexOption.IGNORE_CASE),
+    )
+
+    val INSECURE_RANDOM_CLASSES = setOf("Random", "ThreadLocalRandom")
+
+    // ── A09 Logging Failures ──────────────────────────────────────────────────
+
+    val LOG_METHOD_NAMES = setOf("trace", "debug", "info", "warn", "error", "log")
+
+    val SENSITIVE_LOG_KEYWORDS = setOf(
+        "password", "passwd", "pwd", "secret", "token", "apikey", "api_key",
+        "credential", "privatekey", "private_key", "accesskey", "access_key",
+        "clientsecret", "client_secret", "authorization", "bearer"
+    )
+
+    // ── A01 Broken Access Control ─────────────────────────────────────────────
+
+    val SPRING_ENDPOINT_ANNOTATIONS = setOf(
+        "RequestMapping",
+        "GetMapping",
+        "PostMapping",
+        "PutMapping",
+        "DeleteMapping",
+        "PatchMapping",
+    )
+
+    val SPRING_SECURITY_ANNOTATIONS = setOf(
+        "PreAuthorize",
+        "PostAuthorize",
+        "Secured",
+        "RolesAllowed",
+    )
+
+    // ── A01 Dropwizard / JAX-RS Access Control ────────────────────────────────
+
+    val JAXRS_HTTP_METHODS = setOf(
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "HEAD",
+        "OPTIONS",
+    )
+
+    val JAXRS_AUTH_ANNOTATIONS = setOf(
+        "RolesAllowed",
+        "DenyAll",
+        "Auth",
+        "PermitAll",
+    )
+
+    // ── A02 Dropwizard insecure TLS ───────────────────────────────────────────
+
+    val INSECURE_TLS_PROTOCOLS = listOf(
+        Regex("""TLSv1$""", RegexOption.IGNORE_CASE),
+        Regex("""TLSv1\.0""", RegexOption.IGNORE_CASE),
+        Regex("""TLSv1\.1""", RegexOption.IGNORE_CASE),
+        Regex("""SSLv2""", RegexOption.IGNORE_CASE),
+        Regex("""SSLv3""", RegexOption.IGNORE_CASE),
+    )
+
+    val TLS_SETTER_NAMES = setOf(
+        "setSupportedProtocols",
+        "setEnabledProtocols",
+        "setSslProtocol",
+    )
+}
