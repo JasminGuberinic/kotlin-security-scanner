@@ -63,6 +63,8 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | A01 Broken Access Control | `MissingAuthorizationRule` | spring-boot | SPRING_ENDPOINT | ✅ |
 | A01 Broken Access Control | `DisabledHttpSecurityRule` | spring-boot | SPRING_CSRF_PROTECTION_DISABLED | ✅ |
 | A01 Broken Access Control | `OpenRedirectRule` | spring-boot | SPRING_UNVALIDATED_REDIRECT | ✅ |
+| A01 Broken Access Control | `CsrfTokenLeakRule` | spring-boot | CSRF_TOKEN_INTROSPECTION | ✅ |
+| A01 Broken Access Control | `CoroutineSecurityContextLossRule` | spring-boot | — (Kotlin-unique) | ✅ |
 | A01 Broken Access Control | `DropwizardMissingAuthRule` | dropwizard | JAXRS_ENDPOINT | ✅ |
 | A01 Broken Access Control | `DropwizardOpenRedirectRule` | dropwizard | UNVALIDATED_REDIRECT | ✅ |
 | A01 Broken Access Control | `QuarkusMissingAuthRule` | quarkus | JAXRS_ENDPOINT | ✅ |
@@ -72,9 +74,16 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | A02 Cryptographic Failures | `TrustAllCertsRule` | core | WEAK_TRUST_MANAGER | ✅ |
 | A02 Cryptographic Failures | `HardcodedIvRule` | core | STATIC_IV | ✅ |
 | A02 Cryptographic Failures | `WeakRsaKeyRule` | core | WEAK_KEY_SIZE | ✅ |
+| A02 Cryptographic Failures | `JwtNoneAlgorithmRule` | core | — | ✅ |
+| A02 Cryptographic Failures | `JwtWeakSecretRule` | core | HARD_CODE_KEY | ✅ |
+| A02 Cryptographic Failures | `UnsafeCryptoPaddingOracleRule` | core | PADDING_ORACLE | ✅ |
+| A02 Cryptographic Failures | `InsecurePasswordStorageRule` | core | WEAK_MESSAGE_DIGEST_* | ✅ |
 | A02 Cryptographic Failures | `InsecurePasswordEncoderRule` | spring-boot | WEAK_PASSWORD_ENCODER | ✅ |
+| A02 Cryptographic Failures | `MissingHttpsRedirectRule` | spring-boot | INSECURE_CHANNEL | ✅ |
+| A02 Cryptographic Failures | `InsecureRedisConnectionRule` | spring-boot | UNENCRYPTED_SOCKET | ✅ |
+| A02 Cryptographic Failures | `InsecureSmtpConfigRule` | spring-boot | INSECURE_SMTP_SSL | ✅ |
 | A02 Cryptographic Failures | `InsecureTlsProtocolRule` | dropwizard | SSL_CONTEXT | ✅ |
-| A05 Security Misconfiguration | `InsecureCookieRule` | dropwizard | INSECURE_COOKIE | ✅ |
+| A02 Cryptographic Failures | `DropwizardUnencryptedJwtSecretRule` | dropwizard | HARD_CODE_KEY | ✅ |
 | A03 Injection — SQL | `SqlInjectionRule` | core | SQL_INJECTION_JPA | ✅ |
 | A03 Injection — LDAP | `LdapInjectionRule` | core | LDAP_INJECTION | ✅ |
 | A03 Injection — XPath | `XpathInjectionRule` | core | XPATH_INJECTION | ✅ |
@@ -83,24 +92,33 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | A03 Injection — Path Traversal | `PathTraversalRule` | core | PATH_TRAVERSAL_IN | ✅ |
 | A03 Injection — Command | `CommandInjectionRule` | core | COMMAND_INJECTION | ✅ |
 | A03 Injection — XXE | `XxeInjectionRule` | core | XXE_DTD | ✅ |
+| A03 Injection — Groovy Script | `GroovyScriptInjectionRule` | core | SCRIPT_ENGINE_INJECTION | ✅ |
 | A03 Injection — SpEL | `SpelInjectionRule` | spring-boot | SPEL_INJECTION | ✅ |
 | A03 Injection — Response Splitting | `ResponseSplittingRule` | spring-boot | HTTP_RESPONSE_SPLITTING | ✅ |
-| A03 Injection — Panache | `PanacheRawQueryRule` | quarkus | SQL_INJECTION_JPA | ✅ |
-| A03 Injection — Groovy Script | `GroovyScriptInjectionRule` | core | SCRIPT_ENGINE_INJECTION | ✅ |
 | A03 Injection — EL | `ELInjectionRule` | spring-boot | EL_INJECTION | ✅ |
+| A03 Injection — MongoDB | `SpringDataMongoInjectionRule` | spring-boot | SQL_INJECTION_JPA | ✅ |
+| A03 Injection — Thymeleaf SSTI | `ThymeleafSSTIRule` | spring-boot | — | ✅ |
+| A03 Injection — Panache | `PanacheRawQueryRule` | quarkus | SQL_INJECTION_JPA | ✅ |
+| A03 Injection — EL | `DropwizardSelfValidatingELRule` | dropwizard | EL_INJECTION | ✅ |
 | A04 Insecure Design | `MassAssignmentRule` | spring-boot | MASS_ASSIGNMENT | ✅ |
-| A01 CSRF Token Leak | `CsrfTokenLeakRule` | spring-boot | CSRF_TOKEN_INTROSPECTION | ✅ |
-| A05 CSRF | `SpringCsrfDisabledRule` | spring-boot | SPRING_CSRF_PROTECTION_DISABLED | ✅ |
-| A05 CORS | `PermissiveCorsRule` | spring-boot | PERMISSIVE_CORS | ✅ |
+| A05 Security Misconfiguration | `SpringCsrfDisabledRule` | spring-boot | SPRING_CSRF_PROTECTION_DISABLED | ✅ |
+| A05 Security Misconfiguration | `PermissiveCorsRule` | spring-boot | PERMISSIVE_CORS | ✅ |
+| A05 Security Misconfiguration | `InsecureActuatorExposureRule` | spring-boot | — | ✅ |
+| A05 Security Misconfiguration | `QuarkusBuildTimeSecretLeakRule` | quarkus | — | ✅ |
 | A05 Security Misconfiguration | `QuarkusUnsafeHeaderRule` | quarkus | HTTP_RESPONSE_SPLITTING | ✅ |
+| A05 Security Misconfiguration | `InsecureCookieRule` | dropwizard | INSECURE_COOKIE | ✅ |
+| A06 Vulnerable Components | `RegexDenialOfServiceRule` | core | REDOS | ✅ |
 | A07 Hardcoded Secrets | `HardcodedCredentialsRule` | core | HARD_CODE_PASSWORD | ✅ |
-| A07 Hardcoded Secrets | `QuarkusHardcodedConfigSecretRule` | quarkus | HARD_CODE_PASSWORD | ✅ |
 | A07 Insecure Random | `InsecureRandomRule` | core | PREDICTABLE_RANDOM | ✅ |
+| A07 Authentication Failures | `QuarkusHardcodedConfigSecretRule` | quarkus | HARD_CODE_PASSWORD | ✅ |
+| A07 Authentication Failures | `QuarkusOidcInsecureConfigRule` | quarkus | — | ✅ |
 | A08 Deserialization | `InsecureDeserializationRule` | core | OBJECT_DESERIALIZATION | ✅ |
+| A08 Deserialization | `JacksonUnsafeDeserializationRule` | core | JACKSON_UNSAFE_DESERIALIZATION | ✅ |
+| A08 Deserialization | `XmlMapperUnsafeRule` | core | JACKSON_UNSAFE_DESERIALIZATION | ✅ |
 | A08 Deserialization | `QuarkusReflectionUnsafeRule` | quarkus | OBJECT_DESERIALIZATION | ✅ |
 | A09 Sensitive Logging | `SensitiveDataLoggingRule` | core | INFORMATION_EXPOSURE | ✅ |
 | A10 SSRF | `SsrfRule` | core | URLCONNECTION_SSRF_FD | ✅ |
-| A06 Vulnerable Components | — | — | — | TODO |
+| A10 SSRF | `WebClientSSRFRule` | spring-boot | URLCONNECTION_SSRF_FD | ✅ |
 
 ---
 

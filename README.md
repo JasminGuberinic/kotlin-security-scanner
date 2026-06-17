@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.0.10-purple.svg)](https://kotlinlang.org)
 [![Detekt](https://img.shields.io/badge/detekt-1.23.7-blue.svg)](https://detekt.dev)
-[![Rules](https://img.shields.io/badge/rules-35%2B-brightgreen.svg)](#owasp-top-10-coverage)
+[![Rules](https://img.shields.io/badge/rules-58-brightgreen.svg)](#owasp-top-10-coverage)
 
 **Detekt plugin that catches OWASP Top 10 security vulnerabilities in Kotlin Spring Boot, Quarkus, and Dropwizard applications — at compile time, in your IDE, with zero infrastructure.**
 
@@ -77,7 +77,7 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 
 ## OWASP Top 10 coverage
 
-35 rules across 4 modules. Every rule has positive, negative, and cross-rule isolation tests.
+**58 rules** across 4 modules. Every rule has positive, negative, and cross-rule isolation tests.
 
 ### Core — any Kotlin project (`scanner-core`)
 
@@ -88,6 +88,10 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `TrustAllCertsRule` | A02 | Empty `X509TrustManager` — accepts any certificate |
 | `HardcodedIvRule` | A02 | `IvParameterSpec(byteArrayOf(...))` with hardcoded bytes |
 | `WeakRsaKeyRule` | A02 | `KeyPairGenerator.initialize(≤1024)` |
+| `JwtNoneAlgorithmRule` | A02 | `.signWith(NONE)` / `Algorithm.none()` — JWT signature disabled |
+| `JwtWeakSecretRule` | A02 | `HMAC256(literal)` / `signWith(literal)` — hardcoded JWT secret |
+| `UnsafeCryptoPaddingOracleRule` | A02 | `Cipher.getInstance("AES/CBC/PKCS5Padding")` — padding oracle risk |
+| `InsecurePasswordStorageRule` | A02 | `MessageDigest`/`DigestUtils` for passwords — use BCrypt/Argon2 |
 | `SqlInjectionRule` | A03 | String interpolation or `+` inside SQL queries |
 | `LdapInjectionRule` | A03 | Dynamic strings in `ctx.search()` / `ctx.bind()` |
 | `JndiInjectionRule` | A03 | `ctx.lookup(nonLiteral)` — remote JNDI code execution |
@@ -97,9 +101,12 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `CommandInjectionRule` | A03 | `Runtime.exec()` / `ProcessBuilder()` with dynamic args |
 | `XxeInjectionRule` | A03 | `DocumentBuilderFactory.newInstance()` without DTD disabled |
 | `GroovyScriptInjectionRule` | A03 | `GroovyShell().evaluate(nonLiteral)` — script RCE |
+| `RegexDenialOfServiceRule` | A06 | `Regex("(a+)+")` — catastrophic backtracking / ReDoS |
 | `HardcodedCredentialsRule` | A07 | Hardcoded passwords, API keys, tokens in source code |
 | `InsecureRandomRule` | A07 | `java.util.Random` / `ThreadLocalRandom` for security values |
 | `InsecureDeserializationRule` | A08 | `ObjectInputStream` — unsafe with untrusted data |
+| `JacksonUnsafeDeserializationRule` | A08 | `enableDefaultTyping()` / `@JsonTypeInfo(use=Id.CLASS)` |
+| `XmlMapperUnsafeRule` | A08 | `XmlMapper()` constructor — unsafe XML deserialization |
 | `SensitiveDataLoggingRule` | A09 | Passwords or tokens interpolated into log statements |
 | `SsrfRule` | A10 | `URL()` / `URI()` constructed from a non-literal value |
 
@@ -111,13 +118,21 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `DisabledHttpSecurityRule` | A01 | `anyRequest().permitAll()` in `SecurityFilterChain` |
 | `OpenRedirectRule` | A01 | `"redirect:" + variable` in `@Controller` methods |
 | `CsrfTokenLeakRule` | A01 | `model.addAttribute("csrf/xsrf...", token)` exposes CSRF token |
+| `CoroutineSecurityContextLossRule` | A01 | `suspend fun` with `@PreAuthorize` — security context silently dropped |
 | `InsecurePasswordEncoderRule` | A02 | `NoOpPasswordEncoder`, `Md5PasswordEncoder` |
+| `MissingHttpsRedirectRule` | A02 | `SecurityFilterChain` without `requiresChannel().requiresSecure()` |
+| `InsecureRedisConnectionRule` | A02 | `RedisStandaloneConfiguration`/`LettuceConnectionFactory` without TLS |
+| `InsecureSmtpConfigRule` | A02 | `spring.mail.smtp.starttls.enable=false` in `application.properties` |
 | `SpelInjectionRule` | A03 | `parseExpression(nonLiteral)` — SpEL RCE |
 | `ResponseSplittingRule` | A03 | `response.addHeader(name, nonLiteral)` — CR/LF injection |
 | `ELInjectionRule` | A03 | `ELProcessor.eval(nonLiteral)` — EL expression RCE |
+| `SpringDataMongoInjectionRule` | A03 | `Criteria.where(nonLiteral)` — MongoDB injection |
+| `ThymeleafSSTIRule` | A03 | `templateEngine.process(nonLiteral, ctx)` — Thymeleaf SSTI |
 | `MassAssignmentRule` | A04 | `@RequestBody` on a JPA `@Entity` class |
 | `SpringCsrfDisabledRule` | A05 | `.csrf { disable() }` / `.csrf().disable()` |
 | `PermissiveCorsRule` | A05 | `allowedOrigins("*")` in CORS config |
+| `InsecureActuatorExposureRule` | A05 | `management.endpoints.web.exposure.include=*` in properties |
+| `WebClientSSRFRule` | A10 | `WebClient.create(nonLiteral)` — WebFlux SSRF |
 
 ### Quarkus (`scanner-quarkus`)
 
@@ -126,8 +141,10 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `QuarkusMissingAuthRule` | A01 | JAX-RS `@GET` etc. without `@RolesAllowed` / `@Authenticated` |
 | `QuarkusPermitAllSensitiveRule` | A01 | `@PermitAll` on `@DELETE` / `@PUT` endpoints |
 | `PanacheRawQueryRule` | A03 | `PanacheEntity.find(interpolated)` — NoSQL/ORM injection |
+| `QuarkusBuildTimeSecretLeakRule` | A05 | Hardcoded secret in `application.properties` — bundled into native image |
 | `QuarkusUnsafeHeaderRule` | A05 | `Response.header(name, nonLiteral)` — response splitting |
 | `QuarkusHardcodedConfigSecretRule` | A07 | `@ConfigProperty(defaultValue="hardcoded-secret")` |
+| `QuarkusOidcInsecureConfigRule` | A07 | `quarkus.oidc.tls.verification=none` or hardcoded OIDC secret |
 | `QuarkusReflectionUnsafeRule` | A08 | `@RegisterForReflection` on `Serializable` with `readObject` |
 
 ### Dropwizard (`scanner-dropwizard`)
@@ -137,6 +154,8 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `DropwizardMissingAuthRule` | A01 | JAX-RS `@GET` etc. without `@RolesAllowed`, `@DenyAll`, or `@Auth` |
 | `DropwizardOpenRedirectRule` | A01 | `Response.seeOther(URI(variable))` — open redirect |
 | `InsecureTlsProtocolRule` | A02 | TLS 1.0, TLS 1.1, SSLv2, SSLv3 in TLS configuration |
+| `DropwizardUnencryptedJwtSecretRule` | A02 | `setSecretProvider(literal)` — hardcoded JWT secret |
+| `DropwizardSelfValidatingELRule` | A03 | `buildConstraintViolationWithTemplate(nonLiteral)` — EL injection (CVE-2020-5245) |
 | `InsecureCookieRule` | A05 | `NewCookie(name, value)` without `secure=true` |
 
 ---
@@ -149,7 +168,7 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | Coroutine security patterns | ❌ Impossible | ❌ | ✅ |
 | `let`/`run`/`apply` taint tracking | ❌ | ❌ | ✅ |
 | Spring Boot / Quarkus / Dropwizard rules | ⚠️ Java only | ⚠️ Paid tier | ✅ |
-| Config file scanning (`.properties`/`.yml`) | ❌ | ❌ | ✅ (coming) |
+| Config file scanning (`.properties`/`.yml`) | ❌ | ❌ | ✅ |
 | Infrastructure needed | ❌ | ✅ Server | ❌ |
 | Cost | Free | Free / Paid | Free |
 | IDE integration (Detekt) | ❌ | ❌ | ✅ |
