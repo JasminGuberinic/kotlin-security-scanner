@@ -1,11 +1,18 @@
 package com.jasmin.security.detekt
 
+import com.jasmin.security.detekt.a01.QuarkusJsonBeforeAuthRule
 import com.jasmin.security.detekt.a01.QuarkusMissingAuthRule
+import com.jasmin.security.detekt.a01.QuarkusOpenRedirectRule
 import com.jasmin.security.detekt.a01.QuarkusPermitAllSensitiveRule
+import com.jasmin.security.detekt.a02.QuarkusSmallryeJwtInsecureRule
 import com.jasmin.security.detekt.a03.PanacheRawQueryRule
+import com.jasmin.security.detekt.a03.QuarkusMissingBeanValidationRule
 import com.jasmin.security.detekt.a05.QuarkusBuildTimeSecretLeakRule
+import com.jasmin.security.detekt.a05.QuarkusCorsPermissiveConfigRule
+import com.jasmin.security.detekt.a05.QuarkusDevServicesInProdRule
 import com.jasmin.security.detekt.a05.QuarkusUnsafeHeaderRule
 import com.jasmin.security.detekt.a07.QuarkusHardcodedConfigSecretRule
+import com.jasmin.security.detekt.a07.QuarkusHardcodedDatasourcePasswordRule
 import com.jasmin.security.detekt.a07.QuarkusOidcInsecureConfigRule
 import com.jasmin.security.detekt.a08.QuarkusReflectionUnsafeRule
 import io.gitlab.arturbosch.detekt.api.Config
@@ -30,14 +37,22 @@ class QuarkusRuleSetProvider : RuleSetProvider {
             // A01 Broken Access Control
             QuarkusMissingAuthRule(config.subConfig("QuarkusMissingAuth")),
             QuarkusPermitAllSensitiveRule(config.subConfig("QuarkusPermitAllSensitive")),
+            QuarkusJsonBeforeAuthRule(config.subConfig("QuarkusJsonBeforeAuth")),
+            QuarkusOpenRedirectRule(config.subConfig("QuarkusOpenRedirect")),
+            // A02 Cryptographic Failures
+            QuarkusSmallryeJwtInsecureRule(config.subConfig("QuarkusSmallryeJwtInsecure")),
             // A03 Injection
             PanacheRawQueryRule(config.subConfig("PanacheRawQuery")),
+            QuarkusMissingBeanValidationRule(config.subConfig("QuarkusMissingBeanValidation")),
             // A05 Security Misconfiguration
             QuarkusUnsafeHeaderRule(config.subConfig("QuarkusUnsafeHeader")),
             QuarkusBuildTimeSecretLeakRule(config.subConfig("QuarkusBuildTimeSecretLeak")),
+            QuarkusCorsPermissiveConfigRule(config.subConfig("QuarkusCorsPermissiveConfig")),
+            QuarkusDevServicesInProdRule(config.subConfig("QuarkusDevServicesInProd")),
             // A07 Identification and Authentication Failures
             QuarkusHardcodedConfigSecretRule(config.subConfig("QuarkusHardcodedConfigSecret")),
             QuarkusOidcInsecureConfigRule(config.subConfig("QuarkusOidcInsecureConfig")),
+            QuarkusHardcodedDatasourcePasswordRule(config.subConfig("QuarkusHardcodedDatasourcePassword")),
             // A08 Software and Data Integrity
             QuarkusReflectionUnsafeRule(config.subConfig("QuarkusReflectionUnsafe")),
         )

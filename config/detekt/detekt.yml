@@ -238,18 +238,33 @@ security-quarkus:
     active: true
   QuarkusPermitAllSensitive:
     active: true
+  QuarkusJsonBeforeAuth:
+    active: true
+  QuarkusOpenRedirect:
+    active: true
+  # A02 Cryptographic Failures
+  QuarkusSmallryeJwtInsecure:
+    active: true
   # A03 Injection
   PanacheRawQuery:
+    active: true
+  QuarkusMissingBeanValidation:
     active: true
   # A05 Security Misconfiguration
   QuarkusUnsafeHeader:
     active: true
   QuarkusBuildTimeSecretLeak:
     active: true
+  QuarkusCorsPermissiveConfig:
+    active: true
+  QuarkusDevServicesInProd:
+    active: true
   # A07 Identification and Authentication Failures
   QuarkusHardcodedConfigSecret:
     active: true
   QuarkusOidcInsecureConfig:
+    active: true
+  QuarkusHardcodedDatasourcePassword:
     active: true
   # A08 Software and Data Integrity
   QuarkusReflectionUnsafe:
@@ -281,8 +296,23 @@ security-ktor:
   # A01 Broken Access Control
   KtorMissingAuth:
     active: true
+  KtorInsecureRedirect:
+    active: true
+  # A02 Cryptographic Failures
+  KtorBasicAuthInsecure:
+    active: true
+  # A03 Injection
+  KtorXssResponse:
+    active: true
   # A05 Security Misconfiguration
   KtorInsecureCookieSession:
     active: true
   KtorPermissiveCors:
+    active: true
+  KtorClearTextCookie:
+    active: true
+  # A07 Identification and Authentication Failures
+  KtorHardcodedSecretKey:
+    active: true
+  KtorHardcodedPasswordComparison:
     active: true

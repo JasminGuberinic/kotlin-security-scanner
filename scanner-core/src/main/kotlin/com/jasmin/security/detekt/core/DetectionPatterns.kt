@@ -333,6 +333,20 @@ object DetectionPatterns {
 
     val AWS_ACCESS_KEY_PATTERN = Regex("""(AKIA|ASIA|AROA|AIDA)[0-9A-Z]{16}""")
 
+    // ── A03 Quarkus Bean Validation ───────────────────────────────────────────
+
+    val JAXRS_ENTITY_METHODS = setOf("POST", "PUT")
+    val JAXRS_PARAM_ANNOTATIONS = setOf(
+        "PathParam",
+        "QueryParam",
+        "HeaderParam",
+        "FormParam",
+        "CookieParam",
+        "Context",
+        "BeanParam",
+        "MatrixParam",
+    )
+
     // ── Ktor ──────────────────────────────────────────────────────────────────
 
     const val KTOR_ROUTING = "routing"
@@ -340,4 +354,12 @@ object DetectionPatterns {
     const val KTOR_SESSIONS_FEATURE = "Sessions"
     const val KTOR_CORS_FEATURE = "CORS"
     const val KTOR_ANY_HOST = "anyHost()"
+    const val KTOR_RESPOND_REDIRECT = "respondRedirect"
+    const val KTOR_RESPOND_TEXT = "respondText"
+    const val KTOR_BASIC_AUTH = "basic"
+    const val KTOR_COOKIE_CLASS = "Cookie"
+    val KTOR_SESSION_TRANSFORM_CLASSES = setOf(
+        "SessionTransportTransformerEncrypt",
+        "SessionTransportTransformerMessageAuthentication",
+    )
 }

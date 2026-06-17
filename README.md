@@ -4,9 +4,9 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.0.10-purple.svg)](https://kotlinlang.org)
 [![Detekt](https://img.shields.io/badge/detekt-1.23.7-blue.svg)](https://detekt.dev)
-[![Rules](https://img.shields.io/badge/rules-68-brightgreen.svg)](#owasp-top-10-coverage)
+[![Rules](https://img.shields.io/badge/rules-81-brightgreen.svg)](#owasp-top-10-coverage)
 
-**Detekt plugin that catches OWASP Top 10 security vulnerabilities in Kotlin Spring Boot, Quarkus, and Dropwizard applications — at compile time, in your IDE, with zero infrastructure.**
+**Kotlin SAST — Detekt plugin with 81 rules that detects OWASP Top 10 security vulnerabilities in Spring Boot, Quarkus, Dropwizard, and Ktor applications at compile time, in your IDE, with zero infrastructure.**
 
 > **FindSecBugs** works on JVM bytecode and misses Kotlin-specific patterns: coroutines, scope functions, Kotlin DSLs.  
 > **SonarQube** security rules require a paid tier or a running server.  
@@ -78,7 +78,7 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 
 ## OWASP Top 10 coverage
 
-**68 rules** across 5 modules. Every rule has positive, negative, and cross-rule isolation tests.
+**81 rules** across 5 modules. Every rule has positive, negative, and cross-rule isolation tests.
 
 ### Core — any Kotlin project (`scanner-core`)
 
@@ -148,11 +148,18 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 |---|---|---|
 | `QuarkusMissingAuthRule` | A01 | JAX-RS `@GET` etc. without `@RolesAllowed` / `@Authenticated` |
 | `QuarkusPermitAllSensitiveRule` | A01 | `@PermitAll` on `@DELETE` / `@PUT` endpoints |
+| `QuarkusJsonBeforeAuthRule` | A01 | CVE-2023-6267: `@Path` class with method-only security — JSON parsed before auth |
+| `QuarkusOpenRedirectRule` | A01 | `Response.seeOther(URI(variable))` / `temporaryRedirect(URI(variable))` |
+| `QuarkusSmallryeJwtInsecureRule` | A02 | `mp.jwt.verify.algorithm=none` or hardcoded `mp.jwt.verify.secret.value` |
 | `PanacheRawQueryRule` | A03 | `PanacheEntity.find(interpolated)` — NoSQL/ORM injection |
+| `QuarkusMissingBeanValidationRule` | A03 | `@POST`/`@PUT` entity parameter without `@Valid` — input skips validation |
 | `QuarkusBuildTimeSecretLeakRule` | A05 | Hardcoded secret in `application.properties` — bundled into native image |
 | `QuarkusUnsafeHeaderRule` | A05 | `Response.header(name, nonLiteral)` — response splitting |
+| `QuarkusCorsPermissiveConfigRule` | A05 | `quarkus.http.cors.origins=*` — allows all cross-origin requests |
+| `QuarkusDevServicesInProdRule` | A05 | `quarkus.devservices.enabled=true` in production profile |
 | `QuarkusHardcodedConfigSecretRule` | A07 | `@ConfigProperty(defaultValue="hardcoded-secret")` |
 | `QuarkusOidcInsecureConfigRule` | A07 | `quarkus.oidc.tls.verification=none` or hardcoded OIDC secret |
+| `QuarkusHardcodedDatasourcePasswordRule` | A07 | `quarkus.datasource.password` hardcoded — use env var reference |
 | `QuarkusReflectionUnsafeRule` | A08 | `@RegisterForReflection` on `Serializable` with `readObject` |
 
 ### Dropwizard (`scanner-dropwizard`)
@@ -171,8 +178,14 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | Rule | OWASP 2021 | What it catches |
 |---|---|---|
 | `KtorMissingAuthRule` | A01 | `routing {}` block with no `authenticate {}` wrapper — all routes public |
+| `KtorInsecureRedirectRule` | A01 | `call.respondRedirect(variable)` — open redirect via dynamic URL |
+| `KtorBasicAuthInsecureRule` | A02 | `basic { }` authentication — credentials base64-encoded over wire |
+| `KtorXssResponseRule` | A03 | `call.respondText(dynamic, ContentType.Text.Html)` — reflected XSS |
 | `KtorInsecureCookieSessionRule` | A05 | `install(Sessions) { cookie<T>() }` without `transform(Encrypt...)` — forgeable session |
 | `KtorPermissiveCorsRule` | A05 | `install(CORS) { anyHost() }` — cross-origin requests from any domain |
+| `KtorClearTextCookieRule` | A05 | `Cookie(name, value)` without `secure = true` — sent over plain HTTP |
+| `KtorHardcodedSecretKeyRule` | A07 | `SessionTransportTransformerEncrypt("literal", ...)` — hardcoded session key |
+| `KtorHardcodedPasswordComparisonRule` | A07 | `credentials.password == "literal"` — plaintext hardcoded password |
 
 ---
 
@@ -183,7 +196,7 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | Kotlin-native (PSI/AST) | ❌ Bytecode only | ⚠️ Partial | ✅ |
 | Coroutine security patterns | ❌ Impossible | ❌ | ✅ |
 | `let`/`run`/`apply` taint tracking | ❌ | ❌ | ✅ |
-| Spring Boot / Quarkus / Dropwizard rules | ⚠️ Java only | ⚠️ Paid tier | ✅ |
+| Spring Boot / Quarkus / Dropwizard / Ktor rules | ⚠️ Java only | ⚠️ Paid tier | ✅ |
 | Config file scanning (`.properties`/`.yml`) | ❌ | ❌ | ✅ |
 | Infrastructure needed | ❌ | ✅ Server | ❌ |
 | Cost | Free | Free / Paid | Free |
