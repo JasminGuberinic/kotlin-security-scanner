@@ -9,6 +9,31 @@ allprojects {
     repositories { mavenCentral() }
 }
 
+// ── Root-level security tasks ──────────────────────────────────────────────────
+//
+// generateSecurityBaseline — snapshot current findings into config/detekt/security-baseline.xml.
+//   Brownfield teams run this once to accept existing issues. Subsequent checkSecurity calls
+//   only fail on *new* findings introduced after the snapshot.
+//
+// checkSecurity — run the full security scan with the active baseline.
+//   New findings fail the build; baselined ones are silently skipped.
+
+tasks.register("generateSecurityBaseline") {
+    group = "security"
+    description = "Snapshot current security findings as the baseline (new violations will still fail)."
+    dependsOn(subprojects.map { "${it.path}:detektBaseline" })
+    doLast {
+        println("Security baseline written to config/detekt/security-baseline.xml")
+        println("Commit this file so CI enforces only regressions, not pre-existing issues.")
+    }
+}
+
+tasks.register("checkSecurity") {
+    group = "security"
+    description = "Security scan — only findings absent from the baseline cause a failure."
+    dependsOn(subprojects.map { "${it.path}:detekt" })
+}
+
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "io.gitlab.arturbosch.detekt")
@@ -45,6 +70,7 @@ subprojects {
         config.setFrom(rootProject.files("config/detekt/detekt.yml"))
         buildUponDefaultConfig = true
         source.setFrom("src/main/kotlin", "src/test/kotlin")
+        baseline = rootProject.file("config/detekt/security-baseline.xml")
     }
 
     tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
