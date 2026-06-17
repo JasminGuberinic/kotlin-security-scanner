@@ -119,6 +119,7 @@ security-core:
     active: true
   WeakRsaKey:
     active: true
+    minKeySize: 2048    # NIST SP 800-57: 2048 through 2030, 3072+ for longer lifetimes
   JwtNoneAlgorithm:
     active: true
   JwtWeakSecret:
@@ -191,6 +192,7 @@ security-spring-boot:
     active: true
   WeakBcryptRounds:
     active: true
+    minStrength: 10     # Spring default; raise to 12 for higher security (doubles compute per +1)
   JwtExpirationMissing:
     active: true
   MissingHttpsRedirect:

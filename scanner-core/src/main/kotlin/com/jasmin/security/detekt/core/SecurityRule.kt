@@ -21,7 +21,11 @@ abstract class SecurityRule(config: Config) : Rule(config) {
     // ── Reporting ─────────────────────────────────────────────────────────────
 
     protected fun reportAt(node: KtElement, message: String) {
-        report(CodeSmell(issue, Entity.from(node), message))
+        val cwe = CweMapping.forRule(issue.id)
+        val fix = RemediationHints.forRule(issue.id)
+        val withCwe = if (cwe != null) "$message [$cwe]" else message
+        val fullMessage = if (fix != null) "$withCwe — Fix: $fix" else withCwe
+        report(CodeSmell(issue, Entity.from(node), fullMessage))
     }
 
     // ── AST traversal ─────────────────────────────────────────────────────────

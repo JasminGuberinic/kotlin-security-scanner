@@ -297,6 +297,10 @@ object DetectionPatterns {
     const val BCRYPT_ENCODER_CLASS = "BCryptPasswordEncoder"
     const val BCRYPT_MIN_ROUNDS = 10
 
+    // ── A02 RSA key size ──────────────────────────────────────────────────────
+
+    const val RSA_MIN_KEY_SIZE = 2048
+
     // ── A02 JWT Expiration ────────────────────────────────────────────────────
 
     const val JWT_COMPACT_METHOD = "compact"

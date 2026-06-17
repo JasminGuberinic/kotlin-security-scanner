@@ -13,9 +13,14 @@ import org.jetbrains.kotlin.psi.KtConstantExpression
  * OWASP A02 — Cryptographic Failures (Weak Key Size)
  * FindSecBugs: RSA_KEY_SIZE, BLOWFISH_KEY_SIZE
  *
- * Flags KeyPairGenerator.initialize() calls with a key size ≤ 1024 bits.
+ * Flags KeyPairGenerator.initialize() calls with a key size below [minKeySize].
  * RSA-1024 is considered broken since 2010 — NIST requires ≥ 2048 bits through
  * 2030 and recommends 3072+ for longer lifetimes.
+ *
+ * Configure in detekt.yml:
+ *   WeakRsaKey:
+ *     active: true
+ *     minKeySize: 2048   # default: 2048 (NIST SP 800-57)
  *
  * Compliant:
  *   kpg.initialize(2048)   // RSA-2048 — acceptable
@@ -27,29 +32,26 @@ import org.jetbrains.kotlin.psi.KtConstantExpression
  */
 class WeakRsaKeyRule(config: Config) : SecurityRule(config) {
 
-    companion object {
-        private const val MIN_SAFE_KEY_SIZE = 2048
-    }
+    private val minKeySize: Int = config.valueOrDefault("minKeySize", DetectionPatterns.RSA_MIN_KEY_SIZE)
 
     override val issue = Issue(
         id = "WeakRsaKey",
         severity = Severity.Security,
-        description = "KeyPairGenerator initialized with ≤ 1024-bit key — use ≥ 2048 bits for RSA",
+        description = "KeyPairGenerator initialized with insufficient key size — use ≥ 2048 bits for RSA",
         debt = Debt.TWENTY_MINS,
     )
 
-    @Suppress("ReturnCount", "MagicNumber")
+    @Suppress("ReturnCount")
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
         if (expression.calleeExpression?.text != DetectionPatterns.KEY_GEN_INIT_METHOD) return
         val firstArg = expression.valueArguments.firstOrNull()?.getArgumentExpression() ?: return
         val sizeExpr = firstArg as? KtConstantExpression ?: return
         val size = sizeExpr.text.toIntOrNull() ?: return
-        if (size < MIN_SAFE_KEY_SIZE) {
-            reportAt(
-                expression,
-                "Key size $size is too small — use ≥ 2048 bits for RSA, ≥ 256 bits for EC",
-            )
-        }
+        if (size >= minKeySize) return
+        reportAt(
+            expression,
+            "Key size $size is too small — use ≥ $minKeySize bits for RSA, ≥ 256 bits for EC",
+        )
     }
 }

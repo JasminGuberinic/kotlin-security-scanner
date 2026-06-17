@@ -35,8 +35,12 @@ abstract class PropertiesSecurityRule(config: Config) : SecurityRule(config) {
         val propertiesFile = File(root, "src/main/resources/application.properties")
         if (!propertiesFile.exists()) return
         val props = Properties().also { it.load(propertiesFile.bufferedReader()) }
+        val cwe = CweMapping.forRule(issue.id)
+        val fix = RemediationHints.forRule(issue.id)
         scanProperties(props).forEach { (key, message) ->
-            report(CodeSmell(issue, Entity.from(file), "application.properties[$key]: $message"))
+            val withCwe = "application.properties[$key]: $message" + if (cwe != null) " [$cwe]" else ""
+            val fullMessage = if (fix != null) "$withCwe — Fix: $fix" else withCwe
+            report(CodeSmell(issue, Entity.from(file), fullMessage))
         }
     }
 
