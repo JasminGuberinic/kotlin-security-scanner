@@ -10,7 +10,7 @@ Fill in the form with:
 - **Languages:** Kotlin
 - **Homepage:** https://github.com/JasminGuberinic/kotlin-security-scanner
 - **Description:**
-  > Detekt plugin with 58 OWASP Top 10 security rules for Kotlin Spring Boot, Quarkus,
+  > Detekt plugin with 68 OWASP Top 10 security rules for Kotlin Spring Boot, Quarkus,
   > and Dropwizard applications. Catches coroutine security context loss, JWT attacks,
   > SQL/LDAP/JNDI injection, XXE, insecure crypto, ReDoS, SSRF, and more — patterns that
   > bytecode tools like FindSecBugs cannot detect.
@@ -27,7 +27,7 @@ Add to section **Libraries/Frameworks > Security**:
 
 ```markdown
 * [kotlin-security-scanner](https://github.com/JasminGuberinic/kotlin-security-scanner) - 
-  Detekt plugin with 58 OWASP Top 10 rules for Spring Boot, Quarkus, and Dropwizard
+  Detekt plugin with 68 OWASP Top 10 rules for Spring Boot, Quarkus, and Dropwizard
 ```
 
 Steps:
@@ -42,7 +42,7 @@ Steps:
 
 URL: https://kotlinweekly.net/submit
 
-**Subject:** kotlin-security-scanner — 58 OWASP Top 10 rules as a Detekt plugin
+**Subject:** kotlin-security-scanner — 68 OWASP Top 10 rules as a Detekt plugin
 
 **Body:**
 ```
@@ -52,7 +52,7 @@ I'd like to submit kotlin-security-scanner for consideration in Kotlin Weekly.
 
 https://github.com/JasminGuberinic/kotlin-security-scanner
 
-It's a Detekt plugin with 58 OWASP Top 10 security rules specifically for Kotlin
+It's a Detekt plugin with 68 OWASP Top 10 security rules specifically for Kotlin
 Spring Boot, Quarkus, and Dropwizard backends.
 
 The key differentiator is that it detects patterns that bytecode tools (FindSecBugs, 
@@ -85,6 +85,6 @@ Add under "Free/Open Source Tools" table, Kotlin section:
 
 ```markdown
 | [kotlin-security-scanner](https://github.com/JasminGuberinic/kotlin-security-scanner) | Kotlin | 
-Detekt plugin, 58 OWASP Top 10 rules, Spring Boot/Quarkus/Dropwizard, catches coroutine patterns | 
+Detekt plugin, 68 OWASP Top 10 rules, Spring Boot/Quarkus/Dropwizard, catches coroutine patterns | 
 Apache 2.0 |
 ```

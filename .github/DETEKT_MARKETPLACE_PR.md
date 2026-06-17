@@ -9,7 +9,7 @@ in alphabetical order by title (between "K" entries).
   {
     title: "Kotlin Security Scanner",
     description:
-      "58 OWASP Top 10 rules for Kotlin Spring Boot, Quarkus & Dropwizard. Catches what FindSecBugs misses.",
+      "68 OWASP Top 10 rules for Kotlin Spring Boot, Quarkus & Dropwizard. Catches what FindSecBugs misses.",
     repo: "https://github.com/JasminGuberinic/kotlin-security-scanner",
     ruleset: "security-core",
     rules: [
@@ -47,14 +47,14 @@ in alphabetical order by title (between "K" entries).
 
 ## PR description
 
-**Title:** Add kotlin-security-scanner — 58 OWASP Top 10 rules for Kotlin backends
+**Title:** Add kotlin-security-scanner — 68 OWASP Top 10 rules for Kotlin backends
 
 **Body:**
 ```
 ## What this adds
 
 [kotlin-security-scanner](https://github.com/JasminGuberinic/kotlin-security-scanner)
-is a Detekt plugin with 58 OWASP Top 10 rules specifically for Kotlin Spring Boot,
+is a Detekt plugin with 68 OWASP Top 10 rules specifically for Kotlin Spring Boot,
 Quarkus, and Dropwizard applications.
 
 ### Why it belongs here
@@ -80,7 +80,7 @@ structurally cannot detect:
 
 ### Coverage
 
-Full OWASP A01–A10 coverage including A06 (ReDoS) — 58 rules total.
+Full OWASP A01–A10 coverage including A06 (ReDoS) — 68 rules total.
 All rules have positive, negative, and isolation tests.
 ```
 
