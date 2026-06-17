@@ -291,4 +291,53 @@ object DetectionPatterns {
 
     const val THYMELEAF_PROCESS_METHOD = "process"
     val THYMELEAF_ENGINE_RECEIVERS = setOf("templateengine", "thymeleaf")
+
+    // ── A02 BCrypt ────────────────────────────────────────────────────────────
+
+    const val BCRYPT_ENCODER_CLASS = "BCryptPasswordEncoder"
+    const val BCRYPT_MIN_ROUNDS = 10
+
+    // ── A02 JWT Expiration ────────────────────────────────────────────────────
+
+    const val JWT_COMPACT_METHOD = "compact"
+
+    // ── A05 Exception Details Exposure ────────────────────────────────────────
+
+    const val EXCEPTION_HANDLER_ANNOTATION = "ExceptionHandler"
+    val EXCEPTION_DETAIL_PATTERNS = listOf(
+        "e.message",
+        "ex.message",
+        "exception.message",
+        "err.message",
+        "t.message",
+        "throwable.message",
+        ".localizedMessage",
+        "printStackTrace",
+        ".stackTraceToString",
+    )
+
+    // ── A05 HTTP Method Override ──────────────────────────────────────────────
+
+    const val HTTP_METHOD_OVERRIDE_FILTER = "HiddenHttpMethodFilter"
+
+    // ── A08 Kotlinx Serialization ─────────────────────────────────────────────
+
+    const val KOTLINX_SERIALIZABLE_ANNOTATION = "Serializable"
+    const val KOTLINX_TRANSIENT_ANNOTATION = "Transient"
+    val SERIALIZATION_SENSITIVE_FIELDS = setOf(
+        "password", "passwd", "pwd", "secret",
+        "privatekey", "private_key", "clientsecret", "client_secret",
+    )
+
+    // ── A07 Hardcoded Cloud Credentials ──────────────────────────────────────
+
+    val AWS_ACCESS_KEY_PATTERN = Regex("""(AKIA|ASIA|AROA|AIDA)[0-9A-Z]{16}""")
+
+    // ── Ktor ──────────────────────────────────────────────────────────────────
+
+    const val KTOR_ROUTING = "routing"
+    const val KTOR_INSTALL = "install"
+    const val KTOR_SESSIONS_FEATURE = "Sessions"
+    const val KTOR_CORS_FEATURE = "CORS"
+    const val KTOR_ANY_HOST = "anyHost()"
 }

@@ -19,10 +19,12 @@ import com.jasmin.security.detekt.a03.SqlInjectionRule
 import com.jasmin.security.detekt.a03.XpathInjectionRule
 import com.jasmin.security.detekt.a03.XxeInjectionRule
 import com.jasmin.security.detekt.a06.RegexDenialOfServiceRule
+import com.jasmin.security.detekt.a07.HardcodedAwsCredentialsRule
 import com.jasmin.security.detekt.a07.HardcodedCredentialsRule
 import com.jasmin.security.detekt.a07.InsecureRandomRule
 import com.jasmin.security.detekt.a08.InsecureDeserializationRule
 import com.jasmin.security.detekt.a08.JacksonUnsafeDeserializationRule
+import com.jasmin.security.detekt.a08.KotlinxSerializationSensitiveFieldRule
 import com.jasmin.security.detekt.a08.XmlMapperUnsafeRule
 import com.jasmin.security.detekt.a09.SensitiveDataLoggingRule
 import com.jasmin.security.detekt.a10.SsrfRule
@@ -70,10 +72,12 @@ class CoreRuleSetProvider : RuleSetProvider {
             // A07 Authentication Failures
             HardcodedCredentialsRule(config.subConfig("HardcodedCredentials")),
             InsecureRandomRule(config.subConfig("InsecureRandom")),
+            HardcodedAwsCredentialsRule(config.subConfig("HardcodedAwsCredentials")),
             // A08 Software and Data Integrity
             InsecureDeserializationRule(config.subConfig("InsecureDeserialization")),
             JacksonUnsafeDeserializationRule(config.subConfig("JacksonUnsafeDeserialization")),
             XmlMapperUnsafeRule(config.subConfig("XmlMapperUnsafe")),
+            KotlinxSerializationSensitiveFieldRule(config.subConfig("KotlinxSerializationSensitiveField")),
             // A09 Logging Failures
             SensitiveDataLoggingRule(config.subConfig("SensitiveDataLogging")),
             // A10 Server-Side Request Forgery

@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.0.10-purple.svg)](https://kotlinlang.org)
 [![Detekt](https://img.shields.io/badge/detekt-1.23.7-blue.svg)](https://detekt.dev)
-[![Rules](https://img.shields.io/badge/rules-58-brightgreen.svg)](#owasp-top-10-coverage)
+[![Rules](https://img.shields.io/badge/rules-68-brightgreen.svg)](#owasp-top-10-coverage)
 
 **Detekt plugin that catches OWASP Top 10 security vulnerabilities in Kotlin Spring Boot, Quarkus, and Dropwizard applications — at compile time, in your IDE, with zero infrastructure.**
 
@@ -31,6 +31,7 @@ dependencies {
     detektPlugins(files("path/to/scanner-spring-boot-0.1.0-SNAPSHOT.jar"))
     // detektPlugins(files("path/to/scanner-quarkus-0.1.0-SNAPSHOT.jar"))
     // detektPlugins(files("path/to/scanner-dropwizard-0.1.0-SNAPSHOT.jar"))
+    // detektPlugins(files("path/to/scanner-ktor-0.1.0-SNAPSHOT.jar"))
 }
 
 detekt {
@@ -77,7 +78,7 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 
 ## OWASP Top 10 coverage
 
-**58 rules** across 4 modules. Every rule has positive, negative, and cross-rule isolation tests.
+**68 rules** across 5 modules. Every rule has positive, negative, and cross-rule isolation tests.
 
 ### Core — any Kotlin project (`scanner-core`)
 
@@ -104,9 +105,11 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `RegexDenialOfServiceRule` | A06 | `Regex("(a+)+")` — catastrophic backtracking / ReDoS |
 | `HardcodedCredentialsRule` | A07 | Hardcoded passwords, API keys, tokens in source code |
 | `InsecureRandomRule` | A07 | `java.util.Random` / `ThreadLocalRandom` for security values |
+| `HardcodedAwsCredentialsRule` | A07 | AWS access key literals matching `AKIA/ASIA/AROA/AIDA[0-9A-Z]{16}` |
 | `InsecureDeserializationRule` | A08 | `ObjectInputStream` — unsafe with untrusted data |
 | `JacksonUnsafeDeserializationRule` | A08 | `enableDefaultTyping()` / `@JsonTypeInfo(use=Id.CLASS)` |
 | `XmlMapperUnsafeRule` | A08 | `XmlMapper()` constructor — unsafe XML deserialization |
+| `KotlinxSerializationSensitiveFieldRule` | A08 | `@Serializable` class with password/secret field missing `@Transient` |
 | `SensitiveDataLoggingRule` | A09 | Passwords or tokens interpolated into log statements |
 | `SsrfRule` | A10 | `URL()` / `URI()` constructed from a non-literal value |
 
@@ -120,6 +123,8 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `CsrfTokenLeakRule` | A01 | `model.addAttribute("csrf/xsrf...", token)` exposes CSRF token |
 | `CoroutineSecurityContextLossRule` | A01 | `suspend fun` with `@PreAuthorize` — security context silently dropped |
 | `InsecurePasswordEncoderRule` | A02 | `NoOpPasswordEncoder`, `Md5PasswordEncoder` |
+| `WeakBcryptRoundsRule` | A02 | `BCryptPasswordEncoder(strength < 10)` — brute-forceable offline |
+| `JwtExpirationMissingRule` | A02 | JWT `.compact()` without `.setExpiration()` — tokens never expire |
 | `MissingHttpsRedirectRule` | A02 | `SecurityFilterChain` without `requiresChannel().requiresSecure()` |
 | `InsecureRedisConnectionRule` | A02 | `RedisStandaloneConfiguration`/`LettuceConnectionFactory` without TLS |
 | `InsecureSmtpConfigRule` | A02 | `spring.mail.smtp.starttls.enable=false` in `application.properties` |
@@ -132,6 +137,9 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `SpringCsrfDisabledRule` | A05 | `.csrf { disable() }` / `.csrf().disable()` |
 | `PermissiveCorsRule` | A05 | `allowedOrigins("*")` in CORS config |
 | `InsecureActuatorExposureRule` | A05 | `management.endpoints.web.exposure.include=*` in properties |
+| `SecurityHeadersMissingRule` | A05 | `SecurityFilterChain` without `.headers{}` (no CSP, X-Frame-Options) |
+| `ExceptionDetailsExposedRule` | A05 | `@ExceptionHandler` returning `e.message` — leaks internals to client |
+| `HttpMethodOverrideRule` | A05 | `HiddenHttpMethodFilter` re-enabled — bypasses method-specific CSRF |
 | `WebClientSSRFRule` | A10 | `WebClient.create(nonLiteral)` — WebFlux SSRF |
 
 ### Quarkus (`scanner-quarkus`)
@@ -157,6 +165,14 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `DropwizardUnencryptedJwtSecretRule` | A02 | `setSecretProvider(literal)` — hardcoded JWT secret |
 | `DropwizardSelfValidatingELRule` | A03 | `buildConstraintViolationWithTemplate(nonLiteral)` — EL injection (CVE-2020-5245) |
 | `InsecureCookieRule` | A05 | `NewCookie(name, value)` without `secure=true` |
+
+### Ktor (`scanner-ktor`)
+
+| Rule | OWASP 2021 | What it catches |
+|---|---|---|
+| `KtorMissingAuthRule` | A01 | `routing {}` block with no `authenticate {}` wrapper — all routes public |
+| `KtorInsecureCookieSessionRule` | A05 | `install(Sessions) { cookie<T>() }` without `transform(Encrypt...)` — forgeable session |
+| `KtorPermissiveCorsRule` | A05 | `install(CORS) { anyHost() }` — cross-origin requests from any domain |
 
 ---
 
@@ -217,6 +233,7 @@ kotlin-security-scanner/
 ├── scanner-spring-boot/     # Spring MVC / Spring Security rules
 ├── scanner-quarkus/         # Quarkus / MicroProfile / JAX-RS rules
 ├── scanner-dropwizard/      # Dropwizard / JAX-RS rules
+├── scanner-ktor/            # Ktor routing / session / CORS rules
 └── scanner-all/             # Convenience bundle (all modules)
 ```
 

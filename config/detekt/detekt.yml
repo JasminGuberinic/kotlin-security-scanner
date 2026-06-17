@@ -154,12 +154,16 @@ security-core:
     active: true
   InsecureRandom:
     active: true
+  HardcodedAwsCredentials:
+    active: true
   # A08 Software and Data Integrity
   InsecureDeserialization:
     active: true
   JacksonUnsafeDeserialization:
     active: true
   XmlMapperUnsafe:
+    active: true
+  KotlinxSerializationSensitiveField:
     active: true
   # A09 Logging Failures
   SensitiveDataLogging:
@@ -184,6 +188,10 @@ security-spring-boot:
     active: true
   # A02 Cryptographic Failures
   InsecurePasswordEncoder:
+    active: true
+  WeakBcryptRounds:
+    active: true
+  JwtExpirationMissing:
     active: true
   MissingHttpsRedirect:
     active: true
@@ -211,6 +219,12 @@ security-spring-boot:
   PermissiveCors:
     active: true
   InsecureActuatorExposure:
+    active: true
+  SecurityHeadersMissing:
+    active: true
+  ExceptionDetailsExposed:
+    active: true
+  HttpMethodOverride:
     active: true
   # A10 Server-Side Request Forgery
   WebClientSSRF:
@@ -259,4 +273,16 @@ security-dropwizard:
     active: true
   # A05 Security Misconfiguration
   InsecureCookie:
+    active: true
+
+# ─── KTOR SECURITY RULES (scanner-ktor) ──────────────────────────────────────
+security-ktor:
+  active: true
+  # A01 Broken Access Control
+  KtorMissingAuth:
+    active: true
+  # A05 Security Misconfiguration
+  KtorInsecureCookieSession:
+    active: true
+  KtorPermissiveCors:
     active: true

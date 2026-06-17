@@ -5,5 +5,6 @@ include(
     "scanner-spring-boot",
     "scanner-dropwizard",
     "scanner-quarkus",
+    "scanner-ktor",
     "scanner-all",
 )

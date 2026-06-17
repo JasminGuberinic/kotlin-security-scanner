@@ -70,6 +70,7 @@ class InsecurePasswordStorageRule(config: Config) : SecurityRule(config) {
         reportAt(expression, "DigestUtils.$callee() is not safe for passwords — use BCrypt or Argon2")
     }
 
+    @Suppress("ReturnCount")
     private fun isInsidePasswordFunction(expression: KtCallExpression): Boolean {
         val fn = expression.getStrictParentOfType<KtNamedFunction>() ?: return false
         val name = fn.name?.lowercase() ?: return false
