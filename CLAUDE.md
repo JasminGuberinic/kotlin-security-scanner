@@ -119,6 +119,17 @@ config/detekt/detekt.yml         # Detekt config — built-in + all custom rule 
 | A09 Sensitive Logging | `SensitiveDataLoggingRule` | core | INFORMATION_EXPOSURE | ✅ |
 | A10 SSRF | `SsrfRule` | core | URLCONNECTION_SSRF_FD | ✅ |
 | A10 SSRF | `WebClientSSRFRule` | spring-boot | URLCONNECTION_SSRF_FD | ✅ |
+| A01 Auth | `AsyncSecurityContextLossRule` | spring-boot | — (Spring-specific) | ✅ |
+| A01 Auth | `FeignClientInsecureUrlRule` | spring-boot | — | ✅ |
+| A02 Crypto | `JwtSecretInPropertiesRule` | spring-boot | HARD_CODE_KEY | ✅ |
+| A03 Injection | `EntityManagerJpqlInjectionRule` | spring-boot | SQL_INJECTION_JPA | ✅ |
+| A05 Config | `KafkaTrustedPackagesWildcardRule` | spring-boot | OBJECT_DESERIALIZATION | ✅ |
+| A05 Config | `KafkaInsecureProtocolRule` | spring-boot | — | ✅ |
+| A05 Config | `SpringSecurityDebugEnabledRule` | spring-boot | — | ✅ |
+| A05 Config | `H2ConsoleEnabledRule` | spring-boot | — | ✅ |
+| A07 Auth | `InsecureRememberMeRule` | spring-boot | HARD_CODE_PASSWORD | ✅ |
+| A09 Logging | `ShowSqlEnabledRule` | spring-boot | INFORMATION_EXPOSURE | ✅ |
+| A10 SSRF | `RestTemplateSsrfRule` | spring-boot | URLCONNECTION_SSRF_FD | ✅ |
 
 ---
 

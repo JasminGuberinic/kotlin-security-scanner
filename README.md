@@ -4,9 +4,9 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.0.10-purple.svg)](https://kotlinlang.org)
 [![Detekt](https://img.shields.io/badge/detekt-1.23.7-blue.svg)](https://detekt.dev)
-[![Rules](https://img.shields.io/badge/rules-81-brightgreen.svg)](#owasp-top-10-coverage)
+[![Rules](https://img.shields.io/badge/rules-92-brightgreen.svg)](#owasp-top-10-coverage)
 
-**Kotlin SAST — Detekt plugin with 81 rules that detects OWASP Top 10 security vulnerabilities in Spring Boot, Quarkus, Dropwizard, and Ktor applications at compile time, in your IDE, with zero infrastructure.**
+**Kotlin SAST — Detekt plugin with 92 rules that detects OWASP Top 10 security vulnerabilities in Spring Boot, Quarkus, Dropwizard, and Ktor applications at compile time, in your IDE, with zero infrastructure.**
 
 > **FindSecBugs** works on JVM bytecode and misses Kotlin-specific patterns: coroutines, scope functions, Kotlin DSLs.  
 > **SonarQube** security rules require a paid tier or a running server.  
@@ -78,7 +78,7 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 
 ## OWASP Top 10 coverage
 
-**81 rules** across 5 modules. Every rule has positive, negative, and cross-rule isolation tests.
+**92 rules** across 5 modules. Every rule has positive, negative, and cross-rule isolation tests.
 
 ### Core — any Kotlin project (`scanner-core`)
 
@@ -122,17 +122,21 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `OpenRedirectRule` | A01 | `"redirect:" + variable` in `@Controller` methods |
 | `CsrfTokenLeakRule` | A01 | `model.addAttribute("csrf/xsrf...", token)` exposes CSRF token |
 | `CoroutineSecurityContextLossRule` | A01 | `suspend fun` with `@PreAuthorize` — security context silently dropped |
+| `AsyncSecurityContextLossRule` | A01 | `@Async` method reading `SecurityContextHolder` — context lost across threads |
+| `FeignClientInsecureUrlRule` | A01 | `@FeignClient(url = "http://...")` — credentials over cleartext channel |
 | `InsecurePasswordEncoderRule` | A02 | `NoOpPasswordEncoder`, `Md5PasswordEncoder` |
 | `WeakBcryptRoundsRule` | A02 | `BCryptPasswordEncoder(strength < 10)` — brute-forceable offline |
 | `JwtExpirationMissingRule` | A02 | JWT `.compact()` without `.setExpiration()` — tokens never expire |
 | `MissingHttpsRedirectRule` | A02 | `SecurityFilterChain` without `requiresChannel().requiresSecure()` |
 | `InsecureRedisConnectionRule` | A02 | `RedisStandaloneConfiguration`/`LettuceConnectionFactory` without TLS |
 | `InsecureSmtpConfigRule` | A02 | `spring.mail.smtp.starttls.enable=false` in `application.properties` |
+| `JwtSecretInPropertiesRule` | A02 | JWT signing secret hardcoded in `application.properties` |
 | `SpelInjectionRule` | A03 | `parseExpression(nonLiteral)` — SpEL RCE |
 | `ResponseSplittingRule` | A03 | `response.addHeader(name, nonLiteral)` — CR/LF injection |
 | `ELInjectionRule` | A03 | `ELProcessor.eval(nonLiteral)` — EL expression RCE |
 | `SpringDataMongoInjectionRule` | A03 | `Criteria.where(nonLiteral)` — MongoDB injection |
 | `ThymeleafSSTIRule` | A03 | `templateEngine.process(nonLiteral, ctx)` — Thymeleaf SSTI |
+| `EntityManagerJpqlInjectionRule` | A03 | `createQuery`/`createNativeQuery` with dynamic string — JPQL/SQL injection |
 | `MassAssignmentRule` | A04 | `@RequestBody` on a JPA `@Entity` class |
 | `SpringCsrfDisabledRule` | A05 | `.csrf { disable() }` / `.csrf().disable()` |
 | `PermissiveCorsRule` | A05 | `allowedOrigins("*")` in CORS config |
@@ -140,7 +144,14 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `SecurityHeadersMissingRule` | A05 | `SecurityFilterChain` without `.headers{}` (no CSP, X-Frame-Options) |
 | `ExceptionDetailsExposedRule` | A05 | `@ExceptionHandler` returning `e.message` — leaks internals to client |
 | `HttpMethodOverrideRule` | A05 | `HiddenHttpMethodFilter` re-enabled — bypasses method-specific CSRF |
+| `KafkaTrustedPackagesWildcardRule` | A05 | `spring.json.trusted.packages=*` — arbitrary class deserialization (CVE-2023-34040) |
+| `KafkaInsecureProtocolRule` | A05 | `spring.kafka.*.security.protocol=PLAINTEXT` — unencrypted broker traffic |
+| `SpringSecurityDebugEnabledRule` | A05 | `@EnableWebSecurity(debug=true)` — logs all requests and auth decisions |
+| `H2ConsoleEnabledRule` | A05 | `spring.h2.console.enabled=true` outside dev/test — exposes SQL console |
+| `InsecureRememberMeRule` | A07 | `rememberMe().key("literal")` — hardcoded cookie-signing secret |
+| `ShowSqlEnabledRule` | A09 | `spring.jpa.show-sql=true` / Hibernate SQL logging — leaks schema to logs |
 | `WebClientSSRFRule` | A10 | `WebClient.create(nonLiteral)` — WebFlux SSRF |
+| `RestTemplateSsrfRule` | A10 | `restTemplate.getForObject/exchange(variable, ...)` — RestTemplate SSRF |
 
 ### Quarkus (`scanner-quarkus`)
 
