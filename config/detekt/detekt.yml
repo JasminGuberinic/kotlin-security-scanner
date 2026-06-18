@@ -359,6 +359,33 @@ security-quarkus:
     active: true
   QuarkusConfigPasswordLeak:
     active: true
+  # A01 Batch 3
+  QuarkusFormCsrfMissing:
+    active: true
+  QuarkusUnsafeSecurityContext:
+    active: true
+  # A03 Batch 3
+  QuarkusSensitiveQueryParam:
+    active: true
+  # A04 Insecure Design
+  QuarkusMassAssignment:
+    active: true
+  # A05 Batch 3
+  QuarkusInsecureCookie:
+    active: true
+  QuarkusInsecureFileUpload:
+    active: true
+  # A07 Batch 3
+  QuarkusHardcodedConfigPropertyDefault:
+    active: true
+  # A08 Batch 3
+  QuarkusJsonbUnsafeDeserialization:
+    active: true
+  # A09 Batch 3
+  QuarkusExceptionMessageLeak:
+    active: true
+  QuarkusPasswordInLog:
+    active: true
 
 # ─── DROPWIZARD SECURITY RULES (scanner-dropwizard) ──────────────────────────
 security-dropwizard:

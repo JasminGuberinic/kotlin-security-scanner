@@ -1,5 +1,6 @@
 package com.jasmin.security.detekt
 
+import com.jasmin.security.detekt.a01.QuarkusFormCsrfMissingRule
 import com.jasmin.security.detekt.a01.QuarkusGraphQLNoAuthRule
 import com.jasmin.security.detekt.a01.QuarkusJsonBeforeAuthRule
 import com.jasmin.security.detekt.a01.QuarkusMissingAuthRule
@@ -7,6 +8,7 @@ import com.jasmin.security.detekt.a01.QuarkusOpenRedirectRule
 import com.jasmin.security.detekt.a01.QuarkusPermitAllSensitiveRule
 import com.jasmin.security.detekt.a01.QuarkusReactiveRouteNoAuthRule
 import com.jasmin.security.detekt.a01.QuarkusRestClientInsecureUrlRule
+import com.jasmin.security.detekt.a01.QuarkusUnsafeSecurityContextRule
 import com.jasmin.security.detekt.a02.QuarkusGrpcInsecureRule
 import com.jasmin.security.detekt.a02.QuarkusMongoInsecureRule
 import com.jasmin.security.detekt.a02.QuarkusOidcAudienceMissingRule
@@ -16,18 +18,26 @@ import com.jasmin.security.detekt.a03.PanacheRawQueryRule
 import com.jasmin.security.detekt.a03.QuarkusMissingBeanValidationRule
 import com.jasmin.security.detekt.a03.QuarkusNativeQueryInjectionRule
 import com.jasmin.security.detekt.a03.QuarkusPathParamInjectionRule
+import com.jasmin.security.detekt.a03.QuarkusSensitiveQueryParamRule
+import com.jasmin.security.detekt.a04.QuarkusMassAssignmentRule
 import com.jasmin.security.detekt.a05.QuarkusBuildTimeSecretLeakRule
 import com.jasmin.security.detekt.a05.QuarkusCorsPermissiveConfigRule
 import com.jasmin.security.detekt.a05.QuarkusDevServicesInProdRule
+import com.jasmin.security.detekt.a05.QuarkusInsecureCookieRule
+import com.jasmin.security.detekt.a05.QuarkusInsecureFileUploadRule
 import com.jasmin.security.detekt.a05.QuarkusMultipartInsecureRule
 import com.jasmin.security.detekt.a05.QuarkusSmallRyeHealthInsecureRule
 import com.jasmin.security.detekt.a05.QuarkusSwaggerUiInProdRule
 import com.jasmin.security.detekt.a05.QuarkusUnsafeHeaderRule
 import com.jasmin.security.detekt.a07.QuarkusConfigPasswordLeakRule
+import com.jasmin.security.detekt.a07.QuarkusHardcodedConfigPropertyDefaultRule
 import com.jasmin.security.detekt.a07.QuarkusHardcodedConfigSecretRule
 import com.jasmin.security.detekt.a07.QuarkusHardcodedDatasourcePasswordRule
 import com.jasmin.security.detekt.a07.QuarkusOidcInsecureConfigRule
+import com.jasmin.security.detekt.a08.QuarkusJsonbUnsafeDeserializationRule
 import com.jasmin.security.detekt.a08.QuarkusReflectionUnsafeRule
+import com.jasmin.security.detekt.a09.QuarkusExceptionMessageLeakRule
+import com.jasmin.security.detekt.a09.QuarkusPasswordInLogRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.RuleSet
 import io.gitlab.arturbosch.detekt.api.RuleSetProvider
@@ -47,6 +57,8 @@ class QuarkusRuleSetProvider : RuleSetProvider {
             QuarkusRestClientInsecureUrlRule(config.subConfig("QuarkusRestClientInsecureUrl")),
             QuarkusGraphQLNoAuthRule(config.subConfig("QuarkusGraphQLNoAuth")),
             QuarkusReactiveRouteNoAuthRule(config.subConfig("QuarkusReactiveRouteNoAuth")),
+            QuarkusFormCsrfMissingRule(config.subConfig("QuarkusFormCsrfMissing")),
+            QuarkusUnsafeSecurityContextRule(config.subConfig("QuarkusUnsafeSecurityContext")),
             // A02 Cryptographic Failures
             QuarkusSmallryeJwtInsecureRule(config.subConfig("QuarkusSmallryeJwtInsecure")),
             QuarkusRedisInsecureRule(config.subConfig("QuarkusRedisInsecure")),
@@ -58,6 +70,9 @@ class QuarkusRuleSetProvider : RuleSetProvider {
             QuarkusMissingBeanValidationRule(config.subConfig("QuarkusMissingBeanValidation")),
             QuarkusNativeQueryInjectionRule(config.subConfig("QuarkusNativeQueryInjection")),
             QuarkusPathParamInjectionRule(config.subConfig("QuarkusPathParamInjection")),
+            QuarkusSensitiveQueryParamRule(config.subConfig("QuarkusSensitiveQueryParam")),
+            // A04 Insecure Design
+            QuarkusMassAssignmentRule(config.subConfig("QuarkusMassAssignment")),
             // A05 Security Misconfiguration
             QuarkusUnsafeHeaderRule(config.subConfig("QuarkusUnsafeHeader")),
             QuarkusBuildTimeSecretLeakRule(config.subConfig("QuarkusBuildTimeSecretLeak")),
@@ -66,13 +81,22 @@ class QuarkusRuleSetProvider : RuleSetProvider {
             QuarkusMultipartInsecureRule(config.subConfig("QuarkusMultipartInsecure")),
             QuarkusSmallRyeHealthInsecureRule(config.subConfig("QuarkusSmallRyeHealthInsecure")),
             QuarkusSwaggerUiInProdRule(config.subConfig("QuarkusSwaggerUiInProd")),
+            QuarkusInsecureCookieRule(config.subConfig("QuarkusInsecureCookie")),
+            QuarkusInsecureFileUploadRule(config.subConfig("QuarkusInsecureFileUpload")),
             // A07 Identification and Authentication Failures
             QuarkusHardcodedConfigSecretRule(config.subConfig("QuarkusHardcodedConfigSecret")),
             QuarkusOidcInsecureConfigRule(config.subConfig("QuarkusOidcInsecureConfig")),
             QuarkusHardcodedDatasourcePasswordRule(config.subConfig("QuarkusHardcodedDatasourcePassword")),
             QuarkusConfigPasswordLeakRule(config.subConfig("QuarkusConfigPasswordLeak")),
+            QuarkusHardcodedConfigPropertyDefaultRule(
+                config.subConfig("QuarkusHardcodedConfigPropertyDefault"),
+            ),
             // A08 Software and Data Integrity
             QuarkusReflectionUnsafeRule(config.subConfig("QuarkusReflectionUnsafe")),
+            QuarkusJsonbUnsafeDeserializationRule(config.subConfig("QuarkusJsonbUnsafeDeserialization")),
+            // A09 Security Logging and Monitoring Failures
+            QuarkusExceptionMessageLeakRule(config.subConfig("QuarkusExceptionMessageLeak")),
+            QuarkusPasswordInLogRule(config.subConfig("QuarkusPasswordInLog")),
         )
     )
 }

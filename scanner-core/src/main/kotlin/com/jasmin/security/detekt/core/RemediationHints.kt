@@ -311,6 +311,38 @@ object RemediationHints {
         "QuarkusConfigPasswordLeak" to
             "Remove defaultValue from @ConfigProperty for secrets — require the env var to be explicitly set",
 
+        // ── Quarkus batch 3 ───────────────────────────────────────────────────
+
+        "QuarkusFormCsrfMissing" to
+            "Add @HeaderParam(\"X-CSRF-Token\") or use the Quarkus CSRF Reactive extension",
+
+        "QuarkusUnsafeSecurityContext" to
+            "if (!ctx.isUserInRole(\"admin\")) throw ForbiddenException() — always check the injected context",
+
+        "QuarkusSensitiveQueryParam" to
+            "Pass credentials in the request body or Authorization header, not as URL query parameters",
+
+        "QuarkusMassAssignment" to
+            "Create a DTO that exposes only fields the client is allowed to set, not the domain entity directly",
+
+        "QuarkusInsecureCookie" to
+            "NewCookie.Builder(name).secure(true).httpOnly(true).sameSite(SameSite.STRICT).build()",
+
+        "QuarkusInsecureFileUpload" to
+            "val safe = UUID.randomUUID().toString() + ext; File(uploadDir, safe)",
+
+        "QuarkusHardcodedConfigPropertyDefault" to
+            "@ConfigProperty(name = \"jwt.secret\") — omit defaultValue so the app fails fast when absent",
+
+        "QuarkusJsonbUnsafeDeserialization" to
+            "Replace Object::class.java with a concrete DTO class in Jsonb.fromJson()",
+
+        "QuarkusExceptionMessageLeak" to
+            "Response.serverError().entity(mapOf(\"error\" to \"Internal error\")).build()",
+
+        "QuarkusPasswordInLog" to
+            "Log only non-sensitive identifiers (userId, requestId) — never log credentials or secrets",
+
         // ── Dropwizard — A01 Broken Access Control ────────────────────────────
 
         "DropwizardMissingAuth" to

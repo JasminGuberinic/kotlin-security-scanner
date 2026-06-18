@@ -155,6 +155,17 @@ object CweMapping {
         "QuarkusSmallRyeHealthInsecure" to "CWE-489",
         "QuarkusSwaggerUiInProd" to "CWE-489",
         "QuarkusConfigPasswordLeak" to "CWE-798",
+        // Quarkus batch 3
+        "QuarkusFormCsrfMissing" to "CWE-352",
+        "QuarkusUnsafeSecurityContext" to "CWE-285",
+        "QuarkusSensitiveQueryParam" to "CWE-598",
+        "QuarkusMassAssignment" to "CWE-915",
+        "QuarkusInsecureCookie" to "CWE-614",
+        "QuarkusInsecureFileUpload" to "CWE-22",
+        "QuarkusHardcodedConfigPropertyDefault" to "CWE-798",
+        "QuarkusJsonbUnsafeDeserialization" to "CWE-502",
+        "QuarkusExceptionMessageLeak" to "CWE-209",
+        "QuarkusPasswordInLog" to "CWE-532",
 
         // ── Dropwizard rules ──────────────────────────────────────────────────
 
