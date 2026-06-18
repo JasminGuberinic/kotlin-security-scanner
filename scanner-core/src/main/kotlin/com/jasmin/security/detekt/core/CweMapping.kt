@@ -81,6 +81,24 @@ object CweMapping {
         "HttpMethodOverride" to "CWE-352",
         // A10 SSRF
         "WebClientSSRF" to "CWE-918",
+        // A01 (new)
+        "AsyncSecurityContextLoss" to "CWE-272",
+        "FeignClientInsecureUrl" to "CWE-319",
+        // A02 (new)
+        "JwtSecretInProperties" to "CWE-798",
+        // A03 (new)
+        "EntityManagerJpqlInjection" to "CWE-89",
+        // A05 (new)
+        "KafkaTrustedPackagesWildcard" to "CWE-502",
+        "KafkaInsecureProtocol" to "CWE-319",
+        "SpringSecurityDebugEnabled" to "CWE-489",
+        "H2ConsoleEnabled" to "CWE-489",
+        // A07 (new)
+        "InsecureRememberMe" to "CWE-798",
+        // A09 (new)
+        "ShowSqlEnabled" to "CWE-532",
+        // A10 (new)
+        "RestTemplateSsrf" to "CWE-918",
 
         // ── Quarkus rules ─────────────────────────────────────────────────────
 

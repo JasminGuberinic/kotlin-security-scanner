@@ -305,6 +305,41 @@ object RemediationHints {
         "KtorClearTextCookie" to
             "Cookie(name, value, secure = true, httpOnly = true)",
 
+        // ── Spring Boot (new batch) ───────────────────────────────────────────
+
+        "AsyncSecurityContextLoss" to
+            "Wrap executor: @Bean fun exec() = DelegatingSecurityContextAsyncTaskExecutor(ThreadPoolTaskExecutor())",
+
+        "FeignClientInsecureUrl" to
+            "@FeignClient(name = \"svc\", url = \"https://svc\") or remove url and use service discovery",
+
+        "JwtSecretInProperties" to
+            """spring.security.oauth2.resourceserver.jwt.secret=${"$"}{JWT_SECRET} // inject from env""",
+
+        "EntityManagerJpqlInjection" to
+            "em.createQuery(\"SELECT u FROM User u WHERE name = :n\").setParameter(\"n\", value)",
+
+        "KafkaTrustedPackagesWildcard" to
+            "spring.kafka.consumer.properties.spring.json.trusted.packages=com.myapp.dto",
+
+        "KafkaInsecureProtocol" to
+            "spring.kafka.security.protocol=SASL_SSL (and configure keystore/truststore)",
+
+        "SpringSecurityDebugEnabled" to
+            "Remove debug=true from @EnableWebSecurity — it is safe to omit entirely in production",
+
+        "H2ConsoleEnabled" to
+            "%prod.spring.h2.console.enabled=false or simply remove the property (default is false)",
+
+        "InsecureRememberMe" to
+            """http.rememberMe().key(System.getenv("REMEMBER_ME_KEY") ?: error("key not set"))""",
+
+        "ShowSqlEnabled" to
+            "Use %dev.spring.jpa.show-sql=true and omit the key in default/prod profile",
+
+        "RestTemplateSsrf" to
+            "val host = URI(url).host; require(host in allowedHosts) before restTemplate.getForObject(url, ...)",
+
         // ── Ktor — A07 Identification and Authentication Failures ─────────────
 
         "KtorHardcodedSecretKey" to

@@ -351,6 +351,20 @@ object DetectionPatterns {
         "MatrixParam",
     )
 
+    // ── A03 JPA EntityManager ─────────────────────────────────────────────────
+
+    val ENTITY_MANAGER_QUERY_METHODS = setOf("createQuery", "createNativeQuery")
+
+    // ── A10 RestTemplate SSRF ─────────────────────────────────────────────────
+
+    val REST_TEMPLATE_METHODS = setOf(
+        "getForObject",
+        "getForEntity",
+        "postForObject",
+        "postForEntity",
+        "exchange",
+    )
+
     // ── Ktor ──────────────────────────────────────────────────────────────────
 
     const val KTOR_ROUTING = "routing"

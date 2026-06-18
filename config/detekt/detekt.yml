@@ -228,8 +228,36 @@ security-spring-boot:
     active: true
   HttpMethodOverride:
     active: true
+  # A01 (new)
+  AsyncSecurityContextLoss:
+    active: true
+  FeignClientInsecureUrl:
+    active: true
+  # A02 (new)
+  JwtSecretInProperties:
+    active: true
+  # A03 (new)
+  EntityManagerJpqlInjection:
+    active: true
+  # A05 (new)
+  KafkaTrustedPackagesWildcard:
+    active: true
+  KafkaInsecureProtocol:
+    active: true
+  SpringSecurityDebugEnabled:
+    active: true
+  H2ConsoleEnabled:
+    active: true
+  # A07 (new)
+  InsecureRememberMe:
+    active: true
+  # A09 (new)
+  ShowSqlEnabled:
+    active: true
   # A10 Server-Side Request Forgery
   WebClientSSRF:
+    active: true
+  RestTemplateSsrf:
     active: true
 
 # ─── QUARKUS SECURITY RULES (scanner-quarkus) ────────────────────────────────
