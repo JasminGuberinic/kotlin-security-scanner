@@ -84,6 +84,16 @@ subprojects {
 
     // Shared POM metadata applied whenever a module opts into publishing
     pluginManager.withPlugin("com.vanniktech.maven.publish") {
+        // Explicitly wire in-memory GPG key — signAllPublications() creates tasks but
+        // does not auto-configure the signatory from project properties in 0.29.x
+        pluginManager.withPlugin("signing") {
+            configure<org.gradle.plugins.signing.SigningExtension> {
+                val key = findProperty("signingInMemoryKey") as? String
+                val keyId = findProperty("signingInMemoryKeyId") as? String
+                val password = findProperty("signingInMemoryKeyPassword") as? String
+                if (key != null) useInMemoryPgpKeys(keyId, key, password)
+            }
+        }
         configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
             publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
             signAllPublications()
