@@ -228,18 +228,34 @@ security-spring-boot:
     active: true
   HttpMethodOverride:
     active: true
-  # A01 (new)
+  # A01
   AsyncSecurityContextLoss:
     active: true
   FeignClientInsecureUrl:
     active: true
-  # A02 (new)
+  UnvalidatedForward:
+    active: true
+  PermitAllAdminPath:
+    active: true
+  # A02
   JwtSecretInProperties:
     active: true
-  # A03 (new)
+  OAuth2ClientSecretInProperties:
+    active: true
+  SpringCacheableSensitive:
+    active: true
+  # A03
   EntityManagerJpqlInjection:
     active: true
-  # A05 (new)
+  SpringDataSortInjection:
+    active: true
+  # A05
+  SpringActuatorShutdownEnabled:
+    active: true
+  CloudConfigInsecureUri:
+    active: true
+  CrossOriginCredentialsWildcard:
+    active: true
   KafkaTrustedPackagesWildcard:
     active: true
   KafkaInsecureProtocol:
@@ -248,11 +264,15 @@ security-spring-boot:
     active: true
   H2ConsoleEnabled:
     active: true
-  # A07 (new)
+  # A07
   InsecureRememberMe:
     active: true
-  # A09 (new)
+  HardcodedDatasourcePassword:
+    active: true
+  # A09
   ShowSqlEnabled:
+    active: true
+  SecurityLoggingVerbose:
     active: true
   # A10 Server-Side Request Forgery
   WebClientSSRF:

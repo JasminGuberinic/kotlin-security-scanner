@@ -99,6 +99,17 @@ object CweMapping {
         "ShowSqlEnabled" to "CWE-532",
         // A10 (new)
         "RestTemplateSsrf" to "CWE-918",
+        // Spring Boot batch 2
+        "OAuth2ClientSecretInProperties" to "CWE-798",
+        "HardcodedDatasourcePassword" to "CWE-798",
+        "SpringActuatorShutdownEnabled" to "CWE-489",
+        "CloudConfigInsecureUri" to "CWE-319",
+        "SpringDataSortInjection" to "CWE-89",
+        "UnvalidatedForward" to "CWE-601",
+        "SpringCacheableSensitive" to "CWE-312",
+        "CrossOriginCredentialsWildcard" to "CWE-942",
+        "PermitAllAdminPath" to "CWE-285",
+        "SecurityLoggingVerbose" to "CWE-532",
 
         // ── Quarkus rules ─────────────────────────────────────────────────────
 

@@ -340,6 +340,38 @@ object RemediationHints {
         "RestTemplateSsrf" to
             "val host = URI(url).host; require(host in allowedHosts) before restTemplate.getForObject(url, ...)",
 
+        // ── Spring Boot Batch 2 ───────────────────────────────────────────────
+
+        "OAuth2ClientSecretInProperties" to
+            "Use spring.security.oauth2.client.registration.google.client-secret=\${GOOGLE_CLIENT_SECRET}",
+
+        "HardcodedDatasourcePassword" to
+            "Use spring.datasource.password=\${DB_PASSWORD} and set the variable in the deployment environment",
+
+        "SpringActuatorShutdownEnabled" to
+            "Remove management.endpoint.shutdown.enabled=true and 'shutdown' from exposure.include",
+
+        "CloudConfigInsecureUri" to
+            "Use spring.cloud.config.uri=https://config-server to prevent credentials sent in cleartext",
+
+        "SpringDataSortInjection" to
+            "val allowed = setOf(\"name\",\"email\"); require(field in allowed); Sort.by(field)",
+
+        "UnvalidatedForward" to
+            "Use a whitelist map: val targets = mapOf(\"home\" to \"/home.jsp\"); forward to targets[key]!!",
+
+        "SpringCacheableSensitive" to
+            "Remove @Cacheable or encrypt the cached value: redisTemplate.opsForValue().set(key, encrypt(value))",
+
+        "CrossOriginCredentialsWildcard" to
+            "@CrossOrigin(origins = [\"https://app.example.com\"], allowCredentials = \"true\")",
+
+        "PermitAllAdminPath" to
+            ".requestMatchers(\"/admin/**\").hasRole(\"ADMIN\") — never use permitAll() for admin paths",
+
+        "SecurityLoggingVerbose" to
+            "Use %dev.logging.level.org.springframework.security=DEBUG — omit the key in default/prod profile",
+
         // ── Ktor — A07 Identification and Authentication Failures ─────────────
 
         "KtorHardcodedSecretKey" to

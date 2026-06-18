@@ -40,6 +40,9 @@ class EntityManagerJpqlInjectionRule(config: Config) : SecurityRule(config) {
         if (callee !in DetectionPatterns.ENTITY_MANAGER_QUERY_METHODS) return
         val firstArg = expression.valueArguments.firstOrNull()?.getArgumentExpression() ?: return
         if (firstArg is KtStringTemplateExpression && !firstArg.hasInterpolation()) return
-        reportAt(expression, "$callee() with dynamic string — use named params: createQuery(\"... WHERE x = :x\").setParameter(\"x\", v)")
+        reportAt(
+            expression,
+            "$callee() with dynamic string — use named params: .setParameter(\"name\", value)",
+        )
     }
 }

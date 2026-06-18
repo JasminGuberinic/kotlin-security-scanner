@@ -329,8 +329,14 @@ object DetectionPatterns {
     const val KOTLINX_SERIALIZABLE_ANNOTATION = "Serializable"
     const val KOTLINX_TRANSIENT_ANNOTATION = "Transient"
     val SERIALIZATION_SENSITIVE_FIELDS = setOf(
-        "password", "passwd", "pwd", "secret",
-        "privatekey", "private_key", "clientsecret", "client_secret",
+        "password",
+        "passwd",
+        "pwd",
+        "secret",
+        "privatekey",
+        "private_key",
+        "clientsecret",
+        "client_secret",
     )
 
     // ── A07 Hardcoded Cloud Credentials ──────────────────────────────────────
@@ -349,6 +355,16 @@ object DetectionPatterns {
         "Context",
         "BeanParam",
         "MatrixParam",
+    )
+
+    // ── A01 Admin / privileged paths ─────────────────────────────────────────
+
+    val ADMIN_PATHS = listOf(
+        "/admin",
+        "/actuator",
+        "/management",
+        "/console",
+        "/h2-console",
     )
 
     // ── A03 JPA EntityManager ─────────────────────────────────────────────────
