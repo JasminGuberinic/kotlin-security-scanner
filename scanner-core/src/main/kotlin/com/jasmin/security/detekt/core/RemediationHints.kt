@@ -448,6 +448,38 @@ object RemediationHints {
         "SecurityLoggingVerbose" to
             "Use %dev.logging.level.org.springframework.security=DEBUG — omit the key in default/prod profile",
 
+        // ── Ktor — A01 Broken Access Control ──────────────────────────────────
+
+        "KtorCsrfMissing" to
+            "install(CSRF) { allowHeader(HttpHeaders.Origin) } — add CSRF plugin or validate Origin/X-Requested-With",
+
+        // ── Ktor — A02 Cryptographic Failures ────────────────────────────────
+
+        "KtorWeakJwtSecret" to
+            """val secret = System.getenv("JWT_SECRET") ?: error("JWT_SECRET not set"); Algorithm.HMAC256(secret)""",
+
+        // ── Ktor — A03 Injection ──────────────────────────────────────────────
+
+        "KtorExposedOrmInjection" to
+            "Use Exposed's typesafe DSL: Users.select { Users.name eq param } — avoid exec() with string templates",
+
+        "KtorSensitiveRouteParam" to
+            "Never log or expose route params named password/token/secret — read from body or headers instead",
+
+        // ── Ktor — A05 Security Misconfiguration ──────────────────────────────
+
+        "KtorSecurityHeadersMissing" to
+            """install(DefaultHeaders) { header("X-Frame-Options", "DENY"); header("X-Content-Type-Options", "nosniff") }""",
+
+        "KtorSslRedirectMissing" to
+            "install(HttpsRedirect) { sslPort = 443 } — redirect all HTTP traffic to HTTPS",
+
+        "KtorRateLimitingMissing" to
+            "install(RateLimit) { register(RateLimitName(\"login\")) { rateLimiter(limit = 5, refillPeriod = 1.minutes) } }",
+
+        "KtorSessionCookieDomainMissing" to
+            "cookie.domain = \"app.example.com\" — restrict session cookie to known domain to prevent subdomain hijack",
+
         // ── Ktor — A07 Identification and Authentication Failures ─────────────
 
         "KtorHardcodedSecretKey" to
@@ -455,6 +487,14 @@ object RemediationHints {
 
         "KtorHardcodedPasswordComparison" to
             "BCrypt.checkpw(credentials.password, storedHash) // never compare plaintext passwords",
+
+        "KtorHardcodedDatabasePassword" to
+            """Database.connect(url, password = System.getenv("DB_PASS") ?: error("DB_PASS not set"))""",
+
+        // ── Ktor — A09 Security Logging and Monitoring Failures ───────────────
+
+        "KtorLoggingCredentials" to
+            "Remove sensitive keywords from log statements — log only non-sensitive identifiers (userId, requestId)",
     )
 
     /** Returns the fix hint for a given rule ID, or null if not mapped. */

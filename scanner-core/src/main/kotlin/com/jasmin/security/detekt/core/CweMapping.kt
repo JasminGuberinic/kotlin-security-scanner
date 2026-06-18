@@ -179,17 +179,28 @@ object CweMapping {
         // A01 Broken Access Control
         "KtorMissingAuth" to "CWE-285",
         "KtorInsecureRedirect" to "CWE-601",
+        "KtorCsrfMissing" to "CWE-352",
         // A02 Cryptographic Failures
         "KtorBasicAuthInsecure" to "CWE-319",
+        "KtorWeakJwtSecret" to "CWE-798",
         // A03 Injection
         "KtorXssResponse" to "CWE-79",
+        "KtorExposedOrmInjection" to "CWE-89",
+        "KtorSensitiveRouteParam" to "CWE-200",
         // A05 Security Misconfiguration
         "KtorInsecureCookieSession" to "CWE-565",
         "KtorPermissiveCors" to "CWE-942",
         "KtorClearTextCookie" to "CWE-614",
+        "KtorSecurityHeadersMissing" to "CWE-693",
+        "KtorSslRedirectMissing" to "CWE-319",
+        "KtorRateLimitingMissing" to "CWE-307",
+        "KtorSessionCookieDomainMissing" to "CWE-565",
         // A07 Identification and Authentication Failures
         "KtorHardcodedSecretKey" to "CWE-798",
         "KtorHardcodedPasswordComparison" to "CWE-798",
+        "KtorHardcodedDatabasePassword" to "CWE-798",
+        // A09 Security Logging and Monitoring Failures
+        "KtorLoggingCredentials" to "CWE-532",
     )
 
     /** Returns the CWE tag string for a given rule ID, e.g. "CWE-89". Null if not mapped. */

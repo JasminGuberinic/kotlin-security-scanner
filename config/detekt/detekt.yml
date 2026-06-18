@@ -396,11 +396,19 @@ security-ktor:
     active: true
   KtorInsecureRedirect:
     active: true
+  KtorCsrfMissing:
+    active: true
   # A02 Cryptographic Failures
   KtorBasicAuthInsecure:
     active: true
+  KtorWeakJwtSecret:
+    active: true
   # A03 Injection
   KtorXssResponse:
+    active: true
+  KtorExposedOrmInjection:
+    active: true
+  KtorSensitiveRouteParam:
     active: true
   # A05 Security Misconfiguration
   KtorInsecureCookieSession:
@@ -409,8 +417,21 @@ security-ktor:
     active: true
   KtorClearTextCookie:
     active: true
+  KtorSecurityHeadersMissing:
+    active: true
+  KtorSslRedirectMissing:
+    active: true
+  KtorRateLimitingMissing:
+    active: true
+  KtorSessionCookieDomainMissing:
+    active: true
   # A07 Identification and Authentication Failures
   KtorHardcodedSecretKey:
     active: true
   KtorHardcodedPasswordComparison:
+    active: true
+  KtorHardcodedDatabasePassword:
+    active: true
+  # A09 Security Logging and Monitoring Failures
+  KtorLoggingCredentials:
     active: true
