@@ -319,6 +319,33 @@ security-quarkus:
   # A08 Software and Data Integrity
   QuarkusReflectionUnsafe:
     active: true
+  # Quarkus Batch 2
+  QuarkusRestClientInsecureUrl:
+    active: true
+  QuarkusGraphQLNoAuth:
+    active: true
+  QuarkusReactiveRouteNoAuth:
+    active: true
+  QuarkusRedisInsecure:
+    active: true
+  QuarkusMongoInsecure:
+    active: true
+  QuarkusOidcAudienceMissing:
+    active: true
+  QuarkusGrpcInsecure:
+    active: true
+  QuarkusNativeQueryInjection:
+    active: true
+  QuarkusPathParamInjection:
+    active: true
+  QuarkusMultipartInsecure:
+    active: true
+  QuarkusSmallRyeHealthInsecure:
+    active: true
+  QuarkusSwaggerUiInProd:
+    active: true
+  QuarkusConfigPasswordLeak:
+    active: true
 
 # ─── DROPWIZARD SECURITY RULES (scanner-dropwizard) ──────────────────────────
 security-dropwizard:

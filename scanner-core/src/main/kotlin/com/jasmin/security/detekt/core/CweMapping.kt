@@ -134,6 +134,20 @@ object CweMapping {
         "QuarkusHardcodedDatasourcePassword" to "CWE-798",
         // A08 Software and Data Integrity
         "QuarkusReflectionUnsafe" to "CWE-502",
+        // Quarkus Batch 2
+        "QuarkusRestClientInsecureUrl" to "CWE-319",
+        "QuarkusGraphQLNoAuth" to "CWE-285",
+        "QuarkusReactiveRouteNoAuth" to "CWE-285",
+        "QuarkusRedisInsecure" to "CWE-319",
+        "QuarkusMongoInsecure" to "CWE-319",
+        "QuarkusOidcAudienceMissing" to "CWE-345",
+        "QuarkusGrpcInsecure" to "CWE-319",
+        "QuarkusNativeQueryInjection" to "CWE-89",
+        "QuarkusPathParamInjection" to "CWE-89",
+        "QuarkusMultipartInsecure" to "CWE-400",
+        "QuarkusSmallRyeHealthInsecure" to "CWE-489",
+        "QuarkusSwaggerUiInProd" to "CWE-489",
+        "QuarkusConfigPasswordLeak" to "CWE-798",
 
         // ── Dropwizard rules ──────────────────────────────────────────────────
 

@@ -250,6 +250,47 @@ object RemediationHints {
         "QuarkusReflectionUnsafe" to
             "@RegisterForReflection(targets = [MyDto::class]) — limit to the exact classes needed",
 
+        // ── Quarkus Batch 2 ───────────────────────────────────────────────────
+
+        "QuarkusRestClientInsecureUrl" to
+            "@RegisterRestClient(configKey=\"svc\") and set %prod.quarkus.rest-client.svc.url=https://...",
+
+        "QuarkusGraphQLNoAuth" to
+            "@GraphQLApi @RolesAllowed(\"user\") class MyApi — add access-control annotation to the class",
+
+        "QuarkusReactiveRouteNoAuth" to
+            "@Route(path=\"/x\") @Authenticated fun handle(rc: RoutingContext) — annotate every reactive route",
+
+        "QuarkusRedisInsecure" to
+            "Use quarkus.redis.hosts=rediss://host:6380 (double-s) for TLS-encrypted Redis connections",
+
+        "QuarkusMongoInsecure" to
+            "Use mongodb+srv://host/db or append ?tls=true to quarkus.mongodb.connection-string",
+
+        "QuarkusOidcAudienceMissing" to
+            "Set quarkus.oidc.token.audience=my-service-name to reject tokens issued for other services",
+
+        "QuarkusGrpcInsecure" to
+            "Remove plain-text=true and set quarkus.grpc.clients.svc.ssl.trust-certificate=ca.pem",
+
+        "QuarkusNativeQueryInjection" to
+            "em.createNativeQuery(\"SELECT * FROM t WHERE id = :id\").setParameter(\"id\", id)",
+
+        "QuarkusPathParamInjection" to
+            "Use positional params: User.find(\"name = ?1\", name) instead of string interpolation",
+
+        "QuarkusMultipartInsecure" to
+            "Set quarkus.http.limits.max-body-size=10M to prevent resource exhaustion via large uploads",
+
+        "QuarkusSmallRyeHealthInsecure" to
+            "Use %dev.quarkus.smallrye-health.ui.enable=true — omit or disable in default/prod profile",
+
+        "QuarkusSwaggerUiInProd" to
+            "Use %dev.quarkus.swagger-ui.always-include=true — never set always-include=true globally",
+
+        "QuarkusConfigPasswordLeak" to
+            "Remove defaultValue from @ConfigProperty for secrets — require the env var to be explicitly set",
+
         // ── Dropwizard — A01 Broken Access Control ────────────────────────────
 
         "DropwizardMissingAuth" to
