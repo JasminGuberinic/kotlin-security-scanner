@@ -1,11 +1,12 @@
 plugins {
     kotlin("jvm") version "2.0.10" apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.7" apply false
+    id("com.vanniktech.maven.publish") version "0.29.0" apply false
 }
 
 allprojects {
-    group = "com.jasmin.security"
-    version = "0.1.0-SNAPSHOT"
+    group = "io.github.jasminguberinic"
+    version = "0.1.0"
     repositories { mavenCentral() }
 }
 
@@ -79,5 +80,37 @@ subprojects {
             sarif.required.set(true)
         }
         jvmTarget = "21"
+    }
+
+    // Shared POM metadata applied whenever a module opts into publishing
+    pluginManager.withPlugin("com.vanniktech.maven.publish") {
+        configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
+            publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+            signAllPublications()
+            pom {
+                url = "https://github.com/JasminGuberinic/kotlin-security-scanner"
+                inceptionYear = "2024"
+                licenses {
+                    license {
+                        name = "Apache-2.0"
+                        url = "https://www.apache.org/licenses/LICENSE-2.0"
+                        distribution = "repo"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "JasminGuberinic"
+                        name = "Jasmin Guberinic"
+                        email = "jasmin.guberinic@gmail.com"
+                    }
+                }
+                scm {
+                    url = "https://github.com/JasminGuberinic/kotlin-security-scanner"
+                    connection = "scm:git:git://github.com/JasminGuberinic/kotlin-security-scanner.git"
+                    developerConnection =
+                        "scm:git:ssh://git@github.com/JasminGuberinic/kotlin-security-scanner.git"
+                }
+            }
+        }
     }
 }

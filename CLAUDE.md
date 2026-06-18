@@ -188,19 +188,19 @@ Uses `io.gitlab.arturbosch.detekt:detekt-test` with `rule.lint(code)` and
 **Spring Boot project:**
 ```kotlin
 // build.gradle.kts
-detektPlugins("com.jasmin.security:scanner-core:0.1.0-SNAPSHOT")
-detektPlugins("com.jasmin.security:scanner-spring-boot:0.1.0-SNAPSHOT")
+detektPlugins("io.github.jasminguberinic:scanner-core:0.1.0")
+detektPlugins("io.github.jasminguberinic:scanner-spring-boot:0.1.0")
 ```
 
 **Dropwizard project:**
 ```kotlin
-detektPlugins("com.jasmin.security:scanner-core:0.1.0-SNAPSHOT")
-detektPlugins("com.jasmin.security:scanner-dropwizard:0.1.0-SNAPSHOT")
+detektPlugins("io.github.jasminguberinic:scanner-core:0.1.0")
+detektPlugins("io.github.jasminguberinic:scanner-dropwizard:0.1.0")
 ```
 
 **Everything:**
 ```kotlin
-detektPlugins("com.jasmin.security:scanner-all:0.1.0-SNAPSHOT")
+detektPlugins("io.github.jasminguberinic:scanner-all:0.1.0")
 ```
 
 ---
