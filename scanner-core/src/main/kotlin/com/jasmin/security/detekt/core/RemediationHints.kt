@@ -193,6 +193,26 @@ object RemediationHints {
         "WebClientSSRF" to
             "Validate URL host against an allowlist before WebClient.create(url).get().retrieve()",
 
+        // ── Spring Boot batch 3 ───────────────────────────────────────────────
+
+        "SpringBootNoOpPasswordEncoder" to
+            "@Bean fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder() — never use NoOpPasswordEncoder",
+
+        "SpringBootHardcodedValueDefault" to
+            "Remove the default value and let the app fail fast: @Value(\"\${jwt.secret}\")",
+
+        "SpringBootCookieNotHttpOnly" to
+            "cookie.isHttpOnly = true — or ResponseCookie.from(name, value).httpOnly(true).secure(true).build()",
+
+        "SpringBootInsecureFileUpload" to
+            """val safe = UUID.randomUUID().toString() + ".${"\${"}ext${"}"}"; file.transferTo(File(uploadDir, safe))""",
+
+        "SpringBootRequestBodyAnyType" to
+            "Replace @RequestBody body: Any with a concrete DTO class to prevent polymorphic deserialization",
+
+        "SpringBootExceptionBodyLeak" to
+            "return ResponseEntity.status(500).body(mapOf(\"error\" to \"Internal server error\"))",
+
         // ── Quarkus — A01 Broken Access Control ──────────────────────────────
 
         "QuarkusMissingAuth" to

@@ -37,12 +37,18 @@ import com.jasmin.security.detekt.a05.KafkaTrustedPackagesWildcardRule
 import com.jasmin.security.detekt.a05.PermissiveCorsRule
 import com.jasmin.security.detekt.a05.SecurityHeadersMissingRule
 import com.jasmin.security.detekt.a05.SpringActuatorShutdownEnabledRule
+import com.jasmin.security.detekt.a05.SpringBootCookieNotHttpOnlyRule
+import com.jasmin.security.detekt.a05.SpringBootInsecureFileUploadRule
 import com.jasmin.security.detekt.a05.SpringCsrfDisabledRule
 import com.jasmin.security.detekt.a05.SpringSecurityDebugEnabledRule
 import com.jasmin.security.detekt.a07.HardcodedDatasourcePasswordRule
 import com.jasmin.security.detekt.a07.InsecureRememberMeRule
+import com.jasmin.security.detekt.a07.SpringBootHardcodedValueDefaultRule
+import com.jasmin.security.detekt.a07.SpringBootNoOpPasswordEncoderRule
+import com.jasmin.security.detekt.a08.SpringBootRequestBodyAnyTypeRule
 import com.jasmin.security.detekt.a09.SecurityLoggingVerboseRule
 import com.jasmin.security.detekt.a09.ShowSqlEnabledRule
+import com.jasmin.security.detekt.a09.SpringBootExceptionBodyLeakRule
 import com.jasmin.security.detekt.a10.RestTemplateSsrfRule
 import com.jasmin.security.detekt.a10.WebClientSSRFRule
 import io.gitlab.arturbosch.detekt.api.Config
@@ -105,12 +111,19 @@ class SpringBootRuleSetProvider : RuleSetProvider {
             SpringActuatorShutdownEnabledRule(config.subConfig("SpringActuatorShutdownEnabled")),
             CloudConfigInsecureUriRule(config.subConfig("CloudConfigInsecureUri")),
             CrossOriginCredentialsWildcardRule(config.subConfig("CrossOriginCredentialsWildcard")),
+            SpringBootCookieNotHttpOnlyRule(config.subConfig("SpringBootCookieNotHttpOnly")),
+            SpringBootInsecureFileUploadRule(config.subConfig("SpringBootInsecureFileUpload")),
             // A07 Identification and Authentication Failures
             InsecureRememberMeRule(config.subConfig("InsecureRememberMe")),
             HardcodedDatasourcePasswordRule(config.subConfig("HardcodedDatasourcePassword")),
+            SpringBootNoOpPasswordEncoderRule(config.subConfig("SpringBootNoOpPasswordEncoder")),
+            SpringBootHardcodedValueDefaultRule(config.subConfig("SpringBootHardcodedValueDefault")),
+            // A08 Software and Data Integrity Failures
+            SpringBootRequestBodyAnyTypeRule(config.subConfig("SpringBootRequestBodyAnyType")),
             // A09 Security Logging and Monitoring Failures
             ShowSqlEnabledRule(config.subConfig("ShowSqlEnabled")),
             SecurityLoggingVerboseRule(config.subConfig("SecurityLoggingVerbose")),
+            SpringBootExceptionBodyLeakRule(config.subConfig("SpringBootExceptionBodyLeak")),
             // A10 Server-Side Request Forgery
             WebClientSSRFRule(config.subConfig("WebClientSSRF")),
             RestTemplateSsrfRule(config.subConfig("RestTemplateSsrf")),

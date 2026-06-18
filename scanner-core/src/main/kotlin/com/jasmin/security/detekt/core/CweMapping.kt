@@ -110,6 +110,13 @@ object CweMapping {
         "CrossOriginCredentialsWildcard" to "CWE-942",
         "PermitAllAdminPath" to "CWE-285",
         "SecurityLoggingVerbose" to "CWE-532",
+        // Spring Boot batch 3
+        "SpringBootNoOpPasswordEncoder" to "CWE-312",
+        "SpringBootHardcodedValueDefault" to "CWE-798",
+        "SpringBootCookieNotHttpOnly" to "CWE-1004",
+        "SpringBootInsecureFileUpload" to "CWE-22",
+        "SpringBootRequestBodyAnyType" to "CWE-502",
+        "SpringBootExceptionBodyLeak" to "CWE-209",
 
         // ── Quarkus rules ─────────────────────────────────────────────────────
 

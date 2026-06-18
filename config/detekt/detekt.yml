@@ -264,15 +264,28 @@ security-spring-boot:
     active: true
   H2ConsoleEnabled:
     active: true
+  SpringBootCookieNotHttpOnly:
+    active: true
+  SpringBootInsecureFileUpload:
+    active: true
   # A07
   InsecureRememberMe:
     active: true
   HardcodedDatasourcePassword:
     active: true
+  SpringBootNoOpPasswordEncoder:
+    active: true
+  SpringBootHardcodedValueDefault:
+    active: true
+  # A08 Software and Data Integrity Failures
+  SpringBootRequestBodyAnyType:
+    active: true
   # A09
   ShowSqlEnabled:
     active: true
   SecurityLoggingVerbose:
+    active: true
+  SpringBootExceptionBodyLeak:
     active: true
   # A10 Server-Side Request Forgery
   WebClientSSRF:
