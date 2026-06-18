@@ -35,7 +35,37 @@ tasks.register("checkSecurity") {
     dependsOn(subprojects.map { "${it.path}:detekt" })
 }
 
+// ── e2e module — detekt-only, no Kotlin compilation, ignoreFailures ───────────
+project(":scanner-e2e") {
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+
+    dependencies {
+        "detektPlugins"(project(":scanner-core"))
+        "detektPlugins"(project(":scanner-spring-boot"))
+        "detektPlugins"(project(":scanner-quarkus"))
+        "detektPlugins"(project(":scanner-dropwizard"))
+        "detektPlugins"(project(":scanner-ktor"))
+        "detektPlugins"("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
+    }
+
+    extensions.configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension> {
+        config.setFrom(rootProject.files("config/detekt/detekt.yml"))
+        buildUponDefaultConfig = true
+        source.setFrom("src/main/kotlin")
+    }
+
+    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+        ignoreFailures = true  // intentionally vulnerable code — we want the report, not a build failure
+        reports {
+            html.required.set(true)
+            sarif.required.set(true)
+        }
+    }
+}
+
 subprojects {
+    if (name == "scanner-e2e") return@subprojects
+
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "io.gitlab.arturbosch.detekt")
 

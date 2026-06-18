@@ -44,44 +44,46 @@ class CoreRuleSetProvider : RuleSetProvider {
 
     override val ruleSetId = "security-core"
 
+    // config is the rule-set config (security-core section). Each Rule subclass
+    // receives it as ruleSetConfig and self-scopes via getRuleConfig() = ruleSetConfig.subConfig(ruleId).
     override fun instance(config: Config): RuleSet = RuleSet(
         ruleSetId,
         listOf(
             // A02 Cryptographic Failures
-            WeakCipherModeRule(config.subConfig("WeakCipherMode")),
-            WeakHashAlgorithmRule(config.subConfig("WeakHashAlgorithm")),
-            TrustAllCertsRule(config.subConfig("TrustAllCerts")),
-            HardcodedIvRule(config.subConfig("HardcodedIv")),
-            WeakRsaKeyRule(config.subConfig("WeakRsaKey")),
-            JwtNoneAlgorithmRule(config.subConfig("JwtNoneAlgorithm")),
-            JwtWeakSecretRule(config.subConfig("JwtWeakSecret")),
-            UnsafeCryptoPaddingOracleRule(config.subConfig("UnsafeCryptoPaddingOracle")),
-            InsecurePasswordStorageRule(config.subConfig("InsecurePasswordStorage")),
+            WeakCipherModeRule(config),
+            WeakHashAlgorithmRule(config),
+            TrustAllCertsRule(config),
+            HardcodedIvRule(config),
+            WeakRsaKeyRule(config),
+            JwtNoneAlgorithmRule(config),
+            JwtWeakSecretRule(config),
+            UnsafeCryptoPaddingOracleRule(config),
+            InsecurePasswordStorageRule(config),
             // A03 Injection
-            SqlInjectionRule(config.subConfig("SqlInjection")),
-            LdapInjectionRule(config.subConfig("LdapInjection")),
-            JndiInjectionRule(config.subConfig("JndiInjection")),
-            XpathInjectionRule(config.subConfig("XpathInjection")),
-            ReflectionInjectionRule(config.subConfig("ReflectionInjection")),
-            PathTraversalRule(config.subConfig("PathTraversal")),
-            CommandInjectionRule(config.subConfig("CommandInjection")),
-            XxeInjectionRule(config.subConfig("XxeInjection")),
-            GroovyScriptInjectionRule(config.subConfig("GroovyScriptInjection")),
+            SqlInjectionRule(config),
+            LdapInjectionRule(config),
+            JndiInjectionRule(config),
+            XpathInjectionRule(config),
+            ReflectionInjectionRule(config),
+            PathTraversalRule(config),
+            CommandInjectionRule(config),
+            XxeInjectionRule(config),
+            GroovyScriptInjectionRule(config),
             // A06 Vulnerable Components / ReDoS
-            RegexDenialOfServiceRule(config.subConfig("RegexDenialOfService")),
+            RegexDenialOfServiceRule(config),
             // A07 Authentication Failures
-            HardcodedCredentialsRule(config.subConfig("HardcodedCredentials")),
-            InsecureRandomRule(config.subConfig("InsecureRandom")),
-            HardcodedAwsCredentialsRule(config.subConfig("HardcodedAwsCredentials")),
+            HardcodedCredentialsRule(config),
+            InsecureRandomRule(config),
+            HardcodedAwsCredentialsRule(config),
             // A08 Software and Data Integrity
-            InsecureDeserializationRule(config.subConfig("InsecureDeserialization")),
-            JacksonUnsafeDeserializationRule(config.subConfig("JacksonUnsafeDeserialization")),
-            XmlMapperUnsafeRule(config.subConfig("XmlMapperUnsafe")),
-            KotlinxSerializationSensitiveFieldRule(config.subConfig("KotlinxSerializationSensitiveField")),
+            InsecureDeserializationRule(config),
+            JacksonUnsafeDeserializationRule(config),
+            XmlMapperUnsafeRule(config),
+            KotlinxSerializationSensitiveFieldRule(config),
             // A09 Logging Failures
-            SensitiveDataLoggingRule(config.subConfig("SensitiveDataLogging")),
+            SensitiveDataLoggingRule(config),
             // A10 Server-Side Request Forgery
-            SsrfRule(config.subConfig("Ssrf")),
+            SsrfRule(config),
         )
     )
 }

@@ -27,27 +27,27 @@ class DropwizardRuleSetProvider : RuleSetProvider {
         ruleSetId,
         listOf(
             // A01 Broken Access Control
-            DropwizardMissingAuthRule(config.subConfig("DropwizardMissingAuth")),
-            DropwizardOpenRedirectRule(config.subConfig("DropwizardOpenRedirect")),
+            DropwizardMissingAuthRule(config),
+            DropwizardOpenRedirectRule(config),
             // A02 Cryptographic Failures
-            InsecureTlsProtocolRule(config.subConfig("InsecureTlsProtocol")),
-            DropwizardUnencryptedJwtSecretRule(config.subConfig("DropwizardUnencryptedJwtSecret")),
+            InsecureTlsProtocolRule(config),
+            DropwizardUnencryptedJwtSecretRule(config),
             // A03 Injection
-            DropwizardSelfValidatingELRule(config.subConfig("DropwizardSelfValidatingEL")),
-            DropwizardJdbiSqlInjectionRule(config.subConfig("DropwizardJdbiSqlInjection")),
-            DropwizardMissingBeanValidationRule(config.subConfig("DropwizardMissingBeanValidation")),
-            DropwizardXssResponseRule(config.subConfig("DropwizardXssResponse")),
+            DropwizardSelfValidatingELRule(config),
+            DropwizardJdbiSqlInjectionRule(config),
+            DropwizardMissingBeanValidationRule(config),
+            DropwizardXssResponseRule(config),
             // A05 Security Misconfiguration
-            InsecureCookieRule(config.subConfig("InsecureCookie")),
-            DropwizardAdminConnectorExposedRule(config.subConfig("DropwizardAdminConnectorExposed")),
-            DropwizardInsecureMultipartRule(config.subConfig("DropwizardInsecureMultipart")),
+            InsecureCookieRule(config),
+            DropwizardAdminConnectorExposedRule(config),
+            DropwizardInsecureMultipartRule(config),
             // A07 Identification and Authentication Failures
-            DropwizardHardcodedTokenRule(config.subConfig("DropwizardHardcodedToken")),
-            DropwizardDatabasePasswordRule(config.subConfig("DropwizardDatabasePassword")),
+            DropwizardHardcodedTokenRule(config),
+            DropwizardDatabasePasswordRule(config),
             // A08 Software and Data Integrity Failures
-            DropwizardJacksonPolymorphismRule(config.subConfig("DropwizardJacksonPolymorphism")),
+            DropwizardJacksonPolymorphismRule(config),
             // A09 Security Logging and Monitoring Failures
-            DropwizardSensitiveDataLoggingRule(config.subConfig("DropwizardSensitiveDataLogging")),
+            DropwizardSensitiveDataLoggingRule(config),
         )
     )
 }

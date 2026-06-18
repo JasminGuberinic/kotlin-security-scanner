@@ -31,30 +31,30 @@ class KtorRuleSetProvider : RuleSetProvider {
         ruleSetId,
         listOf(
             // A01 Broken Access Control
-            KtorMissingAuthRule(config.subConfig("KtorMissingAuth")),
-            KtorInsecureRedirectRule(config.subConfig("KtorInsecureRedirect")),
-            KtorCsrfMissingRule(config.subConfig("KtorCsrfMissing")),
+            KtorMissingAuthRule(config),
+            KtorInsecureRedirectRule(config),
+            KtorCsrfMissingRule(config),
             // A02 Cryptographic Failures
-            KtorBasicAuthInsecureRule(config.subConfig("KtorBasicAuthInsecure")),
-            KtorWeakJwtSecretRule(config.subConfig("KtorWeakJwtSecret")),
+            KtorBasicAuthInsecureRule(config),
+            KtorWeakJwtSecretRule(config),
             // A03 Injection
-            KtorXssResponseRule(config.subConfig("KtorXssResponse")),
-            KtorExposedOrmInjectionRule(config.subConfig("KtorExposedOrmInjection")),
-            KtorSensitiveRouteParamRule(config.subConfig("KtorSensitiveRouteParam")),
+            KtorXssResponseRule(config),
+            KtorExposedOrmInjectionRule(config),
+            KtorSensitiveRouteParamRule(config),
             // A05 Security Misconfiguration
-            KtorInsecureCookieSessionRule(config.subConfig("KtorInsecureCookieSession")),
-            KtorPermissiveCorsRule(config.subConfig("KtorPermissiveCors")),
-            KtorClearTextCookieRule(config.subConfig("KtorClearTextCookie")),
-            KtorSecurityHeadersMissingRule(config.subConfig("KtorSecurityHeadersMissing")),
-            KtorSslRedirectMissingRule(config.subConfig("KtorSslRedirectMissing")),
-            KtorRateLimitingMissingRule(config.subConfig("KtorRateLimitingMissing")),
-            KtorSessionCookieDomainMissingRule(config.subConfig("KtorSessionCookieDomainMissing")),
+            KtorInsecureCookieSessionRule(config),
+            KtorPermissiveCorsRule(config),
+            KtorClearTextCookieRule(config),
+            KtorSecurityHeadersMissingRule(config),
+            KtorSslRedirectMissingRule(config),
+            KtorRateLimitingMissingRule(config),
+            KtorSessionCookieDomainMissingRule(config),
             // A07 Identification and Authentication Failures
-            KtorHardcodedSecretKeyRule(config.subConfig("KtorHardcodedSecretKey")),
-            KtorHardcodedPasswordComparisonRule(config.subConfig("KtorHardcodedPasswordComparison")),
-            KtorHardcodedDatabasePasswordRule(config.subConfig("KtorHardcodedDatabasePassword")),
+            KtorHardcodedSecretKeyRule(config),
+            KtorHardcodedPasswordComparisonRule(config),
+            KtorHardcodedDatabasePasswordRule(config),
             // A09 Security Logging and Monitoring Failures
-            KtorLoggingCredentialsRule(config.subConfig("KtorLoggingCredentials")),
+            KtorLoggingCredentialsRule(config),
         )
     )
 }
