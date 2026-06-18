@@ -363,8 +363,29 @@ security-dropwizard:
   # A03 Injection
   DropwizardSelfValidatingEL:
     active: true
+  DropwizardJdbiSqlInjection:
+    active: true
+  DropwizardMissingBeanValidation:
+    active: true
+  DropwizardXssResponse:
+    active: true
   # A05 Security Misconfiguration
   InsecureCookie:
+    active: true
+  DropwizardAdminConnectorExposed:
+    active: true
+  DropwizardInsecureMultipart:
+    active: true
+  # A07 Identification and Authentication Failures
+  DropwizardHardcodedToken:
+    active: true
+  DropwizardDatabasePassword:
+    active: true
+  # A08 Software and Data Integrity Failures
+  DropwizardJacksonPolymorphism:
+    active: true
+  # A09 Security Logging and Monitoring Failures
+  DropwizardSensitiveDataLogging:
     active: true
 
 # ─── KTOR SECURITY RULES (scanner-ktor) ──────────────────────────────────────

@@ -312,10 +312,45 @@ object RemediationHints {
         "DropwizardSelfValidatingEL" to
             "Use a static message string in buildConstraintViolationWithTemplate() — never user input",
 
+        // ── Dropwizard — A03 Injection ────────────────────────────────────────
+
+        "DropwizardJdbiSqlInjection" to
+            "@SqlQuery(\"SELECT * FROM t WHERE id = :id\") fun find(@Bind(\"id\") id: Long): T",
+
+        "DropwizardMissingBeanValidation" to
+            "Add @Valid to the request body parameter: fun create(@Valid @NotNull req: CreateReq): Response",
+
+        "DropwizardXssResponse" to
+            "HTML-encode output: StringEscapeUtils.escapeHtml4(value) or switch to APPLICATION_JSON",
+
         // ── Dropwizard — A05 Security Misconfiguration ────────────────────────
 
         "InsecureCookie" to
             "NewCookie(name, value, path, domain, comment, maxAge, secure = true, httpOnly = true)",
+
+        "DropwizardAdminConnectorExposed" to
+            "Set server.adminConnectors[0].bindHost=127.0.0.1 in production configuration",
+
+        "DropwizardInsecureMultipart" to
+            "Set server.maxRequestEntitySize=10MiB to prevent resource-exhaustion via large uploads",
+
+        // ── Dropwizard — A07 Identification and Authentication Failures ────────
+
+        "DropwizardHardcodedToken" to
+            "val apiKey: String = System.getenv(\"API_KEY\") ?: error(\"API_KEY env var not set\")",
+
+        "DropwizardDatabasePassword" to
+            "Use database.password=\${DB_PASSWORD} and inject the value via the deployment environment",
+
+        // ── Dropwizard — A08 Software and Data Integrity Failures ─────────────
+
+        "DropwizardJacksonPolymorphism" to
+            "mapper.activateDefaultTypingAsProperty(ptv, OBJECT_AND_NON_CONCRETE, \"@class\")",
+
+        // ── Dropwizard — A09 Security Logging and Monitoring Failures ─────────
+
+        "DropwizardSensitiveDataLogging" to
+            "Log user ID or action only — never the credential itself: logger.info(\"Auth for userId={}\", id)",
 
         // ── Ktor — A01 Broken Access Control ──────────────────────────────────
 

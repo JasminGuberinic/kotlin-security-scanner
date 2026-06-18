@@ -159,8 +159,20 @@ object CweMapping {
         "DropwizardUnencryptedJwtSecret" to "CWE-798",
         // A03 Injection
         "DropwizardSelfValidatingEL" to "CWE-94",
+        "DropwizardJdbiSqlInjection" to "CWE-89",
+        "DropwizardMissingBeanValidation" to "CWE-20",
+        "DropwizardXssResponse" to "CWE-79",
         // A05 Security Misconfiguration
         "InsecureCookie" to "CWE-614",
+        "DropwizardAdminConnectorExposed" to "CWE-284",
+        "DropwizardInsecureMultipart" to "CWE-400",
+        // A07 Identification and Authentication Failures
+        "DropwizardHardcodedToken" to "CWE-798",
+        "DropwizardDatabasePassword" to "CWE-798",
+        // A08 Software and Data Integrity Failures
+        "DropwizardJacksonPolymorphism" to "CWE-502",
+        // A09 Security Logging and Monitoring Failures
+        "DropwizardSensitiveDataLogging" to "CWE-532",
 
         // ── Ktor rules ────────────────────────────────────────────────────────
 
