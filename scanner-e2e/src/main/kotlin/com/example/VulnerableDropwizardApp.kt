@@ -3,14 +3,17 @@ package com.example
 import javax.ws.rs.GET
 import javax.ws.rs.POST
 import javax.ws.rs.Path
+import javax.ws.rs.PathParam
+import javax.ws.rs.QueryParam
 import javax.ws.rs.core.NewCookie
 import javax.ws.rs.core.Response
+import java.net.URI
 
 // ── A01 Broken Access Control ─────────────────────────────────────────────────
 
 @Path("/api")
 class UserResource {
-    // VULNERABLE: no @RolesAllowed — public access to user management [CWE-285]
+    // VULNERABLE: no @RolesAllowed [DropwizardMissingAuth, CWE-285]
     @GET
     @Path("/users")
     fun getUsers(): Response = Response.ok().build()
@@ -20,30 +23,69 @@ class UserResource {
     fun deleteUser(id: String): Response = Response.ok().build()
 }
 
-// ── A02 Cryptographic Failures ────────────────────────────────────────────────
-
-fun configureTls(): javax.net.ssl.SSLContext {
-    // VULNERABLE: TLSv1.0 is deprecated and broken [CWE-326]
-    val ctx = javax.net.ssl.SSLContext.getInstance("TLSv1")
-    return ctx
+@Path("/redirect")
+class RedirectResource {
+    @GET
+    fun redirect(@QueryParam("to") redirectTo: String): Response {
+        // VULNERABLE: open redirect — user controls URI [DropwizardOpenRedirect, CWE-601]
+        return Response.seeOther(URI(redirectTo)).build()
+    }
 }
 
-class JwtConfig {
-    // VULNERABLE: JWT secret stored unencrypted in config [CWE-798]
-    val jwtSecret = "my-super-secret-jwt-key-2024"
+@Path("/page")
+class HtmlResource {
+    // VULNERABLE: produces HTML with user content — reflected XSS [DropwizardXssResponse, CWE-79]
+    @GET
+    @javax.ws.rs.Produces("text/html")
+    fun page(@QueryParam("name") name: String): Response =
+        Response.ok("<h1>Hello $name</h1>").build()
+}
+
+class CreateRequest(val name: String = "")
+
+@Path("/items")
+class ItemResource {
+    // VULNERABLE: no @Valid on request body [DropwizardMissingBeanValidation, CWE-20]
+    @POST
+    fun create(req: CreateRequest): Response = Response.ok().build()
+}
+
+// ── A02 Cryptographic Failures ────────────────────────────────────────────────
+
+class TlsConfiguration {
+    fun configureTls() {
+        val tlsConfig = io.dropwizard.jetty.HttpsConnectorFactory()
+        // VULNERABLE: deprecated TLS version [InsecureTlsProtocol, CWE-326]
+        tlsConfig.setSupportedProtocols("TLSv1.0")
+    }
+}
+
+class JwtFilterConfig {
+    // VULNERABLE: JWT secret hardcoded in setSecretProvider [DropwizardUnencryptedJwtSecret, CWE-798]
+    fun buildFilter() {
+        io.dropwizard.auth.jwt.JwtAuthFilter.Builder<Any>()
+            .setSecretProvider("hardcoded-jwt-secret-key-2024")
+            .buildAuthFilter()
+    }
 }
 
 // ── A03 Injection ─────────────────────────────────────────────────────────────
 
-class UserDao(private val jdbi: org.jdbi.v3.core.Jdbi) {
-    fun findByUsername(username: String): Any? {
-        // VULNERABLE: JDBI SQL injection via string concatenation [CWE-89]
-        return jdbi.withHandle<Any, Exception> { handle ->
-            handle.createQuery("SELECT * FROM users WHERE username = '" + username + "'")
-                .mapToMap()
-                .findFirst()
-                .orElse(null)
-        }
+interface JdbiUserDao {
+    // VULNERABLE: @SqlQuery with interpolated string [DropwizardJdbiSqlInjection, CWE-89]
+    @org.jdbi.v3.sqlobject.statement.SqlQuery("SELECT * FROM users WHERE username = '$username'")
+    fun findByUsername(username: String): List<Any>
+
+    @org.jdbi.v3.sqlobject.statement.SqlUpdate("UPDATE users SET active = true WHERE id = $id")
+    fun activate(id: Long)
+}
+
+class ELValidator : javax.validation.ConstraintValidator<javax.validation.constraints.NotNull, String> {
+    override fun initialize(constraintAnnotation: javax.validation.constraints.NotNull) {}
+    override fun isValid(value: String, context: javax.validation.ConstraintValidatorContext): Boolean {
+        // VULNERABLE: user value directly in EL template [DropwizardSelfValidatingEL, CWE-94]
+        context.buildConstraintViolationWithTemplate(value).addConstraintViolation()
+        return false
     }
 }
 
@@ -53,7 +95,7 @@ class UserDao(private val jdbi: org.jdbi.v3.core.Jdbi) {
 class SessionResource {
     @GET
     fun createSession(): Response {
-        // VULNERABLE: cookie missing Secure and HttpOnly flags [CWE-614]
+        // VULNERABLE: cookie without Secure/HttpOnly [InsecureCookie, CWE-614]
         val cookie = NewCookie("SESSION", "abc123")
         return Response.ok().cookie(cookie).build()
     }
@@ -62,16 +104,17 @@ class SessionResource {
 // ── A07 Identification and Authentication Failures ────────────────────────────
 
 class AppConfiguration {
-    // VULNERABLE: hardcoded database password [CWE-798]
+    // VULNERABLE: hardcoded credentials [HardcodedCredentials, CWE-798]
     val databasePassword = "hardcodedDbPass!"
-    val adminToken = "Bearer eyJhbGciOiJub25lIn0.admin.token"
+    // VULNERABLE: hardcoded API token [DropwizardHardcodedToken, CWE-798]
+    val apiKey = "sk-prod-abc123def456ghi789"
 }
 
 // ── A08 Software and Data Integrity ──────────────────────────────────────────
 
 fun configureJackson(): com.fasterxml.jackson.databind.ObjectMapper {
     val mapper = com.fasterxml.jackson.databind.ObjectMapper()
-    // VULNERABLE: enables polymorphic type handling — deserialization gadget risk [CWE-502]
+    // VULNERABLE: unsafe deserialization [JacksonUnsafeDeserialization, CWE-502]
     mapper.enableDefaultTyping(com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.NON_FINAL)
     return mapper
 }
@@ -82,7 +125,7 @@ class AuditLogger {
     private val log = org.slf4j.LoggerFactory.getLogger(AuditLogger::class.java)
 
     fun logPayment(cardNumber: String, cvv: String, amount: Double) {
-        // VULNERABLE: PCI-sensitive data written to logs [CWE-532]
-        log.info("Payment processed: card=${'$'}cardNumber cvv=${'$'}cvv amount=${'$'}amount")
+        // VULNERABLE: payment data in logs [SensitiveDataLogging, CWE-532]
+        log.info("Payment: card=$cardNumber cvv=$cvv amount=$amount")
     }
 }

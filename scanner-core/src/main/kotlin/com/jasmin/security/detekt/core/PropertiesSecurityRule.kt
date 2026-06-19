@@ -22,9 +22,9 @@ import java.util.Properties
  */
 abstract class PropertiesSecurityRule(config: Config) : SecurityRule(config) {
 
-    companion object {
-        private val scannedRoots: MutableSet<String> = Collections.synchronizedSet(mutableSetOf())
-    }
+    // Each rule instance tracks its own scanned roots so that multiple
+    // PropertiesSecurityRules in the same Detekt run each scan the file independently.
+    private val scannedRoots: MutableSet<String> = Collections.synchronizedSet(mutableSetOf())
 
     // visitKtFile is the PSI visitor hook called when the tree walker reaches the root KtFile
     @Suppress("ReturnCount")

@@ -121,6 +121,7 @@ object CweMapping {
         // ── Quarkus rules ─────────────────────────────────────────────────────
 
         // A01 Broken Access Control
+        "QuarkusSystemExit" to "CWE-733",
         "QuarkusMissingAuth" to "CWE-285",
         "QuarkusPermitAllSensitive" to "CWE-285",
         "QuarkusJsonBeforeAuth" to "CWE-285",

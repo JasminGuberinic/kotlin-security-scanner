@@ -50,7 +50,7 @@ project(":scanner-e2e") {
 
     extensions.configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension> {
         config.setFrom(rootProject.files("config/detekt/detekt.yml"))
-        buildUponDefaultConfig = true
+        buildUponDefaultConfig = false
         source.setFrom("src/main/kotlin")
     }
 
@@ -114,19 +114,29 @@ subprojects {
 
     // Shared POM metadata applied whenever a module opts into publishing
     pluginManager.withPlugin("com.vanniktech.maven.publish") {
-        // Explicitly wire in-memory GPG key — signAllPublications() creates tasks but
-        // does not auto-configure the signatory from project properties in 0.29.x
-        pluginManager.withPlugin("signing") {
-            configure<org.gradle.plugins.signing.SigningExtension> {
-                val key = findProperty("signingInMemoryKey") as? String
-                val keyId = findProperty("signingInMemoryKeyId") as? String
-                val password = findProperty("signingInMemoryKeyPassword") as? String
-                if (key != null) useInMemoryPgpKeys(keyId, key, password)
+        val signingKey = findProperty("signingInMemoryKey")?.toString()
+        val signingKeyId = findProperty("signingInMemoryKeyId")?.toString()
+        val signingPassword = findProperty("signingInMemoryKeyPassword")?.toString()
+        val hasSigning = !signingKey.isNullOrBlank()
+
+        // Wire in-memory GPG key only when credentials are actually present.
+        // GitHub Actions sets empty string for unset secrets; calling useInMemoryPgpKeys("","","")
+        // throws "key ID must be in a valid form" even before the upload attempt.
+        if (hasSigning) {
+            pluginManager.withPlugin("signing") {
+                configure<org.gradle.plugins.signing.SigningExtension> {
+                    useInMemoryPgpKeys(
+                        signingKeyId?.takeIf { it.isNotBlank() },
+                        signingKey,
+                        signingPassword,
+                    )
+                }
             }
         }
+
         configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
             publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
-            signAllPublications()
+            if (hasSigning) signAllPublications()
             pom {
                 url = "https://github.com/JasminGuberinic/kotlin-security-scanner"
                 inceptionYear = "2024"

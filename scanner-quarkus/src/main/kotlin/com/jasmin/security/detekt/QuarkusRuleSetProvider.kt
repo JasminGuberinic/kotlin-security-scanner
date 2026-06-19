@@ -8,6 +8,7 @@ import com.jasmin.security.detekt.a01.QuarkusOpenRedirectRule
 import com.jasmin.security.detekt.a01.QuarkusPermitAllSensitiveRule
 import com.jasmin.security.detekt.a01.QuarkusReactiveRouteNoAuthRule
 import com.jasmin.security.detekt.a01.QuarkusRestClientInsecureUrlRule
+import com.jasmin.security.detekt.a01.QuarkusSystemExitRule
 import com.jasmin.security.detekt.a01.QuarkusUnsafeSecurityContextRule
 import com.jasmin.security.detekt.a02.QuarkusGrpcInsecureRule
 import com.jasmin.security.detekt.a02.QuarkusMongoInsecureRule
@@ -51,6 +52,7 @@ class QuarkusRuleSetProvider : RuleSetProvider {
         listOf(
             // A01 Broken Access Control
             QuarkusMissingAuthRule(config),
+            QuarkusSystemExitRule(config),
             QuarkusPermitAllSensitiveRule(config),
             QuarkusJsonBeforeAuthRule(config),
             QuarkusOpenRedirectRule(config),

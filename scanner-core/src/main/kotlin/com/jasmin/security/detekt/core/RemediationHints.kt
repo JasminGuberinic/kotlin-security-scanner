@@ -214,6 +214,8 @@ object RemediationHints {
             "return ResponseEntity.status(500).body(mapOf(\"error\" to \"Internal server error\"))",
 
         // ── Quarkus — A01 Broken Access Control ──────────────────────────────
+        "QuarkusSystemExit" to
+                "Let the container or orchestrator (Kubernetes) handle the lifecycle — avoid manual System.exit()",
 
         "QuarkusMissingAuth" to
             """@RolesAllowed("user") on the @GET/@POST method (or the resource class)""",

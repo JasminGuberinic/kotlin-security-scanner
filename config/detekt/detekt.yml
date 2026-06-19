@@ -301,6 +301,8 @@ security-quarkus:
     active: true
   QuarkusPermitAllSensitive:
     active: true
+  QuarkusSystemExit:
+    active: true
   QuarkusJsonBeforeAuth:
     active: true
   QuarkusOpenRedirect:
