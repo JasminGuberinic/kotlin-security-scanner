@@ -23,11 +23,7 @@ class QuarkusMultipartInsecureRule(config: Config) : PropertiesSecurityRule(conf
 
     private val largeBodyPattern = Regex("""^(\d+)\s*([GM])$""", RegexOption.IGNORE_CASE)
 
-    @Suppress("MagicNumber")
-    private val maxSafeMegabytes = 50
-
-    @Suppress("MagicNumber")
-    private val megabytesPerGigabyte = 1024
+    private val maxBodySizeMb: Int = config.valueOrDefault("maxBodySizeMb", 50)
 
     @Suppress("ReturnCount")
     override fun scanProperties(props: Properties): List<Pair<String, String>> {
@@ -36,8 +32,8 @@ class QuarkusMultipartInsecureRule(config: Config) : PropertiesSecurityRule(conf
         val match = largeBodyPattern.matchEntire(value.trim()) ?: return emptyList()
         val size = match.groupValues[1].toLongOrNull() ?: return emptyList()
         val unit = match.groupValues[2].uppercase()
-        val megabytes = if (unit == "G") size * megabytesPerGigabyte else size
-        if (megabytes <= maxSafeMegabytes) return emptyList()
+        val megabytes = if (unit == "G") size * 1024 else size
+        if (megabytes <= maxBodySizeMb) return emptyList()
         return listOf(key to "max-body-size=$value is very large — set a reasonable limit (e.g. 10M)")
     }
 }

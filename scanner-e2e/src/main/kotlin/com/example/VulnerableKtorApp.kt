@@ -141,6 +141,33 @@ fun Application.configureDatabase() {
     }
 }
 
+fun Application.configureExposedInjection() {
+    routing {
+        get("/users/search") {
+            val id = call.parameters["id"]
+            // VULNERABLE: exec() with string concatenation [KtorExposedRawSqlConcat, CWE-89]
+            org.jetbrains.exposed.sql.transactions.transaction {
+                org.jetbrains.exposed.sql.transactions.TransactionManager.current()
+                    .exec("SELECT * FROM users WHERE id = " + id)
+            }
+        }
+    }
+}
+
+fun purgeAllUsers() {
+    // VULNERABLE: deleteAll() wipes entire table [KtorExposedDeleteAll, CWE-285]
+    org.jetbrains.exposed.sql.transactions.transaction {
+        Users.deleteAll()
+    }
+}
+
+fun bootstrapSchema() {
+    // VULNERABLE: SchemaUtils.create in application boot [KtorExposedSchemaAutoCreate, CWE-284]
+    org.jetbrains.exposed.sql.transactions.transaction {
+        SchemaUtils.create(Users)
+    }
+}
+
 // ── A07 Identification and Authentication Failures ────────────────────────────
 
 object DbConfig {
@@ -151,6 +178,14 @@ object DbConfig {
             driver = "org.postgresql.Driver",
             user = "admin",
             password = "prodDbPassword123!",
+        )
+    }
+
+    fun connectInsecure() {
+        // VULNERABLE: SSL disabled in JDBC URL [KtorExposedConnectionNotSecure, CWE-319]
+        Database.connect(
+            url = "jdbc:mysql://localhost/mydb?useSSL=false",
+            driver = "com.mysql.cj.jdbc.Driver",
         )
     }
 }

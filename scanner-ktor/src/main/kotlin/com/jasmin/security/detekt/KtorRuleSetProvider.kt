@@ -1,14 +1,18 @@
 package com.jasmin.security.detekt
 
 import com.jasmin.security.detekt.a01.KtorCsrfMissingRule
+import com.jasmin.security.detekt.a01.KtorExposedDeleteAllRule
 import com.jasmin.security.detekt.a01.KtorInsecureRedirectRule
 import com.jasmin.security.detekt.a01.KtorMissingAuthRule
 import com.jasmin.security.detekt.a02.KtorBasicAuthInsecureRule
+import com.jasmin.security.detekt.a02.KtorExposedConnectionNotSecureRule
 import com.jasmin.security.detekt.a02.KtorWeakJwtSecretRule
 import com.jasmin.security.detekt.a03.KtorExposedOrmInjectionRule
+import com.jasmin.security.detekt.a03.KtorExposedRawSqlConcatRule
 import com.jasmin.security.detekt.a03.KtorSensitiveRouteParamRule
 import com.jasmin.security.detekt.a03.KtorXssResponseRule
 import com.jasmin.security.detekt.a05.KtorClearTextCookieRule
+import com.jasmin.security.detekt.a05.KtorExposedSchemaAutoCreateRule
 import com.jasmin.security.detekt.a05.KtorInsecureCookieSessionRule
 import com.jasmin.security.detekt.a05.KtorPermissiveCorsRule
 import com.jasmin.security.detekt.a05.KtorRateLimitingMissingRule
@@ -34,14 +38,18 @@ class KtorRuleSetProvider : RuleSetProvider {
             KtorMissingAuthRule(config),
             KtorInsecureRedirectRule(config),
             KtorCsrfMissingRule(config),
+            KtorExposedDeleteAllRule(config),
             // A02 Cryptographic Failures
             KtorBasicAuthInsecureRule(config),
             KtorWeakJwtSecretRule(config),
+            KtorExposedConnectionNotSecureRule(config),
             // A03 Injection
             KtorXssResponseRule(config),
             KtorExposedOrmInjectionRule(config),
+            KtorExposedRawSqlConcatRule(config),
             KtorSensitiveRouteParamRule(config),
             // A05 Security Misconfiguration
+            KtorExposedSchemaAutoCreateRule(config),
             KtorInsecureCookieSessionRule(config),
             KtorPermissiveCorsRule(config),
             KtorClearTextCookieRule(config),

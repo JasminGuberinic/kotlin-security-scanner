@@ -23,10 +23,9 @@ class DropwizardInsecureMultipartRule(config: Config) : PropertiesSecurityRule(c
 
     private val largePattern = Regex("""^(\d+)\s*(GiB|GiB|GB|MiB|MB)$""", RegexOption.IGNORE_CASE)
 
-    @Suppress("MagicNumber")
-    private val maxSafeMib = 50
+    private val maxBodySizeMb: Int = config.valueOrDefault("maxBodySizeMb", 50)
 
-    @Suppress("MagicNumber", "ReturnCount")
+    @Suppress("ReturnCount")
     override fun scanProperties(props: Properties): List<Pair<String, String>> {
         val key = "server.maxRequestEntitySize"
         val value = props.getProperty(key) ?: return emptyList()
@@ -34,7 +33,7 @@ class DropwizardInsecureMultipartRule(config: Config) : PropertiesSecurityRule(c
         val size = match.groupValues[1].toLongOrNull() ?: return emptyList()
         val unit = match.groupValues[2].uppercase()
         val mib = if ("G" in unit) size * 1024 else size
-        if (mib <= maxSafeMib) return emptyList()
+        if (mib <= maxBodySizeMb) return emptyList()
         return listOf(key to "maxRequestEntitySize=$value is very large — set a reasonable limit (e.g. 10MiB)")
     }
 }

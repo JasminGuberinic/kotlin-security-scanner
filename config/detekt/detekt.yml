@@ -355,6 +355,7 @@ security-quarkus:
     active: true
   QuarkusMultipartInsecure:
     active: true
+    maxBodySizeMb: 50   # flag anything above this; lower for stricter environments
   QuarkusSmallRyeHealthInsecure:
     active: true
   QuarkusSwaggerUiInProd:
@@ -418,6 +419,7 @@ security-dropwizard:
     active: true
   DropwizardInsecureMultipart:
     active: true
+    maxBodySizeMb: 50   # flag anything above this; lower for stricter environments
   # A07 Identification and Authentication Failures
   DropwizardHardcodedToken:
     active: true
@@ -440,19 +442,27 @@ security-ktor:
     active: true
   KtorCsrfMissing:
     active: true
+  KtorExposedDeleteAll:
+    active: true
   # A02 Cryptographic Failures
   KtorBasicAuthInsecure:
     active: true
   KtorWeakJwtSecret:
+    active: true
+  KtorExposedConnectionNotSecure:
     active: true
   # A03 Injection
   KtorXssResponse:
     active: true
   KtorExposedOrmInjection:
     active: true
+  KtorExposedRawSqlConcat:
+    active: true
   KtorSensitiveRouteParam:
     active: true
   # A05 Security Misconfiguration
+  KtorExposedSchemaAutoCreate:
+    active: true
   KtorInsecureCookieSession:
     active: true
   KtorPermissiveCors:
