@@ -167,3 +167,37 @@ fun fetchExternalResource(userSuppliedUrl: String): String {
     val url = java.net.URL(userSuppliedUrl)
     return url.openStream().bufferedReader().readText()
 }
+
+// ── A02 New core rules ────────────────────────────────────────────────────────
+
+fun buildAesCipherWithLiteralKey(): javax.crypto.Cipher {
+    // VULNERABLE: AES key is a hardcoded byte array [HardcodedAesKey, CWE-321]
+    val key = javax.crypto.spec.SecretKeySpec(
+        byteArrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+            0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10), "AES"
+    )
+    return javax.crypto.Cipher.getInstance("AES/GCM/NoPadding").also { it.init(javax.crypto.Cipher.ENCRYPT_MODE, key) }
+}
+
+fun buildAesCipherWithStringKey(): javax.crypto.Cipher {
+    // VULNERABLE: AES key is a hardcoded string literal [HardcodedAesKey, CWE-321]
+    val key = javax.crypto.spec.SecretKeySpec("my-secret-key!!!".toByteArray(), "AES")
+    return javax.crypto.Cipher.getInstance("AES/GCM/NoPadding").also { it.init(javax.crypto.Cipher.ENCRYPT_MODE, key) }
+}
+
+fun disableSslHostnameVerification(conn: javax.net.ssl.HttpsURLConnection) {
+    // VULNERABLE: HostnameVerifier always returns true [TrustAllHostnames, CWE-297]
+    conn.setHostnameVerifier { _, _ -> true }
+}
+
+// VULNERABLE: RSA private key PEM material in source [HardcodedPrivateKey, CWE-321]
+val rsaPrivateKeyPem = """
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEowIBAAKCAQEA0Z3VS5JJcds3xHn/ygWep4vI7V+...
+    -----END RSA PRIVATE KEY-----
+""".trimIndent()
+
+fun buildInsecureRng(): java.security.SecureRandom {
+    // VULNERABLE: SecureRandom seeded with constant [InsecureRandomSeed, CWE-335]
+    return java.security.SecureRandom(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8))
+}

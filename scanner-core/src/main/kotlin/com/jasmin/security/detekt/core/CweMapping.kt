@@ -17,6 +17,10 @@ object CweMapping {
         // A01 Broken Access Control
         "JaxrsOpenRedirect" to "CWE-601",
         // A02 Cryptographic Failures
+        "HardcodedAesKey" to "CWE-321",
+        "HardcodedPrivateKey" to "CWE-321",
+        "InsecureRandomSeed" to "CWE-335",
+        "TrustAllHostnames" to "CWE-297",
         "WeakCipherMode" to "CWE-327",
         "WeakHashAlgorithm" to "CWE-327",
         "TrustAllCerts" to "CWE-295",
@@ -240,6 +244,11 @@ object CweMapping {
         // ── Micronaut rules ───────────────────────────────────────────────────
 
         "MicronautMissingSecured" to "CWE-285",
+        "MicronautWebSocketNoAuth" to "CWE-285",
+        "MicronautCacheableSensitive" to "CWE-285",
+        "MicronautRetryOnAuth" to "CWE-307",
+        "MicronautGrpcInsecure" to "CWE-319",
+        "MicronautManagementEndpointInsecure" to "CWE-284",
         "MicronautInsecureHttpClient" to "CWE-319",
         "MicronautSensitiveQueryParam" to "CWE-598",
         "MicronautBodyAnyType" to "CWE-20",

@@ -97,3 +97,42 @@ class GlobalErrorHandler {
     fun handleError(e: Exception): HttpResponse<String> =
         HttpResponse.serverError(e.message)
 }
+
+// ── New Micronaut rules ───────────────────────────────────────────────────────
+
+// VULNERABLE: WebSocket endpoint without @Secured [MicronautWebSocketNoAuth, CWE-285]
+@io.micronaut.websocket.annotation.ServerWebSocket("/notifications/{token}")
+class NotificationHandler {
+    @io.micronaut.websocket.annotation.OnMessage
+    fun onMessage(message: String) {}
+}
+
+// VULNERABLE: @Cacheable on @Secured method — cross-user cache leak [MicronautCacheableSensitive, CWE-285]
+@Controller("/users")
+@Secured(SecurityRule.IS_AUTHENTICATED)
+class UserController {
+    @Get("/{id}")
+    @io.micronaut.cache.annotation.Cacheable("user-profiles")
+    fun getProfile(id: Long): String = "profile-$id"
+}
+
+// VULNERABLE: Management endpoint with unsecured @Read [MicronautManagementEndpointInsecure, CWE-284]
+@io.micronaut.management.endpoint.annotation.Endpoint("app-info")
+class AppInfoEndpoint {
+    @io.micronaut.management.endpoint.annotation.Read
+    fun info(): Map<String, Any> = mapOf("version" to "1.0", "db" to System.getenv("DB_URL"))
+}
+
+// VULNERABLE: @Retryable on authentication method [MicronautRetryOnAuth, CWE-307]
+class LoginService {
+    @io.micronaut.retry.annotation.Retryable
+    fun authenticate(username: String, password: String): Boolean = false
+}
+
+// VULNERABLE: gRPC channel with usePlaintext() [MicronautGrpcInsecure, CWE-319]
+class GrpcClientFactory {
+    fun paymentChannel() = io.grpc.ManagedChannelBuilder
+        .forAddress("payment-service", 8080)
+        .usePlaintext()
+        .build()
+}

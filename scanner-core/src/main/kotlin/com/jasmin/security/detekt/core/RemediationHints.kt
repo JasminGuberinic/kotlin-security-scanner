@@ -15,6 +15,18 @@ object RemediationHints {
 
         // ── Core — A02 Cryptographic Failures ────────────────────────────────
 
+        "HardcodedAesKey" to
+            "val bytes = Base64.getDecoder().decode(System.getenv(\"AES_KEY\")); SecretKeySpec(bytes, \"AES\")",
+
+        "HardcodedPrivateKey" to
+            "Load via KeyStore.getInstance(\"PKCS12\").load(stream, passphrase) or inject path via environment variable",
+
+        "InsecureRandomSeed" to
+            "val rng = SecureRandom() // no-arg constructor seeds from OS entropy automatically",
+
+        "TrustAllHostnames" to
+            "Remove setHostnameVerifier entirely — the default verifier validates against the certificate's SAN/CN",
+
         "WeakCipherMode" to
             """Cipher.getInstance("AES/GCM/NoPadding") // authenticated encryption, no padding oracle""",
 
@@ -595,6 +607,21 @@ object RemediationHints {
             "call.respond(HttpStatusCode.InternalServerError, \"Internal error\") — log cause server-side, never send it",
 
         // ── Micronaut — A01 Broken Access Control ─────────────────────────────
+
+        "MicronautWebSocketNoAuth" to
+            "@ServerWebSocket(\"/chat\") @Secured(SecurityRule.IS_AUTHENTICATED) class ChatHandler",
+
+        "MicronautCacheableSensitive" to
+            "Add principal to cache key: @Cacheable(\"user-#{ T(io.micronaut.security.utils.SecurityService).username()  }\")",
+
+        "MicronautRetryOnAuth" to
+            "@Retryable(excludes = [AuthenticationException::class]) // exclude auth failures from retry",
+
+        "MicronautGrpcInsecure" to
+            "ManagedChannelBuilder.forAddress(host, 443) // TLS enabled by default on port 443",
+
+        "MicronautManagementEndpointInsecure" to
+            "@Endpoint(\"metrics\") @Secured(SecurityRule.IS_AUTHENTICATED) class MetricsEndpoint",
 
         "MicronautMissingSecured" to
             "@Get @Secured(SecurityRule.IS_AUTHENTICATED) fun list(): List<T> — or add @Secured at class level",

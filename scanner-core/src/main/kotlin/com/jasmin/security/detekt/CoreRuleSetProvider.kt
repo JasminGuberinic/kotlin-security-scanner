@@ -1,7 +1,11 @@
 package com.jasmin.security.detekt
 
 import com.jasmin.security.detekt.a01.JaxrsOpenRedirectRule
+import com.jasmin.security.detekt.a02.HardcodedAesKeyRule
 import com.jasmin.security.detekt.a02.HardcodedIvRule
+import com.jasmin.security.detekt.a02.HardcodedPrivateKeyRule
+import com.jasmin.security.detekt.a02.InsecureRandomSeedRule
+import com.jasmin.security.detekt.a02.TrustAllHostnamesRule
 import com.jasmin.security.detekt.a02.InsecurePasswordStorageRule
 import com.jasmin.security.detekt.a02.JwtNoneAlgorithmRule
 import com.jasmin.security.detekt.a02.JwtWeakSecretRule
@@ -54,6 +58,10 @@ class CoreRuleSetProvider : RuleSetProvider {
             // A01 Broken Access Control
             JaxrsOpenRedirectRule(config),
             // A02 Cryptographic Failures
+            HardcodedAesKeyRule(config),
+            HardcodedPrivateKeyRule(config),
+            InsecureRandomSeedRule(config),
+            TrustAllHostnamesRule(config),
             WeakCipherModeRule(config),
             WeakHashAlgorithmRule(config),
             TrustAllCertsRule(config),

@@ -112,6 +112,14 @@ security-core:
   JaxrsOpenRedirect:
     active: true
   # A02 Cryptographic Failures
+  HardcodedAesKey:
+    active: true
+  HardcodedPrivateKey:
+    active: true
+  InsecureRandomSeed:
+    active: true
+  TrustAllHostnames:
+    active: true
   WeakCipherMode:
     active: true
   WeakHashAlgorithm:
@@ -513,14 +521,25 @@ security-micronaut:
   # A01 Broken Access Control
   MicronautMissingSecured:
     active: true
+  MicronautWebSocketNoAuth:
+    active: true
+  MicronautCacheableSensitive:
+    active: true
+  MicronautRetryOnAuth:
+    active: true
   # A02 Cryptographic Failures
   MicronautInsecureHttpClient:
+    active: true
+  MicronautGrpcInsecure:
     active: true
   # A03 Injection
   MicronautSensitiveQueryParam:
     active: true
   # A04 Insecure Design
   MicronautBodyAnyType:
+    active: true
+  # A05 Security Misconfiguration
+  MicronautManagementEndpointInsecure:
     active: true
   # A07 Identification and Authentication Failures
   MicronautHardcodedSecret:
