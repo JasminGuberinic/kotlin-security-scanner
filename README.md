@@ -4,9 +4,10 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.0.10-purple.svg)](https://kotlinlang.org)
 [![Detekt](https://img.shields.io/badge/detekt-1.23.7-blue.svg)](https://detekt.dev)
-[![Rules](https://img.shields.io/badge/rules-92-brightgreen.svg)](#owasp-top-10-coverage)
+[![Rules](https://img.shields.io/badge/rules-178-brightgreen.svg)](#owasp-top-10-coverage)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.jasminguberinic/scanner-core.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.jasminguberinic/scanner-core)
 
-**Kotlin SAST — Detekt plugin with 92 rules that detects OWASP Top 10 security vulnerabilities in Spring Boot, Quarkus, Dropwizard, and Ktor applications at compile time, in your IDE, with zero infrastructure.**
+**Kotlin SAST — Detekt plugin with 178 rules that detects OWASP Top 10 security vulnerabilities in Spring Boot, Quarkus, Dropwizard, Ktor, and Micronaut applications at compile time, in your IDE, with zero infrastructure.**
 
 > **FindSecBugs** works on JVM bytecode and misses Kotlin-specific patterns: coroutines, scope functions, Kotlin DSLs.  
 > **SonarQube** security rules require a paid tier or a running server.  
@@ -17,6 +18,8 @@
 
 ## Quick Start
 
+All modules are published to **Maven Central** under `io.github.jasminguberinic`.
+
 ```kotlin
 // build.gradle.kts
 plugins {
@@ -25,29 +28,22 @@ plugins {
 
 dependencies {
     // Core rules — works with any Kotlin project
-    detektPlugins(files("path/to/scanner-core-0.1.0-SNAPSHOT.jar"))
+    detektPlugins("io.github.jasminguberinic:scanner-core:0.2.0")
 
-    // Pick ONE framework module (or use scanner-all for everything)
-    detektPlugins(files("path/to/scanner-spring-boot-0.1.0-SNAPSHOT.jar"))
-    // detektPlugins(files("path/to/scanner-quarkus-0.1.0-SNAPSHOT.jar"))
-    // detektPlugins(files("path/to/scanner-dropwizard-0.1.0-SNAPSHOT.jar"))
-    // detektPlugins(files("path/to/scanner-ktor-0.1.0-SNAPSHOT.jar"))
+    // Pick the module(s) for your framework — combine as many as you like
+    detektPlugins("io.github.jasminguberinic:scanner-spring-boot:0.2.0")
+    // detektPlugins("io.github.jasminguberinic:scanner-quarkus:0.2.0")
+    // detektPlugins("io.github.jasminguberinic:scanner-dropwizard:0.2.0")
+    // detektPlugins("io.github.jasminguberinic:scanner-ktor:0.2.0")
+    // detektPlugins("io.github.jasminguberinic:scanner-micronaut:0.2.0")
+
+    // ...or pull everything in one go:
+    // detektPlugins("io.github.jasminguberinic:scanner-all:0.2.0")
 }
 
 detekt {
-    config.setFrom(files("config/detekt/detekt.yml"))
     buildUponDefaultConfig = true
 }
-```
-
-Build the JARs:
-
-```bash
-git clone https://github.com/JasminGuberinic/kotlin-security-scanner.git
-cd kotlin-security-scanner
-export JAVA_HOME=/opt/homebrew/opt/openjdk@21  # or your JDK 21 path
-./gradlew assemble
-# JARs → scanner-*/build/libs/
 ```
 
 Run:
@@ -55,6 +51,9 @@ Run:
 ```bash
 ./gradlew detekt
 ```
+
+That's it — no server, no account, no extra infrastructure. The rules run on every
+build and in your IDE through the Detekt plugin.
 
 ---
 
@@ -78,7 +77,8 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 
 ## OWASP Top 10 coverage
 
-**92 rules** across 5 modules. Every rule has positive, negative, and cross-rule isolation tests.
+**178 rules** across 6 modules. Every rule has positive, negative, and cross-rule isolation tests
+(1090 tests, all green). The tables below highlight representative rules per module.
 
 ### Core — any Kotlin project (`scanner-core`)
 
@@ -198,6 +198,22 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `KtorHardcodedSecretKeyRule` | A07 | `SessionTransportTransformerEncrypt("literal", ...)` — hardcoded session key |
 | `KtorHardcodedPasswordComparisonRule` | A07 | `credentials.password == "literal"` — plaintext hardcoded password |
 
+### Micronaut (`scanner-micronaut`)
+
+| Rule | OWASP 2021 | What it catches |
+|---|---|---|
+| `MicronautMissingSecuredRule` | A01 | `@Get`/`@Post` controller method without `@Secured` |
+| `MicronautWebSocketNoAuthRule` | A01 | `@ServerWebSocket` endpoint without `@Secured` |
+| `MicronautCacheableSensitiveRule` | A01 | `@Cacheable` on a `@Secured` method — cross-user cache leak |
+| `MicronautRetryOnAuthRule` | A07 | `@Retryable` on a login/auth method — enables brute force |
+| `MicronautManagementEndpointInsecureRule` | A05 | `@Endpoint` `@Read`/`@Write` without `@Secured` |
+| `MicronautInsecureHttpClientRule` | A02 | `@Client("http://...")` — cleartext service-to-service traffic |
+| `MicronautGrpcInsecureRule` | A02 | gRPC `usePlaintext()` — disables channel TLS |
+| `MicronautHardcodedSecretRule` | A07 | `@Value("${...:hardcoded}")` — secret baked into config default |
+| `MicronautSensitiveQueryParamRule` | A03 | `@QueryValue password` — credentials in URL / access logs |
+| `MicronautExceptionMessageLeakRule` | A09 | `@Error` handler returning `exception.message` — internals leak |
+| `MicronautBodyAnyTypeRule` | A04 | `@Body body: Any` — unbounded deserialization target |
+
 ---
 
 ## Why not FindSecBugs / SonarQube?
@@ -207,7 +223,7 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | Kotlin-native (PSI/AST) | ❌ Bytecode only | ⚠️ Partial | ✅ |
 | Coroutine security patterns | ❌ Impossible | ❌ | ✅ |
 | `let`/`run`/`apply` taint tracking | ❌ | ❌ | ✅ |
-| Spring Boot / Quarkus / Dropwizard / Ktor rules | ⚠️ Java only | ⚠️ Paid tier | ✅ |
+| Spring Boot / Quarkus / Dropwizard / Ktor / Micronaut rules | ⚠️ Java only | ⚠️ Paid tier | ✅ |
 | Config file scanning (`.properties`/`.yml`) | ❌ | ❌ | ✅ |
 | Infrastructure needed | ❌ | ✅ Server | ❌ |
 | Cost | Free | Free / Paid | Free |
@@ -258,6 +274,7 @@ kotlin-security-scanner/
 ├── scanner-quarkus/         # Quarkus / MicroProfile / JAX-RS rules
 ├── scanner-dropwizard/      # Dropwizard / JAX-RS rules
 ├── scanner-ktor/            # Ktor routing / session / CORS rules
+├── scanner-micronaut/       # Micronaut security / config / client rules
 └── scanner-all/             # Convenience bundle (all modules)
 ```
 

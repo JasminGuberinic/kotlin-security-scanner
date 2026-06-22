@@ -38,3 +38,6 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### Claude Code personal memory (not project artifacts) ###
+.claude/memory/
