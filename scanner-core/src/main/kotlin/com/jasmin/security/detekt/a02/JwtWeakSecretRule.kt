@@ -7,6 +7,8 @@ import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
 /**
@@ -16,12 +18,20 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
  * A hardcoded JWT signing secret allows offline dictionary attacks against
  * captured tokens. Anyone with the source code can forge valid JWTs.
  *
+ * Covers:
+ *   - Auth0 JWT:       Algorithm.HMAC256("secret")
+ *   - JJWT v0:         Jwts.builder().signWith(alg, "secret")
+ *   - Nimbus JOSE JWT: MACSigner("secret") / MACVerifier("secret")
+ *   - JJWT v1:         Keys.hmacShaKeyFor("secret".toByteArray())
+ *
  * Compliant:
  *   Algorithm.HMAC256(System.getenv("JWT_SECRET"))
+ *   MACSigner(System.getenv("JWT_SECRET").toByteArray())
  *
  * Non-compliant:
  *   Algorithm.HMAC256("my-secret-key")
- *   Jwts.builder().signWith(SignatureAlgorithm.HS256, "hardcoded")
+ *   MACSigner("hardcoded-secret")
+ *   Keys.hmacShaKeyFor("hardcoded".toByteArray())
  */
 class JwtWeakSecretRule(config: Config) : SecurityRule(config) {
 
@@ -36,20 +46,24 @@ class JwtWeakSecretRule(config: Config) : SecurityRule(config) {
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
         val callee = expression.calleeExpression?.text ?: return
-        if (
-            callee !in DetectionPatterns.JWT_HMAC_METHODS &&
-            callee != DetectionPatterns.JWT_SIGN_WITH_METHOD
-        ) {
-            return
-        }
-        val hasLiteralSecret = expression.valueArguments.any {
-            val e = it.getArgumentExpression()
-            e is KtStringTemplateExpression && !e.hasInterpolation()
-        }
+        val simpleName = callee.substringAfterLast(".")
+        if (simpleName !in DetectionPatterns.JWT_HMAC_METHODS && simpleName != DetectionPatterns.JWT_SIGN_WITH_METHOD) return
+        val hasLiteralSecret = expression.valueArguments.any { isHardcodedArg(it.getArgumentExpression()) }
         if (!hasLiteralSecret) return
         reportAt(
             expression,
-            "$callee() with hardcoded secret — load the signing key from an environment variable or key store",
+            "$simpleName() with hardcoded secret — load the signing key from an environment variable or key store",
         )
+    }
+
+    private fun isHardcodedArg(expr: KtExpression?): Boolean {
+        if (expr == null) return false
+        if (expr is KtStringTemplateExpression) return !expr.hasInterpolation()
+        // handles "literal".toByteArray() / .encodeToByteArray()
+        if (expr is KtDotQualifiedExpression) {
+            val recv = expr.receiverExpression
+            return recv is KtStringTemplateExpression && !recv.hasInterpolation()
+        }
+        return false
     }
 }

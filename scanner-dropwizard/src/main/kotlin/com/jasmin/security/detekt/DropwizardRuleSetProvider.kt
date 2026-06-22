@@ -1,7 +1,6 @@
 package com.jasmin.security.detekt
 
 import com.jasmin.security.detekt.a01.DropwizardMissingAuthRule
-import com.jasmin.security.detekt.a01.DropwizardOpenRedirectRule
 import com.jasmin.security.detekt.a02.DropwizardUnencryptedJwtSecretRule
 import com.jasmin.security.detekt.a02.InsecureTlsProtocolRule
 import com.jasmin.security.detekt.a03.DropwizardJdbiSqlInjectionRule
@@ -28,7 +27,6 @@ class DropwizardRuleSetProvider : RuleSetProvider {
         listOf(
             // A01 Broken Access Control
             DropwizardMissingAuthRule(config),
-            DropwizardOpenRedirectRule(config),
             // A02 Cryptographic Failures
             InsecureTlsProtocolRule(config),
             DropwizardUnencryptedJwtSecretRule(config),

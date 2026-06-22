@@ -99,6 +99,16 @@ object RemediationHints {
         "KotlinxSerializationSensitiveField" to
             "@Transient val password: String = \"\" // excluded from serialised output",
 
+        // ── Core — A01 Broken Access Control ─────────────────────────────────
+
+        "JaxrsOpenRedirect" to
+            "Validate the redirect target against a hardcoded allowlist: require(url in ALLOWED_HOSTS)",
+
+        // ── Core — A05 Security Misconfiguration ─────────────────────────────
+
+        "CorsWildcardOrigins" to
+            """allowedOrigins("https://app.example.com", "https://admin.example.com")""",
+
         // ── Core — A09 Logging Failures ──────────────────────────────────────
 
         "SensitiveDataLogging" to
@@ -226,9 +236,6 @@ object RemediationHints {
         "QuarkusJsonBeforeAuth" to
             """Move @RolesAllowed to class level — annotate the @Path class, not individual methods""",
 
-        "QuarkusOpenRedirect" to
-            "Validate redirect URI against a trusted-domain allowlist before Response.seeOther()",
-
         // ── Quarkus — A02 Cryptographic Failures ─────────────────────────────
 
         "QuarkusSmallryeJwtInsecure" to
@@ -349,9 +356,6 @@ object RemediationHints {
 
         "DropwizardMissingAuth" to
             "Add @Auth User user parameter or @RolesAllowed(\"user\") to every JAX-RS method",
-
-        "DropwizardOpenRedirect" to
-            "Validate redirect URI host against trusted allowlist before Response.seeOther(URI(url))",
 
         // ── Dropwizard — A02 Cryptographic Failures ───────────────────────────
 
@@ -589,6 +593,26 @@ object RemediationHints {
 
         "KtorStatusPageLeakDetails" to
             "call.respond(HttpStatusCode.InternalServerError, \"Internal error\") — log cause server-side, never send it",
+
+        // ── Micronaut — A01 Broken Access Control ─────────────────────────────
+
+        "MicronautMissingSecured" to
+            "@Get @Secured(SecurityRule.IS_AUTHENTICATED) fun list(): List<T> — or add @Secured at class level",
+
+        "MicronautInsecureHttpClient" to
+            "@Client(\"https://service-name\") — or inject via @Client(\"\${service.url}\") with url set to https in config",
+
+        "MicronautSensitiveQueryParam" to
+            "Move credentials to @Body or Authorization header — never pass secrets as URL query parameters",
+
+        "MicronautBodyAnyType" to
+            "@Post fun create(@Body request: CreateUserRequest) — define a concrete DTO with bean validation annotations",
+
+        "MicronautHardcodedSecret" to
+            "@Value(\"\${jwt.secret}\") — omit the default value so the app fails fast when the secret is absent",
+
+        "MicronautExceptionMessageLeak" to
+            "log.error(\"Unhandled error\", e); HttpResponse.serverError(\"Internal error\") — log cause, return generic message",
     )
 
     /** Returns the fix hint for a given rule ID, or null if not mapped. */

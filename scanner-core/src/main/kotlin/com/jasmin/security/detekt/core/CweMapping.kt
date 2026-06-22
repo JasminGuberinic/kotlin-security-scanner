@@ -14,6 +14,8 @@ object CweMapping {
     // ── Core rules ────────────────────────────────────────────────────────────
 
     private val MAP: Map<String, String> = mapOf(
+        // A01 Broken Access Control
+        "JaxrsOpenRedirect" to "CWE-601",
         // A02 Cryptographic Failures
         "WeakCipherMode" to "CWE-327",
         "WeakHashAlgorithm" to "CWE-327",
@@ -44,6 +46,8 @@ object CweMapping {
         "JacksonUnsafeDeserialization" to "CWE-502",
         "XmlMapperUnsafe" to "CWE-502",
         "KotlinxSerializationSensitiveField" to "CWE-312",
+        // A05 Security Misconfiguration
+        "CorsWildcardOrigins" to "CWE-942",
         // A09 Logging
         "SensitiveDataLogging" to "CWE-532",
         // A10 SSRF
@@ -125,7 +129,6 @@ object CweMapping {
         "QuarkusMissingAuth" to "CWE-285",
         "QuarkusPermitAllSensitive" to "CWE-285",
         "QuarkusJsonBeforeAuth" to "CWE-285",
-        "QuarkusOpenRedirect" to "CWE-601",
         // A02 Cryptographic Failures
         "QuarkusSmallryeJwtInsecure" to "CWE-347",
         // A03 Injection
@@ -172,7 +175,6 @@ object CweMapping {
 
         // A01 Broken Access Control
         "DropwizardMissingAuth" to "CWE-285",
-        "DropwizardOpenRedirect" to "CWE-601",
         // A02 Cryptographic Failures
         "InsecureTlsProtocol" to "CWE-326",
         "DropwizardUnencryptedJwtSecret" to "CWE-798",
@@ -234,6 +236,15 @@ object CweMapping {
         "KtorMultipartInsecureUpload" to "CWE-400",
         "KtorInsecureContentNegotiation" to "CWE-502",
         "KtorStatusPageLeakDetails" to "CWE-209",
+
+        // ── Micronaut rules ───────────────────────────────────────────────────
+
+        "MicronautMissingSecured" to "CWE-285",
+        "MicronautInsecureHttpClient" to "CWE-319",
+        "MicronautSensitiveQueryParam" to "CWE-598",
+        "MicronautBodyAnyType" to "CWE-20",
+        "MicronautHardcodedSecret" to "CWE-798",
+        "MicronautExceptionMessageLeak" to "CWE-209",
     )
 
     /** Returns the CWE tag string for a given rule ID, e.g. "CWE-89". Null if not mapped. */

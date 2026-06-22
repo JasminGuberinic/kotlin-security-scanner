@@ -71,6 +71,76 @@ class JwtWeakSecretRuleTest {
         assertThat(rule.lint(code)).isEmpty()
     }
 
+    // ── Nimbus JOSE JWT (MACSigner / MACVerifier) ─────────────────────────────
+
+    @Test
+    fun `flags MACSigner with literal string`() {
+        val code = """
+            import com.nimbusds.jose.crypto.MACSigner
+            class JwtFactory {
+                fun sign() = MACSigner("super-secret-key-min-256-bits!!")
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `flags MACVerifier with literal string`() {
+        val code = """
+            import com.nimbusds.jose.crypto.MACVerifier
+            class JwtFactory {
+                fun verify() = MACVerifier("super-secret-key-min-256-bits!!")
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores MACSigner with variable`() {
+        val code = """
+            import com.nimbusds.jose.crypto.MACSigner
+            class JwtFactory {
+                fun build(secret: ByteArray) = MACSigner(secret)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    // ── JJWT v1 (Keys.hmacShaKeyFor) ─────────────────────────────────────────
+
+    @Test
+    fun `flags hmacShaKeyFor with literal toByteArray`() {
+        val code = """
+            import io.jsonwebtoken.security.Keys
+            class JwtUtil {
+                val key = Keys.hmacShaKeyFor("my-secret-key-that-is-long-enough".toByteArray())
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `flags hmacShaKeyFor with plain literal`() {
+        val code = """
+            import io.jsonwebtoken.security.Keys
+            class JwtUtil {
+                val key = Keys.hmacShaKeyFor("my-secret-key-that-is-long-enough")
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores hmacShaKeyFor with variable`() {
+        val code = """
+            import io.jsonwebtoken.security.Keys
+            class JwtUtil {
+                fun build(secret: ByteArray) = Keys.hmacShaKeyFor(secret)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
     // ── Isolation ─────────────────────────────────────────────────────────────
 
     @Test

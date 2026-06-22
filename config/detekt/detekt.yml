@@ -108,6 +108,9 @@ naming:
 # ─── CORE SECURITY RULES (scanner-core) ──────────────────────────────────────
 security-core:
   active: true
+  # A01 Broken Access Control
+  JaxrsOpenRedirect:
+    active: true
   # A02 Cryptographic Failures
   WeakCipherMode:
     active: true
@@ -165,6 +168,9 @@ security-core:
   XmlMapperUnsafe:
     active: true
   KotlinxSerializationSensitiveField:
+    active: true
+  # A05 Security Misconfiguration
+  CorsWildcardOrigins:
     active: true
   # A09 Logging Failures
   SensitiveDataLogging:
@@ -305,8 +311,6 @@ security-quarkus:
     active: true
   QuarkusJsonBeforeAuth:
     active: true
-  QuarkusOpenRedirect:
-    active: true
   # A02 Cryptographic Failures
   QuarkusSmallryeJwtInsecure:
     active: true
@@ -395,8 +399,6 @@ security-dropwizard:
   active: true
   # A01 Broken Access Control
   DropwizardMissingAuth:
-    active: true
-  DropwizardOpenRedirect:
     active: true
   # A02 Cryptographic Failures
   InsecureTlsProtocol:
@@ -504,4 +506,25 @@ security-ktor:
   KtorLoggingCredentials:
     active: true
   KtorStatusPageLeakDetails:
+    active: true
+
+security-micronaut:
+  active: true
+  # A01 Broken Access Control
+  MicronautMissingSecured:
+    active: true
+  # A02 Cryptographic Failures
+  MicronautInsecureHttpClient:
+    active: true
+  # A03 Injection
+  MicronautSensitiveQueryParam:
+    active: true
+  # A04 Insecure Design
+  MicronautBodyAnyType:
+    active: true
+  # A07 Identification and Authentication Failures
+  MicronautHardcodedSecret:
+    active: true
+  # A09 Security Logging and Monitoring Failures
+  MicronautExceptionMessageLeak:
     active: true

@@ -45,6 +45,7 @@ project(":scanner-e2e") {
         "detektPlugins"(project(":scanner-quarkus"))
         "detektPlugins"(project(":scanner-dropwizard"))
         "detektPlugins"(project(":scanner-ktor"))
+        "detektPlugins"(project(":scanner-micronaut"))
         "detektPlugins"("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
     }
 

@@ -224,7 +224,8 @@ object DetectionPatterns {
     // ── A02 JWT ───────────────────────────────────────────────────────────────
 
     const val JWT_SIGN_WITH_METHOD = "signWith"
-    val JWT_HMAC_METHODS = setOf("HMAC256", "HMAC384", "HMAC512")
+    // Auth0 JWT (HMAC256/384/512), Nimbus JOSE JWT (MACSigner/MACVerifier), JJWT v1 key-builder (hmacShaKeyFor)
+    val JWT_HMAC_METHODS = setOf("HMAC256", "HMAC384", "HMAC512", "MACSigner", "MACVerifier", "hmacShaKeyFor")
     const val JWT_NONE_METHOD = "none"
     const val JWT_NONE_ALGORITHM_TEXT = "NONE"
     const val AUTH0_ALGORITHM_CLASS = "Algorithm"
@@ -396,4 +397,9 @@ object DetectionPatterns {
         "SessionTransportTransformerEncrypt",
         "SessionTransportTransformerMessageAuthentication",
     )
+
+    // ── Micronaut ─────────────────────────────────────────────────────────────
+
+    val MICRONAUT_HTTP_METHODS = setOf("Get", "Post", "Put", "Delete", "Patch", "Options", "Head")
+    val MICRONAUT_AUTH_ANNOTATIONS = setOf("Secured")
 }

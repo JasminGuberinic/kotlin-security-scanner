@@ -185,23 +185,86 @@ Uses `io.gitlab.arturbosch.detekt:detekt-test` with `rule.lint(code)` and
 
 ## Using the scanner in your project
 
-**Spring Boot project:**
+### Single-framework projects
+
+**Spring Boot:**
 ```kotlin
-// build.gradle.kts
-detektPlugins("io.github.jasminguberinic:scanner-core:0.1.0")
-detektPlugins("io.github.jasminguberinic:scanner-spring-boot:0.1.0")
+detektPlugins("io.github.jasminguberinic:scanner-core:0.2.0")
+detektPlugins("io.github.jasminguberinic:scanner-spring-boot:0.2.0")
 ```
 
-**Dropwizard project:**
+**Quarkus:**
 ```kotlin
-detektPlugins("io.github.jasminguberinic:scanner-core:0.1.0")
-detektPlugins("io.github.jasminguberinic:scanner-dropwizard:0.1.0")
+detektPlugins("io.github.jasminguberinic:scanner-core:0.2.0")
+detektPlugins("io.github.jasminguberinic:scanner-quarkus:0.2.0")
 ```
 
-**Everything:**
+**Ktor:**
 ```kotlin
-detektPlugins("io.github.jasminguberinic:scanner-all:0.1.0")
+detektPlugins("io.github.jasminguberinic:scanner-core:0.2.0")
+detektPlugins("io.github.jasminguberinic:scanner-ktor:0.2.0")
 ```
+
+**Dropwizard:**
+```kotlin
+detektPlugins("io.github.jasminguberinic:scanner-core:0.2.0")
+detektPlugins("io.github.jasminguberinic:scanner-dropwizard:0.2.0")
+```
+
+**Micronaut:**
+```kotlin
+detektPlugins("io.github.jasminguberinic:scanner-core:0.2.0")
+detektPlugins("io.github.jasminguberinic:scanner-micronaut:0.2.0")
+```
+
+**Everything (convenience bundle):**
+```kotlin
+detektPlugins("io.github.jasminguberinic:scanner-all:0.2.0")
+```
+
+---
+
+### Mixing framework modules (polyglot / multi-module projects)
+
+Each module registers an independent Detekt rule set with a unique ID
+(`security-core`, `security-ktor`, `security-quarkus`, …). Detekt runs every
+loaded rule set against every Kotlin file, so **you can combine any number of
+modules** by adding more `detektPlugins` entries — no conflicts, no duplicates.
+
+**Typical combinations:**
+
+```kotlin
+// Dropwizard service that also uses Ktor for outbound HTTP clients
+detektPlugins("io.github.jasminguberinic:scanner-core:0.2.0")
+detektPlugins("io.github.jasminguberinic:scanner-dropwizard:0.2.0")
+detektPlugins("io.github.jasminguberinic:scanner-ktor:0.2.0")
+
+// Quarkus monorepo with a Spring Boot admin module
+detektPlugins("io.github.jasminguberinic:scanner-core:0.2.0")
+detektPlugins("io.github.jasminguberinic:scanner-quarkus:0.2.0")
+detektPlugins("io.github.jasminguberinic:scanner-spring-boot:0.2.0")
+
+// Migrating from Spring Boot to Micronaut — scan both during transition
+detektPlugins("io.github.jasminguberinic:scanner-core:0.2.0")
+detektPlugins("io.github.jasminguberinic:scanner-spring-boot:0.2.0")
+detektPlugins("io.github.jasminguberinic:scanner-micronaut:0.2.0")
+```
+
+**Rules by scope:**
+
+| Scope | Module | Examples |
+|---|---|---|
+| Any Kotlin code | `scanner-core` | Weak ciphers, hardcoded secrets, SQL injection, path traversal |
+| Framework-agnostic HTTP | `scanner-core` | JAX-RS open redirect, CORS wildcard, JWT hardcoded key |
+| Spring Boot–specific | `scanner-spring-boot` | `@GetMapping` without `@PreAuthorize`, CSRF disabled, SpEL injection |
+| Quarkus–specific | `scanner-quarkus` | `@GET` without `@RolesAllowed`, Panache raw query, OIDC misconfiguration |
+| Dropwizard–specific | `scanner-dropwizard` | JAX-RS missing `@Auth`, JDBI injection, insecure multipart |
+| Ktor–specific | `scanner-ktor` | Missing `authenticate {}`, insecure cookie session, SSL redirect missing |
+| Micronaut–specific | `scanner-micronaut` | `@Get` without `@Secured`, `@Client("http://")`, `@Body: Any` |
+
+> **Note:** `scanner-core` is always required — all framework modules depend on it.
+> `scanner-all` is a convenience bundle that includes every module; use it when you
+> want maximum coverage without managing individual dependencies.
 
 ---
 

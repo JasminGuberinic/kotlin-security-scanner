@@ -1,5 +1,6 @@
 package com.jasmin.security.detekt
 
+import com.jasmin.security.detekt.a01.JaxrsOpenRedirectRule
 import com.jasmin.security.detekt.a02.HardcodedIvRule
 import com.jasmin.security.detekt.a02.InsecurePasswordStorageRule
 import com.jasmin.security.detekt.a02.JwtNoneAlgorithmRule
@@ -27,6 +28,7 @@ import com.jasmin.security.detekt.a08.JacksonUnsafeDeserializationRule
 import com.jasmin.security.detekt.a08.KotlinxSerializationSensitiveFieldRule
 import com.jasmin.security.detekt.a08.XmlMapperUnsafeRule
 import com.jasmin.security.detekt.a09.SensitiveDataLoggingRule
+import com.jasmin.security.detekt.a05.CorsWildcardOriginsRule
 import com.jasmin.security.detekt.a10.SsrfRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.RuleSet
@@ -49,6 +51,8 @@ class CoreRuleSetProvider : RuleSetProvider {
     override fun instance(config: Config): RuleSet = RuleSet(
         ruleSetId,
         listOf(
+            // A01 Broken Access Control
+            JaxrsOpenRedirectRule(config),
             // A02 Cryptographic Failures
             WeakCipherModeRule(config),
             WeakHashAlgorithmRule(config),
@@ -80,6 +84,8 @@ class CoreRuleSetProvider : RuleSetProvider {
             JacksonUnsafeDeserializationRule(config),
             XmlMapperUnsafeRule(config),
             KotlinxSerializationSensitiveFieldRule(config),
+            // A05 Security Misconfiguration
+            CorsWildcardOriginsRule(config),
             // A09 Logging Failures
             SensitiveDataLoggingRule(config),
             // A10 Server-Side Request Forgery
