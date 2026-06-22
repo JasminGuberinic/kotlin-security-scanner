@@ -220,6 +220,20 @@ object CweMapping {
         "KtorHardcodedDatabasePassword" to "CWE-798",
         // A09 Security Logging and Monitoring Failures
         "KtorLoggingCredentials" to "CWE-532",
+        // Faza 2 — Exposed ORM
+        "KtorExposedDeleteAll" to "CWE-285",
+        "KtorExposedConnectionNotSecure" to "CWE-319",
+        "KtorExposedRawSqlConcat" to "CWE-89",
+        "KtorExposedSchemaAutoCreate" to "CWE-284",
+        // Faza 3 — Ktor extensions
+        "KtorWebSocketNoAuth" to "CWE-285",
+        "KtorFileUploadTraversal" to "CWE-22",
+        "KtorUnvalidatedQueryParam" to "CWE-20",
+        "KtorRawCallReceive" to "CWE-20",
+        "KtorForwardedHeaderTrust" to "CWE-346",
+        "KtorMultipartInsecureUpload" to "CWE-400",
+        "KtorInsecureContentNegotiation" to "CWE-502",
+        "KtorStatusPageLeakDetails" to "CWE-209",
     )
 
     /** Returns the CWE tag string for a given rule ID, e.g. "CWE-89". Null if not mapped. */

@@ -444,6 +444,8 @@ security-ktor:
     active: true
   KtorExposedDeleteAll:
     active: true
+  KtorWebSocketNoAuth:
+    active: true
   # A02 Cryptographic Failures
   KtorBasicAuthInsecure:
     active: true
@@ -460,6 +462,13 @@ security-ktor:
     active: true
   KtorSensitiveRouteParam:
     active: true
+  KtorFileUploadTraversal:
+    active: true
+  KtorUnvalidatedQueryParam:
+    active: true
+  # A04 Insecure Design
+  KtorRawCallReceive:
+    active: true
   # A05 Security Misconfiguration
   KtorExposedSchemaAutoCreate:
     active: true
@@ -475,6 +484,10 @@ security-ktor:
     active: true
   KtorRateLimitingMissing:
     active: true
+  KtorForwardedHeaderTrust:
+    active: true
+  KtorMultipartInsecureUpload:
+    active: true
   KtorSessionCookieDomainMissing:
     active: true
   # A07 Identification and Authentication Failures
@@ -484,6 +497,11 @@ security-ktor:
     active: true
   KtorHardcodedDatabasePassword:
     active: true
+  # A08 Software and Data Integrity Failures
+  KtorInsecureContentNegotiation:
+    active: true
   # A09 Security Logging and Monitoring Failures
   KtorLoggingCredentials:
+    active: true
+  KtorStatusPageLeakDetails:
     active: true

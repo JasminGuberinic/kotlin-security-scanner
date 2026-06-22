@@ -549,6 +549,46 @@ object RemediationHints {
 
         "KtorLoggingCredentials" to
             "Remove sensitive keywords from log statements — log only non-sensitive identifiers (userId, requestId)",
+
+        // ── Ktor — Faza 2 Exposed ORM ────────────────────────────────────────
+
+        "KtorExposedDeleteAll" to
+            "Add a WHERE clause: Users.deleteWhere { condition } — never call deleteAll() in production code paths",
+
+        "KtorExposedConnectionNotSecure" to
+            "Remove useSSL=false and sslMode=disabled; use jdbc:postgresql://host/db?ssl=true&sslmode=require",
+
+        "KtorExposedRawSqlConcat" to
+            "Use Exposed DSL: Users.select { Users.id eq id } — never concatenate user input into exec()",
+
+        "KtorExposedSchemaAutoCreate" to
+            "Run SchemaUtils.create() in a one-off migration script, not on application startup",
+
+        // ── Ktor — Faza 3 extensions ──────────────────────────────────────────
+
+        "KtorWebSocketNoAuth" to
+            """authenticate("jwt") { webSocket("/ws") { ... } } — wrap webSocket inside authenticate block""",
+
+        "KtorFileUploadTraversal" to
+            "val safe = UUID.randomUUID().toString() + ext; File(uploadDir, safe) — never use originalFileName directly",
+
+        "KtorUnvalidatedQueryParam" to
+            "call.parameters[\"id\"] ?: return call.respond(HttpStatusCode.BadRequest) — check for null before !!",
+
+        "KtorRawCallReceive" to
+            "call.receive<MyDto>() — use a concrete data class instead of Any to enforce input schema",
+
+        "KtorForwardedHeaderTrust" to
+            "install(ForwardedHeaders) { trustProxyHeaders = listOf(\"10.0.0.0/8\") } — restrict to known proxy CIDR",
+
+        "KtorMultipartInsecureUpload" to
+            "call.receiveMultipart(formFieldLimit = 10 * 1024 * 1024L) — set a size limit to prevent resource exhaustion",
+
+        "KtorInsecureContentNegotiation" to
+            "Use ContentType.Application.Json or ContentType.Application.Xml — never accept java-serialized-object",
+
+        "KtorStatusPageLeakDetails" to
+            "call.respond(HttpStatusCode.InternalServerError, \"Internal error\") — log cause server-side, never send it",
     )
 
     /** Returns the fix hint for a given rule ID, or null if not mapped. */

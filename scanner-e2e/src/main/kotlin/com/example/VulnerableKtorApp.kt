@@ -205,3 +205,76 @@ fun checkPassword(credentials: UserCredentials) {
         println("Access granted")
     }
 }
+
+// ── Faza 3 additions ─────────────────────────────────────────────────────────
+
+// VULNERABLE: webSocket without authenticate{} [KtorWebSocketNoAuth, CWE-285]
+fun Application.configureWebSocket() {
+    routing {
+        webSocket("/ws/chat") {
+            for (frame in incoming) { outgoing.send(frame) }
+        }
+    }
+}
+
+// VULNERABLE: originalFileName directly in File() [KtorFileUploadTraversal, CWE-22]
+fun Application.configureUpload() {
+    routing {
+        post("/upload") {
+            val multipart = call.receiveMultipart()
+            multipart.forEachPart { part ->
+                if (part is io.ktor.http.content.PartData.FileItem) {
+                    val file = File(part.originalFileName!!)
+                    file.writeBytes(part.streamProvider().readBytes())
+                }
+            }
+        }
+    }
+}
+
+// VULNERABLE: install(ForwardedHeaders) unconditionally [KtorForwardedHeaderTrust, CWE-346]
+fun Application.configureProxy() {
+    install(ForwardedHeaders)
+}
+
+// VULNERABLE: exception handler leaks cause.message [KtorStatusPageLeakDetails, CWE-209]
+fun Application.configureStatusPages() {
+    install(io.ktor.server.plugins.statuspages.StatusPages) {
+        exception<Exception> { cause ->
+            call.respond(io.ktor.http.HttpStatusCode.InternalServerError, cause.message ?: "error")
+        }
+    }
+}
+
+// VULNERABLE: receiveMultipart() without maxFileSize [KtorMultipartInsecureUpload, CWE-400]
+fun Application.configureUnlimitedUpload() {
+    routing {
+        post("/bulk") {
+            val multipart = call.receiveMultipart()
+            multipart.forEachPart { it.dispose() }
+        }
+    }
+}
+
+// VULNERABLE: Java serialization content type [KtorInsecureContentNegotiation, CWE-502]
+val javaSerialContentType = "application/x-java-serialized-object"
+
+// VULNERABLE: call.receive<Any>() bypasses type safety [KtorRawCallReceive, CWE-20]
+fun Application.configureRawReceive() {
+    routing {
+        post("/data") {
+            val body = call.receive<Any>()
+            println(body)
+        }
+    }
+}
+
+// VULNERABLE: call.parameters["id"]!! causes 500 on missing param [KtorUnvalidatedQueryParam, CWE-20]
+fun Application.configureUnvalidatedParam() {
+    routing {
+        get("/users/{id}") {
+            val id = call.parameters["id"]!!
+            call.respondText("User: $id")
+        }
+    }
+}
