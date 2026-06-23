@@ -20,6 +20,16 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
  */
 abstract class SecurityRule(config: Config) : Rule(config) {
 
+    // ── Activation ──────────────────────────────────────────────────────────────
+    //
+    // Security rules are ON by default. Detekt's stock default for an unconfigured rule
+    // is `active = false`, which would make this plugin silently do nothing for a user
+    // who simply adds it with buildUponDefaultConfig=true and no per-rule config — a
+    // dangerous failure mode for a security tool. We flip the default to true so every
+    // rule fires out of the box; an explicit `active: false` in detekt.yml still disables.
+    override val active: Boolean
+        get() = valueOrDefault(Config.ACTIVE_KEY, true)
+
     // ── Reporting ─────────────────────────────────────────────────────────────
 
     protected fun reportAt(node: KtElement, message: String) {

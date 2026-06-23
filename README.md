@@ -52,8 +52,17 @@ Run:
 ./gradlew detekt
 ```
 
-That's it — no server, no account, no extra infrastructure. The rules run on every
-build and in your IDE through the Detekt plugin.
+That's it — no server, no account, no extra infrastructure. **Every rule is active by
+default**, so findings appear on the first `./gradlew detekt` with no per-rule setup. To
+silence a specific rule, set it to `active: false` in your `detekt.yml`:
+
+```yaml
+security-core:
+  RegexInjection:
+    active: false   # opt out of an individual rule
+```
+
+The rules run on every build and in your IDE through the Detekt plugin.
 
 ---
 
