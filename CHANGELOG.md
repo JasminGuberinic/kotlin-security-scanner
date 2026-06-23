@@ -6,8 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0] — 2026-06-23
 
-Published to Maven Central as
+First public release on Maven Central:
 `io.github.jasminguberinic:scanner-{core,spring-boot,quarkus,dropwizard,ktor,micronaut,all}:0.2.0`.
+
+> Note: an earlier `0.1.0` was prepared but never published to Maven Central (the deployment
+> was validated but not released), so `0.2.0` is the first version users can actually depend on.
 
 ### Highlights
 
@@ -46,9 +49,4 @@ Published to Maven Central as
   and dead-detection defects (fully-qualified-name receivers, substring over-matching, wrong
   argument indices, Spring `${prop:default}` vs bash `:-` syntax). No crash bugs found.
 
-## [0.1.0] — 2026-06-19
-
-- Initial Maven Central release: `scanner-{core,spring-boot,quarkus,dropwizard,ktor}`.
-
 [0.2.0]: https://github.com/JasminGuberinic/kotlin-security-scanner/releases/tag/v0.2.0
-[0.1.0]: https://github.com/JasminGuberinic/kotlin-security-scanner/releases/tag/v0.1.0
