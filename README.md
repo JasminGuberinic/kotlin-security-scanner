@@ -87,7 +87,7 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 ## OWASP Top 10 coverage
 
 **201 rules** across 6 modules. Every rule has positive, negative, and cross-rule isolation tests
-(1251 tests, all green) and is verified end-to-end against intentionally vulnerable fixtures with a
+(1262 tests, all green) and is verified end-to-end against intentionally vulnerable fixtures with a
 companion safe-code fixture proving zero false positives. The tables below highlight representative
 rules per module.
 
@@ -95,6 +95,7 @@ rules per module.
 
 | Rule | OWASP 2021 | What it catches |
 |---|---|---|
+| `JaxrsOpenRedirectRule` | A01 | `Response.seeOther(URI(variable))` — open redirect (JAX-RS / Micronaut, all frameworks) |
 | `WeakCipherModeRule` | A02 | ECB mode, DES, RC4, RC2, Blowfish in `Cipher.getInstance()` |
 | `WeakHashAlgorithmRule` | A02 | `MessageDigest.getInstance("MD5"\|"SHA-1")` |
 | `TrustAllCertsRule` | A02 | Empty `X509TrustManager` — accepts any certificate |
@@ -183,7 +184,6 @@ rules per module.
 | `QuarkusMissingAuthRule` | A01 | JAX-RS `@GET` etc. without `@RolesAllowed` / `@Authenticated` |
 | `QuarkusPermitAllSensitiveRule` | A01 | `@PermitAll` on `@DELETE` / `@PUT` endpoints |
 | `QuarkusJsonBeforeAuthRule` | A01 | CVE-2023-6267: `@Path` class with method-only security — JSON parsed before auth |
-| `QuarkusOpenRedirectRule` | A01 | `Response.seeOther(URI(variable))` / `temporaryRedirect(URI(variable))` |
 | `QuarkusSmallryeJwtInsecureRule` | A02 | `mp.jwt.verify.algorithm=none` or hardcoded `mp.jwt.verify.secret.value` |
 | `PanacheRawQueryRule` | A03 | `PanacheEntity.find(interpolated)` — NoSQL/ORM injection |
 | `QuarkusMissingBeanValidationRule` | A03 | `@POST`/`@PUT` entity parameter without `@Valid` — input skips validation |
@@ -201,7 +201,6 @@ rules per module.
 | Rule | OWASP 2021 | What it catches |
 |---|---|---|
 | `DropwizardMissingAuthRule` | A01 | JAX-RS `@GET` etc. without `@RolesAllowed`, `@DenyAll`, or `@Auth` |
-| `DropwizardOpenRedirectRule` | A01 | `Response.seeOther(URI(variable))` — open redirect |
 | `InsecureTlsProtocolRule` | A02 | TLS 1.0, TLS 1.1, SSLv2, SSLv3 in TLS configuration |
 | `DropwizardUnencryptedJwtSecretRule` | A02 | `setSecretProvider(literal)` — hardcoded JWT secret |
 | `DropwizardSelfValidatingELRule` | A03 | `buildConstraintViolationWithTemplate(nonLiteral)` — EL injection (CVE-2020-5245) |
