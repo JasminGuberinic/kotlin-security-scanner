@@ -41,7 +41,27 @@ class LdapInjectionRuleTest {
         assertThat(rule.lint(code)).hasSize(1)
     }
 
+    @Test
+    fun `flags search with concatenated filter`() {
+        val code = """
+            fun findUser(username: String) {
+                ctx.search("ou=users", "(uid=" + username + ")", controls)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
+
+    @Test
+    fun `ignores search with constant concatenated filter`() {
+        val code = """
+            fun findAdmins() {
+                ctx.search("ou=users", "(role=" + "admin" + ")", controls)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
 
     @Test
     fun `ignores search with literal filter`() {

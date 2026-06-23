@@ -38,7 +38,25 @@ class XpathInjectionRuleTest {
         assertThat(rule.lint(code)).hasSize(1)
     }
 
+    @Test
+    fun `flags evaluate with concatenated expression`() {
+        val code = """
+            fun findUser(name: String): Any? =
+                xpath.evaluate("//user[@name='" + name + "']", doc, XPathConstants.NODE)
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
+
+    @Test
+    fun `ignores evaluate with constant concatenated expression`() {
+        val code = """
+            fun getAdmins(): Any? =
+                xpath.evaluate("//user[@role='" + "admin" + "']", doc, XPathConstants.NODESET)
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
 
     @Test
     fun `ignores evaluate with literal expression`() {

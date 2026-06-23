@@ -21,7 +21,8 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
  *   val expr = xpath.compile("//user[@id=${'$'}userId]")  // use XPathVariableResolver
  *
  * Non-compliant:
- *   xpath.evaluate("//user[@name='${'$'}name']", doc, XPathConstants.NODE)
+ *   xpath.evaluate("//user[@name='${'$'}name']", doc, XPathConstants.NODE)       // interpolated
+ *   xpath.evaluate("//user[@name='" + name + "']", doc, XPathConstants.NODE)   // concatenated
  */
 class XpathInjectionRule(config: Config) : SecurityRule(config) {
 
@@ -38,10 +39,12 @@ class XpathInjectionRule(config: Config) : SecurityRule(config) {
         val callee = expression.calleeExpression?.text ?: return
         if (callee !in DetectionPatterns.XPATH_EXPRESSION_METHODS) return
         val firstArg = expression.valueArguments.firstOrNull()?.getArgumentExpression() ?: return
-        if (firstArg is KtStringTemplateExpression && firstArg.hasInterpolation()) {
+        val dynamic = (firstArg is KtStringTemplateExpression && firstArg.hasInterpolation()) ||
+            firstArg.isDynamicStringConcat()
+        if (dynamic) {
             reportAt(
                 expression,
-                "XPath $callee() with interpolated expression — use XPathVariableResolver to bind variables safely",
+                "XPath $callee() with dynamic expression — use XPathVariableResolver to bind variables safely",
             )
         }
     }

@@ -23,6 +23,19 @@ class QuarkusPathParamInjectionRuleTest {
     }
 
     @Test
+    fun `flags PathParam concatenated into Panache find`() {
+        val code = """
+            @GET
+            @Path("/{name}")
+            fun getByName(@PathParam("name") name: String): Response {
+                val result = User.find("name = '" + name + "'").list()
+                return Response.ok(result).build()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
     fun `ignores PathParam with positional parameter binding`() {
         val code = """
             @GET

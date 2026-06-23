@@ -22,7 +22,8 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
  *   ctx.search("ou=users", filter, SearchControls())   // parameterised
  *
  * Non-compliant:
- *   ctx.search("ou=users", "(uid=${'$'}username)", controls)   // inline interpolated filter
+ *   ctx.search("ou=users", "(uid=${'$'}username)", controls)        // interpolated filter
+ *   ctx.search("ou=users", "(uid=" + username + ")", controls)   // concatenated filter
  */
 class LdapInjectionRule(config: Config) : SecurityRule(config) {
 
@@ -47,7 +48,9 @@ class LdapInjectionRule(config: Config) : SecurityRule(config) {
 
     private fun hasInterpolatedStringArg(expression: KtCallExpression) =
         expression.valueArguments.any { arg ->
-            val e = arg.getArgumentExpression() as? KtStringTemplateExpression ?: return@any false
-            e.hasInterpolation()
+            when (val e = arg.getArgumentExpression()) {
+                is KtStringTemplateExpression -> e.hasInterpolation()
+                else -> e.isDynamicStringConcat()
+            }
         }
 }

@@ -43,7 +43,23 @@ class PanacheRawQueryRuleTest {
         assertThat(rule.lint(code)).hasSize(1)
     }
 
+    @Test
+    fun `flags find with concatenated query string`() {
+        val code = """
+            fun findByRole(role: String) = User.find("role = '" + role + "'")
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
+
+    @Test
+    fun `ignores find with constant concatenated query`() {
+        val code = """
+            fun findActive() = User.find("active = " + "true")
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
 
     @Test
     fun `ignores find with positional parameter`() {

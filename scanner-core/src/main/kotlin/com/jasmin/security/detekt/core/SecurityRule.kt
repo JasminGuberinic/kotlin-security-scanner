@@ -6,7 +6,9 @@ import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
+import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
 /**
@@ -43,6 +45,36 @@ abstract class SecurityRule(config: Config) : Rule(config) {
     /** Raw string value without surrounding quotes. */
     protected fun KtStringTemplateExpression.rawValue(): String =
         text.removeSurrounding("\"").removeSurrounding("'")
+
+    // ── Dynamic string building ────────────────────────────────────────────────
+
+    /**
+     * True when this expression builds a string by '+'-concatenation that mixes a
+     * string literal with at least one non-constant operand — e.g. `"(uid=" + name + ")"`.
+     *
+     * Precise by design: a pure constant concatenation (`"a" + "b"`) returns false (no
+     * false positive), and a non-string `+` (no string literal anywhere) returns false.
+     * Use alongside `KtStringTemplateExpression.hasInterpolation()` to cover both ways of
+     * splicing untrusted input into a query/filter without binding-context dataflow.
+     */
+    protected fun KtExpression?.isDynamicStringConcat(): Boolean {
+        if (this !is KtBinaryExpression || operationReference.text != "+") return false
+        return containsStringLiteral(this) && !isAllConstantStrings(this)
+    }
+
+    private fun containsStringLiteral(expr: KtExpression?): Boolean = when (expr) {
+        is KtStringTemplateExpression -> true
+        is KtBinaryExpression -> containsStringLiteral(expr.left) || containsStringLiteral(expr.right)
+        else -> false
+    }
+
+    private fun isAllConstantStrings(expr: KtExpression?): Boolean = when (expr) {
+        is KtStringTemplateExpression -> !expr.hasInterpolation()
+        is KtBinaryExpression ->
+            expr.operationReference.text == "+" &&
+                isAllConstantStrings(expr.left) && isAllConstantStrings(expr.right)
+        else -> false
+    }
 
     // ── Annotation inspection ─────────────────────────────────────────────────
 

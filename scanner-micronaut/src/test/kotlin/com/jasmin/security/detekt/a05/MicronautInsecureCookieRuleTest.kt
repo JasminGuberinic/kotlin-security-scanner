@@ -28,10 +28,33 @@ class MicronautInsecureCookieRuleTest {
     }
 
     @Test
+    fun `flags secure false on a Cookie held in a local variable`() {
+        val code = """
+            import io.micronaut.http.cookie.Cookie
+            fun build(id: String) {
+                val c = Cookie.of("SESSION", id)
+                c.secure(false)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
     fun `ignores secure false on a non-cookie builder`() {
         val code = """
             class ConnectionBuilder { fun secure(flag: Boolean) = this }
             fun build() = ConnectionBuilder().secure(false)
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores secure false on a non-cookie local variable`() {
+        val code = """
+            fun build() {
+                val conn = ConnectionBuilder()
+                conn.secure(false)
+            }
         """.trimIndent()
         assertThat(rule.lint(code)).isEmpty()
     }

@@ -10,7 +10,8 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 // OWASP A03 — Injection
 // @PathParam parameters injected directly into a Panache/JPQL query string enable injection.
 // Compliant:   Entity.find("name = ?1", name)  // positional param binding
-// Non-compliant: Entity.find("name = '$name'")  // string template injection
+// Non-compliant: Entity.find("name = '$name'")     // string-template injection
+//               Entity.find("name = '" + name)   // string-concatenation injection
 @Suppress("ReturnCount")
 class QuarkusPathParamInjectionRule(config: Config) : SecurityRule(config) {
 
@@ -30,7 +31,9 @@ class QuarkusPathParamInjectionRule(config: Config) : SecurityRule(config) {
         val body = function.bodyExpression?.text ?: return
         val panacheMethods = setOf("find", "list", "stream", "count", "delete", "update")
         val hasDangerousQuery = panacheMethods.any { method ->
-            Regex("""$method\s*\(\s*"[^"]*\$""").containsMatchIn(body)
+            // method("...$   — interpolated query   OR   method("..." +   — concatenated query
+            Regex("""$method\s*\(\s*"[^"]*\$""").containsMatchIn(body) ||
+                Regex("""$method\s*\(\s*"[^"]*"\s*\+""").containsMatchIn(body)
         }
         if (!hasDangerousQuery) return
         reportAt(

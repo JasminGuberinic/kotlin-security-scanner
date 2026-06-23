@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
  *
  * Non-compliant:
  *   User.find("name = '${'$'}name'")          // interpolated — SQL injection
+ *   User.find("name = '" + name + "'")        // concatenated — SQL injection
  *   User.list("role = '${'$'}{userRole}'")    // interpolated — SQL injection
  */
 class PanacheRawQueryRule(config: Config) : SecurityRule(config) {
@@ -40,10 +41,12 @@ class PanacheRawQueryRule(config: Config) : SecurityRule(config) {
         val callee = expression.calleeExpression?.text ?: return
         if (callee !in DetectionPatterns.PANACHE_QUERY_METHODS) return
         val firstArg = expression.valueArguments.firstOrNull()?.getArgumentExpression() ?: return
-        if (firstArg is KtStringTemplateExpression && firstArg.hasInterpolation()) {
+        val dynamic = (firstArg is KtStringTemplateExpression && firstArg.hasInterpolation()) ||
+            firstArg.isDynamicStringConcat()
+        if (dynamic) {
             reportAt(
                 expression,
-                "Panache.$callee() with interpolated query — use ?1 positional parameters to prevent injection",
+                "Panache.$callee() with a dynamic query — use ?1 positional parameters to prevent injection",
             )
         }
     }
