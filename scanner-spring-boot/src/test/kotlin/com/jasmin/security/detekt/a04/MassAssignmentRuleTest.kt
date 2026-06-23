@@ -47,6 +47,25 @@ class MassAssignmentRuleTest {
         assertThat(rule.lint(code)).hasSize(1)
     }
 
+    @Test
+    fun `flags RequestBody bound to nullable Entity type`() {
+        // Type normalization strips the nullability marker so `User?` resolves to `User`.
+        val code = """
+            import javax.persistence.Entity
+            import org.springframework.web.bind.annotation.*
+
+            @Entity
+            data class User(var id: Long = 0, var name: String = "")
+
+            @RestController
+            class UserController {
+                @PostMapping("/users")
+                fun create(@RequestBody user: User?): String = "ok"
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
 
     @Test

@@ -39,8 +39,12 @@ import com.jasmin.security.detekt.a05.SecurityHeadersMissingRule
 import com.jasmin.security.detekt.a05.SpringActuatorShutdownEnabledRule
 import com.jasmin.security.detekt.a05.SpringBootCookieNotHttpOnlyRule
 import com.jasmin.security.detekt.a05.SpringBootInsecureFileUploadRule
+import com.jasmin.security.detekt.a05.SpringContentTypeOptionsDisabledRule
 import com.jasmin.security.detekt.a05.SpringCsrfDisabledRule
+import com.jasmin.security.detekt.a05.SpringCsrfIgnoringMatchersRule
+import com.jasmin.security.detekt.a05.SpringFrameOptionsDisabledRule
 import com.jasmin.security.detekt.a05.SpringSecurityDebugEnabledRule
+import com.jasmin.security.detekt.a05.SpringSessionFixationNoneRule
 import com.jasmin.security.detekt.a07.HardcodedDatasourcePasswordRule
 import com.jasmin.security.detekt.a07.InsecureRememberMeRule
 import com.jasmin.security.detekt.a07.SpringBootHardcodedValueDefaultRule
@@ -113,6 +117,10 @@ class SpringBootRuleSetProvider : RuleSetProvider {
             CrossOriginCredentialsWildcardRule(config),
             SpringBootCookieNotHttpOnlyRule(config),
             SpringBootInsecureFileUploadRule(config),
+            SpringFrameOptionsDisabledRule(config),
+            SpringContentTypeOptionsDisabledRule(config),
+            SpringSessionFixationNoneRule(config),
+            SpringCsrfIgnoringMatchersRule(config),
             // A07 Identification and Authentication Failures
             InsecureRememberMeRule(config),
             HardcodedDatasourcePasswordRule(config),

@@ -30,7 +30,7 @@ class KtorExposedConnectionNotSecureRule(config: Config) : SecurityRule(config) 
         super.visitCallExpression(expression)
         if (expression.calleeExpression?.text != "connect") return
         val parent = expression.parent as? KtDotQualifiedExpression ?: return
-        if (parent.receiverExpression.text != "Database") return
+        if (parent.receiverExpression.text.substringAfterLast(".") != "Database") return
         val hasInsecureUrl = expression.valueArguments.any { arg ->
             val argExpr = arg.getArgumentExpression()
             argExpr is KtStringTemplateExpression &&

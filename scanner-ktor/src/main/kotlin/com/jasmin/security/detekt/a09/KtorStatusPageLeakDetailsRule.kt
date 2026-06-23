@@ -23,7 +23,16 @@ class KtorStatusPageLeakDetailsRule(config: Config) : SecurityRule(config) {
         debt = Debt.TWENTY_MINS,
     )
 
-    private val leakIndicators = listOf("cause.message", "cause.toString()", "it.message", "it.toString()", "stackTrace", ".localizedMessage")
+    // Match leak indicators on identifier boundaries so e.g. `commit.message`
+    // does not match `it.message` and `audit`/`edit` do not match `it`.
+    private val leakIndicators = listOf(
+        """\bcause\.message\b""",
+        """\bcause\.toString\(\)""",
+        """\bit\.message\b""",
+        """\bit\.toString\(\)""",
+        """\bstackTrace""",
+        """\.localizedMessage\b""",
+    ).map { Regex(it) }
 
     @Suppress("ReturnCount")
     override fun visitCallExpression(expression: KtCallExpression) {
@@ -37,7 +46,7 @@ class KtorStatusPageLeakDetailsRule(config: Config) : SecurityRule(config) {
         val lambdaText = lambda.text
         val hasRespondCall = "call.respond" in lambdaText || "call.respondText" in lambdaText
         if (!hasRespondCall) return
-        val leaksDetails = leakIndicators.any { it in lambdaText }
+        val leaksDetails = leakIndicators.any { it.containsMatchIn(lambdaText) }
         if (!leaksDetails) return
         reportAt(
             expression,

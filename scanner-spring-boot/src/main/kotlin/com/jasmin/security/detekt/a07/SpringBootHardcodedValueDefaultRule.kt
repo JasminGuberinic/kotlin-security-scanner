@@ -9,10 +9,11 @@ import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
 // OWASP A07 — Identification and Authentication Failures
-// @Value("${jwt.secret:-my-hardcoded-secret}") embeds a fallback secret in source code.
+// @Value("${jwt.secret:my-hardcoded-secret}") embeds a fallback secret in source code.
+// Spring's @Value default syntax uses a SINGLE colon (the :- form is bash, not Spring).
 // If the environment variable is absent, the hardcoded default is silently used.
 // Compliant:   @Value("\${jwt.secret}") — fail-fast when env var is absent
-// Non-compliant: @Value("\${jwt.secret:-some-default}")
+// Non-compliant: @Value("\${jwt.secret:some-default}")
 class SpringBootHardcodedValueDefaultRule(config: Config) : SecurityRule(config) {
 
     override val issue = Issue(
@@ -30,12 +31,13 @@ class SpringBootHardcodedValueDefaultRule(config: Config) : SecurityRule(config)
         if (annotation.shortName?.asString() != "Value") return
         val valueArg = annotation.valueArguments.firstOrNull()?.getArgumentExpression() ?: return
         val literal = (valueArg as? KtStringTemplateExpression)?.text?.trim('"') ?: return
-        // @Value("${prop.name:-default}") — the :- introduces a default
-        if (":-" !in literal) return
-        val parts = literal.substringAfter("\${").split(":-")
-        if (parts.size < 2) return
-        val propName = parts[0].lowercase()
-        val defaultValue = parts[1].trimEnd('}')
+        // Spring @Value default syntax: @Value("${prop.name:default}") — a single ':' introduces a default.
+        if ("\${" !in literal) return
+        val placeholder = literal.substringAfter("\${").substringBefore("}")
+        // No ':' means there is no default (e.g. ${jwt.secret}) — fail-fast, nothing to flag.
+        if (":" !in placeholder) return
+        val propName = placeholder.substringBefore(":").lowercase()
+        val defaultValue = placeholder.substringAfter(":")
         if (sensitiveKeywords.none { it in propName }) return
         if (defaultValue.isBlank()) return
         reportAt(

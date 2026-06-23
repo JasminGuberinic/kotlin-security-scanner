@@ -71,6 +71,31 @@ class KtorStatusPageLeakDetailsRuleTest {
     }
 
     @Test
+    fun `ignores exception handler responding with unrelated commit message`() {
+        val code = """
+            install(StatusPages) {
+                exception<Exception> { _ ->
+                    val commit = repo.lastCommit()
+                    call.respond(commit.message)
+                }
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `flags exception handler with stackTraceToString`() {
+        val code = """
+            install(StatusPages) {
+                exception<Throwable> { cause ->
+                    call.respondText(cause.stackTraceToString())
+                }
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
     fun `does not interfere with logging credentials code`() {
         val code = """
             post("/login") {

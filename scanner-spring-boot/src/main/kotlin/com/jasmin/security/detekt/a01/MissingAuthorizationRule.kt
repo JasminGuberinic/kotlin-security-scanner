@@ -7,7 +7,9 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
+import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 
 // FindSecBugs: SPRING_ENDPOINT — OWASP A01
 class MissingAuthorizationRule(config: Config = Config.empty) : SecurityRule(config) {
@@ -22,7 +24,12 @@ class MissingAuthorizationRule(config: Config = Config.empty) : SecurityRule(con
     override fun visitNamedFunction(function: KtNamedFunction) {
         super.visitNamedFunction(function)
         val annotations = function.annotationNames()
-        if (isEndpoint(annotations) && isMissingSecurityAnnotation(annotations)) {
+        // A class-level @PreAuthorize/@Secured/@RolesAllowed applies to every handler in the class.
+        val classAnnotations = function.getParentOfType<KtClass>(strict = true)?.annotationNames().orEmpty()
+        if (isEndpoint(annotations) &&
+            isMissingSecurityAnnotation(annotations) &&
+            isMissingSecurityAnnotation(classAnnotations)
+        ) {
             reportAt(function, "Function '${function.name}' is a Spring endpoint without @PreAuthorize or @Secured")
         }
     }

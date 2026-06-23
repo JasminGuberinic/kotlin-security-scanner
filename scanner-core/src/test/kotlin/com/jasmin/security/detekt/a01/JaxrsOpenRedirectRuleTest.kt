@@ -65,6 +65,28 @@ class JaxrsOpenRedirectRuleTest {
     }
 
     @Test
+    fun `flags seeOther with URL-create of variable`() {
+        val code = """
+            import java.net.URL
+            class Ctrl {
+                fun go(url: String) = Response.seeOther(URL.create(url)).build()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores seeOther with URI-create of literal path`() {
+        val code = """
+            import java.net.URI
+            class Ctrl {
+                fun dashboard() = Response.seeOther(URI.create("/dashboard")).build()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores seeOther with literal URI path`() {
         val code = """
             import java.net.URI

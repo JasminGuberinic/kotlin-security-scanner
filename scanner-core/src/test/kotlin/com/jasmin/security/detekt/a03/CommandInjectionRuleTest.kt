@@ -41,7 +41,38 @@ class CommandInjectionRuleTest {
         assertThat(rule.lint(code)).hasSize(1)
     }
 
+    @Test
+    fun `flags Runtime exec with bare String variable`() {
+        val code = """
+            fun run(userInput: String) {
+                Runtime.getRuntime().exec(userInput)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
+
+    @Test
+    fun `ignores ProcessBuilder with list of only literals`() {
+        val code = """
+            fun run() {
+                ProcessBuilder(listOf("git", "status"))
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores exec with literal string`() {
+        val code = """
+            fun run() {
+                Runtime.getRuntime().exec("whoami")
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
 
     @Test
     fun `ignores exec with all-literal string`() {

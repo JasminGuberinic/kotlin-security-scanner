@@ -45,6 +45,9 @@ class KotlinxSerializationSensitiveFieldRule(config: Config) : SecurityRule(conf
         }
         klass.getProperties().forEach { prop ->
             val name = prop.name?.lowercase() ?: return@forEach
+            // Computed properties with a custom getter have no backing field, so
+            // kotlinx-serialization ignores them — they are never serialized.
+            if (prop.getter?.hasBody() == true) return@forEach
             if (DetectionPatterns.SERIALIZATION_SENSITIVE_FIELDS.none { it in name }) return@forEach
             if (DetectionPatterns.KOTLINX_TRANSIENT_ANNOTATION in prop.annotationNames()) return@forEach
             reportAt(

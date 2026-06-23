@@ -52,6 +52,44 @@ class MicronautExceptionMessageLeakRuleTest {
     }
 
     @Test
+    fun `ignores Error handler that only logs message with nested parens and returns generic`() {
+        // The previous string-strip approach broke on the nested context() call,
+        // leaving e.message visible and producing a false positive.
+        val code = """
+            import io.micronaut.http.annotation.Error
+            import io.micronaut.http.HttpResponse
+            class ErrorHandler {
+                private val logger = org.slf4j.LoggerFactory.getLogger(ErrorHandler::class.java)
+                private fun context(): String = "req-123"
+                @Error
+                fun handle(e: Exception): HttpResponse<String> {
+                    logger.error("ctx=" + context(), e.message)
+                    return HttpResponse.serverError("Internal server error")
+                }
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `flags Error handler that logs but also returns message`() {
+        val code = """
+            import io.micronaut.http.annotation.Error
+            import io.micronaut.http.HttpResponse
+            class ErrorHandler {
+                private val logger = org.slf4j.LoggerFactory.getLogger(ErrorHandler::class.java)
+                private fun context(): String = "req-123"
+                @Error
+                fun handle(e: Exception): HttpResponse<String> {
+                    logger.error("ctx=" + context(), e.message)
+                    return HttpResponse.serverError(e.message)
+                }
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
     fun `ignores regular function with message reference`() {
         val code = """
             class UserService {

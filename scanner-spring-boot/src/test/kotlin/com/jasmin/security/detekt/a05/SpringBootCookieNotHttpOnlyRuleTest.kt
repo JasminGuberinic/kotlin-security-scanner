@@ -32,6 +32,16 @@ class SpringBootCookieNotHttpOnlyRuleTest {
     }
 
     @Test
+    fun `ignores httpOnly assignment on a non-cookie receiver`() {
+        val code = """
+            fun configure(featureToggle: FeatureToggle) {
+                featureToggle.httpOnly = false
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores isHttpOnly set to true`() {
         val code = """
             fun handleLogin(response: HttpServletResponse) {

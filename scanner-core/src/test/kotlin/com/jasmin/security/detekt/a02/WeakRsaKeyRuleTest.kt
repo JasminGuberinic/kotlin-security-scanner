@@ -66,6 +66,22 @@ class WeakRsaKeyRuleTest {
     }
 
     @Test
+    fun `ignores EC key with 256-bit size`() {
+        val code = """
+            fun makeKey() = KeyPairGenerator.getInstance("EC").initialize(256)
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores Ed25519 key with small size`() {
+        val code = """
+            fun makeKey() = KeyPairGenerator.getInstance("Ed25519").initialize(255)
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores initialize with variable size`() {
         val code = """
             fun makeKey(size: Int) {

@@ -31,6 +31,26 @@ class SpringDataSortInjectionRuleTest {
     }
 
     @Test
+    fun `flags fully-qualified Sort_by with variable`() {
+        val code = """
+            fun findUsers(sortField: String): List<User> {
+                return userRepository.findAll(org.springframework.data.domain.Sort.by(sortField))
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `flags Sort_by with Direction and dynamic field name`() {
+        val code = """
+            fun findUsers(sortField: String): List<User> {
+                return userRepository.findAll(Sort.by(Sort.Direction.ASC, sortField))
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
     fun `ignores Sort_by with string literal`() {
         val code = """
             fun findUsers(): List<User> {

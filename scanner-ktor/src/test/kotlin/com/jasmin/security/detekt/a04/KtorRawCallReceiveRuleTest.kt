@@ -63,6 +63,36 @@ class KtorRawCallReceiveRuleTest {
     }
 
     @Test
+    fun `flags bare call receive Any`() {
+        val code = """
+            fun handle() {
+                val body = call.receive<Any>()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores eventBus receive (non-Ktor receiver)`() {
+        val code = """
+            fun handle() {
+                val msg = eventBus.receive<Map<String, Any>>()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores channel receive (non-Ktor receiver)`() {
+        val code = """
+            suspend fun handle() {
+                val item = channel.receive<Any>()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `does not interfere with WebSocket no auth code`() {
         val code = """
             routing {

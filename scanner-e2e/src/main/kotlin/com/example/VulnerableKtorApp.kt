@@ -278,3 +278,24 @@ fun Application.configureUnvalidatedParam() {
         }
     }
 }
+
+// ── Batch: file serving / config ──────────────────────────────────────────────
+
+// VULNERABLE: respondFile path from request parameter [KtorRespondFileTraversal, CWE-22]
+suspend fun serveUserFile(call: Any, baseDir: java.io.File) {
+    call.respondFile(baseDir, call.parameters["file"]!!)
+}
+
+class KtorEnvConfig {
+    var developmentMode: Boolean = false
+}
+
+// VULNERABLE: developmentMode hardcoded true [KtorDevelopmentMode, CWE-489]
+fun configureDevMode(env: KtorEnvConfig) {
+    env.developmentMode = true
+}
+
+// VULNERABLE: CORS anyHeader [KtorCorsAnyHeader, CWE-942]
+fun configureCors(cors: Any) {
+    cors.apply { anyHeader() }
+}

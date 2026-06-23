@@ -136,3 +136,15 @@ class GrpcClientFactory {
         .usePlaintext()
         .build()
 }
+
+// VULNERABLE: anonymous access on a state-changing endpoint [MicronautAnonymousAccess, CWE-285]
+@io.micronaut.http.annotation.Controller("/anon-admin")
+class AnonymousAdminController {
+    @io.micronaut.http.annotation.Delete("/users/{id}")
+    @io.micronaut.security.annotation.Secured(io.micronaut.security.rules.SecurityRule.IS_ANONYMOUS)
+    fun delete(id: Long) {}
+}
+
+// VULNERABLE: cookie marked secure(false) [MicronautInsecureCookie, CWE-614]
+fun buildSessionCookie(id: String) =
+    io.micronaut.http.cookie.Cookie.of("SESSION", id).secure(false)

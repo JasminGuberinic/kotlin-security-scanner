@@ -31,6 +31,11 @@ class QuarkusConfigPasswordLeakRule(config: Config) : SecurityRule(config) {
         klass.body?.properties?.forEach { prop ->
             prop.annotationEntries.forEach { checkAnnotation(it) }
         }
+        // Quarkus constructor injection: @ConfigProperty on a primary-constructor parameter,
+        // e.g. class Svc(@ConfigProperty(name="app.secret", defaultValue="changeme") val s: String)
+        klass.primaryConstructor?.valueParameters?.forEach { param ->
+            param.annotationEntries.forEach { checkAnnotation(it) }
+        }
     }
 
     @Suppress("ReturnCount")

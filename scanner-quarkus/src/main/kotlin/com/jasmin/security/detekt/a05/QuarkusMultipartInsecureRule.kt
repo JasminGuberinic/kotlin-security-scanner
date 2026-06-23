@@ -21,19 +21,30 @@ class QuarkusMultipartInsecureRule(config: Config) : PropertiesSecurityRule(conf
         debt = Debt.TEN_MINS,
     )
 
-    private val largeBodyPattern = Regex("""^(\d+)\s*([GM])$""", RegexOption.IGNORE_CASE)
+    // Accepts an optional K/M/G binary-multiple suffix or a bare byte count.
+    private val sizePattern = Regex("""^(\d+)\s*([KMG]?)$""", RegexOption.IGNORE_CASE)
 
     private val maxBodySizeMb: Int = config.valueOrDefault("maxBodySizeMb", 50)
 
     @Suppress("ReturnCount")
     override fun scanProperties(props: Properties): List<Pair<String, String>> {
         val key = "quarkus.http.limits.max-body-size"
-        val value = props.getProperty(key) ?: return emptyList()
-        val match = largeBodyPattern.matchEntire(value.trim()) ?: return emptyList()
+        val rawValue = props.getProperty(key)
+        // Unset key: Quarkus still accepts uploads (default ~10M), but an explicit limit
+        // documents intent and protects against config drift — promised by the description.
+        if (rawValue == null) {
+            return listOf(key to "max-body-size is unset — set an explicit limit (e.g. 10M)")
+        }
+        val match = sizePattern.matchEntire(rawValue.trim()) ?: return emptyList()
         val size = match.groupValues[1].toLongOrNull() ?: return emptyList()
-        val unit = match.groupValues[2].uppercase()
-        val megabytes = if (unit == "G") size * 1024 else size
-        if (megabytes <= maxBodySizeMb) return emptyList()
-        return listOf(key to "max-body-size=$value is very large — set a reasonable limit (e.g. 10M)")
+        val bytes = when (match.groupValues[2].uppercase()) {
+            "G" -> size * 1024 * 1024 * 1024
+            "M" -> size * 1024 * 1024
+            "K" -> size * 1024
+            else -> size // bare byte count
+        }
+        val maxBytes = maxBodySizeMb.toLong() * 1024 * 1024
+        if (bytes <= maxBytes) return emptyList()
+        return listOf(key to "max-body-size=$rawValue is very large — set a reasonable limit (e.g. 10M)")
     }
 }

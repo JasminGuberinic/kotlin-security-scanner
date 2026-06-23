@@ -53,6 +53,17 @@ class CrossOriginCredentialsWildcardRuleTest {
     }
 
     @Test
+    fun `ignores wildcard methods when origins is restricted`() {
+        // The wildcard is in `methods`, not `origins`, so this must not be flagged.
+        val code = """
+            @CrossOrigin(origins = ["https://app.example.com"], methods = ["*"], allowCredentials = "true")
+            @RestController
+            class UserController
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores CrossOrigin without allowCredentials`() {
         val code = """
             @CrossOrigin(origins = ["*"])

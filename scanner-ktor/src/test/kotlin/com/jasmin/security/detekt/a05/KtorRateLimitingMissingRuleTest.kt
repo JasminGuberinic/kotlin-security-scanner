@@ -51,6 +51,19 @@ class KtorRateLimitingMissingRuleTest {
     }
 
     @Test
+    fun `ignores authors route (substring of auth)`() {
+        val code = """
+            routing {
+                post("/authors") {
+                    val author = call.receive<Author>()
+                    call.respond(authorService.create(author))
+                }
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores non-auth routes`() {
         val code = """
             routing {

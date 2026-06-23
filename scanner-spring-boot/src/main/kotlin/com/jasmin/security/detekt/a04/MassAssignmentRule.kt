@@ -51,7 +51,13 @@ class MassAssignmentRule(config: Config) : SecurityRule(config) {
 
     @Suppress("ReturnCount")
     private fun typeIsEntity(param: KtParameter): Boolean {
-        val typeName = param.typeReference?.text ?: return false
+        // Normalize: strip FQN, nullability, and generic type args so e.g.
+        // `com.example.User?` and `User<T>` resolve to the simple name `User`.
+        val typeName = param.typeReference?.text
+            ?.substringAfterLast(".")
+            ?.removeSuffix("?")
+            ?.substringBefore("<")
+            ?: return false
         val file = param.containingKtFile
         val cls = file.declarations
             .filterIsInstance<KtClass>()

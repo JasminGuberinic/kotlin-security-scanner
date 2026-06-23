@@ -61,6 +61,15 @@ class SpelInjectionRuleTest {
     }
 
     @Test
+    fun `ignores parseExpression built from constant string concatenation`() {
+        val code = """
+            import org.springframework.expression.spel.standard.SpelExpressionParser
+            fun getAge(): Any? = SpelExpressionParser().parseExpression("user." + "age").getValue()
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores unrelated parseExpression calls`() {
         val code = """
             fun parse(pattern: String) = Regex(pattern)

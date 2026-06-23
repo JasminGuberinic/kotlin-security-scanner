@@ -7,6 +7,7 @@ import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
@@ -53,15 +54,25 @@ class JaxrsOpenRedirectRule(config: Config) : SecurityRule(config) {
 
     @Suppress("ReturnCount")
     private fun isNonLiteralTarget(arg: KtExpression): Boolean {
-        if (arg is KtCallExpression) {
-            val argCallee = arg.calleeExpression?.text ?: return false
-            // URI("..."), URI.create("..."), URL("...") — check both SSRF constructors and .create qualifier
-            val argSimple = argCallee.substringAfterLast(".")
-            if (argSimple !in DetectionPatterns.SSRF_CONSTRUCTORS && argCallee != "URI.create") return false
-            val uriArg = arg.valueArguments.firstOrNull()?.getArgumentExpression() ?: return true
-            if (uriArg !is KtStringTemplateExpression) return true
-            return uriArg.hasInterpolation()
+        // The target may be a constructor call `URI("...")` (a KtCallExpression) or a factory
+        // call `URI.create("...")` (a KtDotQualifiedExpression whose selector is the call —
+        // its callee text is just "create", so the URI/URL class is the dot-qualified receiver).
+        val call = arg as? KtCallExpression
+            ?: (arg as? KtDotQualifiedExpression)?.selectorExpression as? KtCallExpression
+        if (call != null) {
+            val argSimple = call.calleeExpression?.text?.substringAfterLast(".") ?: return true
+            val isConstructor = argSimple in DetectionPatterns.SSRF_CONSTRUCTORS
+            val isCreateFactory = argSimple == "create" &&
+                (arg as? KtDotQualifiedExpression)?.receiverExpression?.text
+                    ?.substringAfterLast(".") in DetectionPatterns.SSRF_CONSTRUCTORS
+            if (isConstructor || isCreateFactory) {
+                val uriArg = call.valueArguments.firstOrNull()?.getArgumentExpression() ?: return true
+                return uriArg !is KtStringTemplateExpression || uriArg.hasInterpolation()
+            }
+            // Some other call produces the target (e.g. a helper) — treat as dynamic.
+            return true
         }
+        // A bare string literal is safe; a variable or any other expression is dynamic.
         return arg !is KtStringTemplateExpression
     }
 }

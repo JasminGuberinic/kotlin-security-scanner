@@ -111,12 +111,16 @@ security-core:
   # A01 Broken Access Control
   JaxrsOpenRedirect:
     active: true
+  PredictableTempFile:
+    active: true
   # A02 Cryptographic Failures
   HardcodedAesKey:
     active: true
   HardcodedPrivateKey:
     active: true
   InsecureRandomSeed:
+    active: true
+  InsecureSslContext:
     active: true
   TrustAllHostnames:
     active: true
@@ -158,8 +162,12 @@ security-core:
     active: true
   GroovyScriptInjection:
     active: true
+  ZipSlip:
+    active: true
   # A06 Vulnerable Components / ReDoS
   RegexDenialOfService:
+    active: true
+  RegexInjection:
     active: true
   # A07 Authentication Failures
   HardcodedCredentials:
@@ -167,6 +175,18 @@ security-core:
   InsecureRandom:
     active: true
   HardcodedAwsCredentials:
+    active: true
+  GoogleApiKey:
+    active: true
+  SlackToken:
+    active: true
+  GitHubToken:
+    active: true
+  StripeSecretKey:
+    active: true
+  HardcodedJwtToken:
+    active: true
+  HardcodedJdbcCredentials:
     active: true
   # A08 Software and Data Integrity
   InsecureDeserialization:
@@ -180,8 +200,12 @@ security-core:
   # A05 Security Misconfiguration
   CorsWildcardOrigins:
     active: true
+  InsecureFilePermissions:
+    active: true
   # A09 Logging Failures
   SensitiveDataLogging:
+    active: true
+  LogForging:
     active: true
   # A10 Server-Side Request Forgery
   Ssrf:
@@ -301,6 +325,14 @@ security-spring-boot:
     active: true
   SpringBootExceptionBodyLeak:
     active: true
+  SpringFrameOptionsDisabled:
+    active: true
+  SpringContentTypeOptionsDisabled:
+    active: true
+  SpringSessionFixationNone:
+    active: true
+  SpringCsrfIgnoringMatchers:
+    active: true
   # A10 Server-Side Request Forgery
   WebClientSSRF:
     active: true
@@ -401,6 +433,8 @@ security-quarkus:
     active: true
   QuarkusPasswordInLog:
     active: true
+  QuarkusCacheResultSensitive:
+    active: true
 
 # ─── DROPWIZARD SECURITY RULES (scanner-dropwizard) ──────────────────────────
 security-dropwizard:
@@ -476,11 +510,17 @@ security-ktor:
     active: true
   KtorUnvalidatedQueryParam:
     active: true
+  KtorRespondFileTraversal:
+    active: true
   # A04 Insecure Design
   KtorRawCallReceive:
     active: true
   # A05 Security Misconfiguration
   KtorExposedSchemaAutoCreate:
+    active: true
+  KtorDevelopmentMode:
+    active: true
+  KtorCorsAnyHeader:
     active: true
   KtorInsecureCookieSession:
     active: true
@@ -527,6 +567,8 @@ security-micronaut:
     active: true
   MicronautRetryOnAuth:
     active: true
+  MicronautAnonymousAccess:
+    active: true
   # A02 Cryptographic Failures
   MicronautInsecureHttpClient:
     active: true
@@ -540,6 +582,8 @@ security-micronaut:
     active: true
   # A05 Security Misconfiguration
   MicronautManagementEndpointInsecure:
+    active: true
+  MicronautInsecureCookie:
     active: true
   # A07 Identification and Authentication Failures
   MicronautHardcodedSecret:

@@ -21,7 +21,7 @@ class KtorRateLimitingMissingRule(config: Config) : SecurityRule(config) {
         debt = Debt.TWENTY_MINS,
     )
 
-    private val authPaths = setOf("/login", "/auth", "/token", "/signin", "/authenticate")
+    private val authKeywords = setOf("login", "auth", "token", "signin", "authenticate")
 
     @Suppress("ReturnCount")
     override fun visitCallExpression(expression: KtCallExpression) {
@@ -30,7 +30,9 @@ class KtorRateLimitingMissingRule(config: Config) : SecurityRule(config) {
         if (callee !in setOf("post", "get", "put")) return
         val pathArg = expression.valueArguments.firstOrNull()?.getArgumentExpression()?.text ?: return
         val path = pathArg.trim('"')
-        if (authPaths.none { it in path }) return
+        // Match path SEGMENTS by equality so `/authors` does not match `/auth`.
+        val segments = path.split('/').filter { it.isNotEmpty() }
+        if (segments.none { it in authKeywords }) return
         if (isInsideRateLimiting(expression)) return
         reportAt(
             expression,

@@ -26,6 +26,10 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
  */
 class ExceptionDetailsExposedRule(config: Config) : SecurityRule(config) {
 
+    // Matches a logging call and its arguments, e.g. logger.error("..", e.message) or log.warn(e).
+    // We strip these out so that an exception detail that is only LOGGED (not returned) is ignored.
+    private val LOG_CALL = Regex("""\b(log|logger|LOG|LOGGER)\s*\.\s*\w+\s*\([^)]*\)""")
+
     override val issue = Issue(
         id = "ExceptionDetailsExposed",
         severity = Severity.Security,
@@ -37,7 +41,9 @@ class ExceptionDetailsExposedRule(config: Config) : SecurityRule(config) {
     override fun visitNamedFunction(function: KtNamedFunction) {
         super.visitNamedFunction(function)
         if (DetectionPatterns.EXCEPTION_HANDLER_ANNOTATION !in function.annotationNames()) return
-        val body = function.bodyExpression?.text ?: return
+        val rawBody = function.bodyExpression?.text ?: return
+        // Ignore exception details that only appear inside a logging call — those are not returned.
+        val body = LOG_CALL.replace(rawBody, "")
         val found = DetectionPatterns.EXCEPTION_DETAIL_PATTERNS.any { it in body }
         if (!found) return
         reportAt(

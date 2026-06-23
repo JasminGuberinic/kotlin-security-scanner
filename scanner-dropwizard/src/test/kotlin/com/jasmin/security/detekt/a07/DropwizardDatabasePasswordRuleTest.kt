@@ -40,4 +40,13 @@ class DropwizardDatabasePasswordRuleTest {
         }
         assertThat(rule.scanProperties(props)).isEmpty()
     }
+
+    @Test
+    fun `ignores non-secret database user`() {
+        // database.user is a username, not a credential — must not be flagged
+        val props = Properties().also {
+            it["database.user"] = "app_user"
+        }
+        assertThat(rule.scanProperties(props)).isEmpty()
+    }
 }

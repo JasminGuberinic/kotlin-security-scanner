@@ -35,7 +35,31 @@ class QuarkusBuildTimeSecretLeakRuleTest {
         assertThat(rule.scanProperties(props)).hasSize(1)
     }
 
+    @Test
+    fun `flags hardcoded api-key with dash`() {
+        val props = Properties().also {
+            it["app.integration.api-key"] = "abc123secretkey"
+        }
+        assertThat(rule.scanProperties(props)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
+
+    @Test
+    fun `ignores oidc auth-server-url (contains auth)`() {
+        val props = Properties().also {
+            it["quarkus.oidc.auth-server-url"] = "https://idp.example.com/realms/app"
+        }
+        assertThat(rule.scanProperties(props)).isEmpty()
+    }
+
+    @Test
+    fun `ignores oidc token-path (contains token)`() {
+        val props = Properties().also {
+            it["quarkus.oidc.token-path"] = "/protocol/openid-connect/token"
+        }
+        assertThat(rule.scanProperties(props)).isEmpty()
+    }
 
     @Test
     fun `ignores env var reference`() {

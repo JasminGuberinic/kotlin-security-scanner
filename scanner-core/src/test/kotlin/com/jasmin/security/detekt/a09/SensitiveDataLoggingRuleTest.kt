@@ -53,6 +53,39 @@ class SensitiveDataLoggingRuleTest {
     }
 
     @Test
+    fun `flags SLF4J parameterized form with sensitive value argument`() {
+        val code = """
+            val logger = org.slf4j.LoggerFactory.getLogger("test")
+            fun login(userPwd: String) {
+                logger.info("password={}", userPwd)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores sensitive keyword only in literal prose`() {
+        val code = """
+            val logger = org.slf4j.LoggerFactory.getLogger("test")
+            fun reset(user: User) {
+                logger.warn("Reset of the password page for ${'$'}{user.id}")
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores plain informational message`() {
+        val code = """
+            val logger = org.slf4j.LoggerFactory.getLogger("test")
+            fun login() {
+                logger.info("user logged in")
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores logging non-sensitive data`() {
         val code = """
             val logger = org.slf4j.LoggerFactory.getLogger("test")

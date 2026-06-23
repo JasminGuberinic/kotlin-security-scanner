@@ -53,6 +53,24 @@ class SpringDataMongoInjectionRuleTest {
     }
 
     @Test
+    fun `ignores Criteria where built from constant string concatenation`() {
+        val code = """
+            fun findByUsername(value: String) =
+                mongoTemplate.find(Query(Criteria.where("user" + "name").is(value)), User::class.java)
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores where call on a CriteriaBuilder receiver`() {
+        // Tightened receiver check: only the exact `Criteria` class, not `*CriteriaBuilder`.
+        val code = """
+            fun build(field: String) = criteriaBuilder.where(field)
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores where call on non-Criteria receiver`() {
         val code = """
             fun filter(items: List<String>, pred: (String) -> Boolean) = items.filter { pred(it) }

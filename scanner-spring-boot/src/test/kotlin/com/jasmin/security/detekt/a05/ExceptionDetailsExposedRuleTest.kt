@@ -53,6 +53,18 @@ class ExceptionDetailsExposedRuleTest {
     }
 
     @Test
+    fun `ignores ExceptionHandler that only logs e message but returns generic body`() {
+        val code = """
+            @ExceptionHandler
+            fun handle(e: Exception): ResponseEntity<String> {
+                logger.error("Request failed", e.message)
+                return ResponseEntity.internalServerError().body("An error occurred")
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores regular function returning exception message`() {
         val code = """
             fun logError(e: Exception) = logger.error(e.message)

@@ -27,6 +27,23 @@ class InsecureRandomRuleTest {
     }
 
     @Test
+    fun `flags ThreadLocalRandom current() call`() {
+        val code = """
+            import java.util.concurrent.ThreadLocalRandom
+            fun token(): Int = ThreadLocalRandom.current().nextInt(100000)
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores unrelated current() call`() {
+        val code = """
+            fun now() = Instant.current()
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores SecureRandom`() {
         val code = """
             import java.security.SecureRandom

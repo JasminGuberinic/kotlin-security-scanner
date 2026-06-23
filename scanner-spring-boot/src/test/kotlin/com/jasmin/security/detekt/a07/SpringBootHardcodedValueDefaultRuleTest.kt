@@ -28,6 +28,25 @@ class SpringBootHardcodedValueDefaultRuleTest {
     }
 
     @Test
+    fun `flags @Value with single-colon Spring default for secret`() {
+        // Spring's real default syntax uses a single colon, not ':-' (bash).
+        val code = """
+            @Value("\${'$'}{jwt.secret:changeme}")
+            lateinit var jwtSecret: String
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores @Value with single colon but no default after it`() {
+        val code = """
+            @Value("\${'$'}{jwt.secret}")
+            lateinit var jwtSecret: String
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores @Value without default`() {
         val code = """
             @Value("\${'$'}{jwt.secret}")

@@ -48,9 +48,13 @@ class JacksonUnsafeDeserializationRule(config: Config) : SecurityRule(config) {
     override fun visitAnnotationEntry(annotationEntry: KtAnnotationEntry) {
         super.visitAnnotationEntry(annotationEntry)
         if (annotationEntry.shortName?.asString() != DetectionPatterns.JACKSON_TYPE_INFO_ANNOTATION) return
-        val useArg = annotationEntry.valueArgumentList?.arguments
-            ?.firstOrNull { it.text.substringBefore("=").trim() == "use" }
-            ?.getArgumentExpression()?.text ?: return
+        val args = annotationEntry.valueArgumentList?.arguments ?: return
+        // Prefer the named `use =` argument; fall back to the first positional argument
+        // for the common form @JsonTypeInfo(JsonTypeInfo.Id.CLASS, ...).
+        val useArg = (
+            args.firstOrNull { it.text.substringBefore("=").trim() == "use" }
+                ?: args.firstOrNull { !it.text.contains("=") }
+            )?.getArgumentExpression()?.text ?: return
         if ("CLASS" !in useArg && "MINIMAL_CLASS" !in useArg) return
         reportAt(
             annotationEntry,

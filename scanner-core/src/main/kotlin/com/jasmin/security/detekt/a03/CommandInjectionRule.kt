@@ -7,6 +7,7 @@ import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
 /**
@@ -46,8 +47,10 @@ class CommandInjectionRule(config: Config) : SecurityRule(config) {
     private fun isExecWithVariable(expression: KtCallExpression): Boolean {
         if (expression.calleeExpression?.text !in DetectionPatterns.COMMAND_EXEC_METHODS) return false
         return expression.valueArguments.any { arg ->
-            val e = arg.getArgumentExpression()
-            e is KtStringTemplateExpression && e.hasInterpolation()
+            val e = arg.getArgumentExpression() ?: return@any false
+            // Flag any non-literal argument: interpolated templates AND bare variables /
+            // expressions (e.g. exec(userInput)). A plain string literal is safe.
+            isNonLiteral(e)
         }
     }
 
@@ -55,8 +58,25 @@ class CommandInjectionRule(config: Config) : SecurityRule(config) {
     private fun isProcessBuilderWithVariable(expression: KtCallExpression): Boolean {
         if (expression.calleeExpression?.text != DetectionPatterns.PROCESS_BUILDER_CLASS) return false
         return expression.valueArguments.any { arg ->
-            val e = arg.getArgumentExpression()
-            e !is KtStringTemplateExpression || e.hasInterpolation()
+            val e = arg.getArgumentExpression() ?: return@any false
+            // listOf(...)/arrayOf(...) — a collection of pure string literals is safe;
+            // flag only if some element is non-literal.
+            if (e is KtCallExpression && e.calleeExpression?.text in COLLECTION_BUILDERS) {
+                e.valueArguments.any { el ->
+                    val ee = el.getArgumentExpression() ?: return@any false
+                    isNonLiteral(ee)
+                }
+            } else {
+                isNonLiteral(e)
+            }
         }
+    }
+
+    /** True unless the expression is a plain (non-interpolated) string literal. */
+    private fun isNonLiteral(e: KtExpression): Boolean =
+        e !is KtStringTemplateExpression || e.hasInterpolation()
+
+    private companion object {
+        val COLLECTION_BUILDERS = setOf("listOf", "arrayOf", "mutableListOf", "arrayListOf")
     }
 }

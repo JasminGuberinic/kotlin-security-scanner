@@ -42,6 +42,18 @@ class KtorForwardedHeaderTrustRuleTest {
     }
 
     @Test
+    fun `ignores install ForwardedHeaders with trustProxyHeaders allowlist`() {
+        val code = """
+            fun Application.configureProxy() {
+                install(ForwardedHeaders) {
+                    trustProxyHeaders = listOf("10.0.0.1/24")
+                }
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `does not interfere with session cookie domain missing code`() {
         val code = """
             fun Application.configureSessions() {

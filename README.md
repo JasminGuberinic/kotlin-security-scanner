@@ -4,10 +4,10 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.0.10-purple.svg)](https://kotlinlang.org)
 [![Detekt](https://img.shields.io/badge/detekt-1.23.7-blue.svg)](https://detekt.dev)
-[![Rules](https://img.shields.io/badge/rules-178-brightgreen.svg)](#owasp-top-10-coverage)
+[![Rules](https://img.shields.io/badge/rules-201-brightgreen.svg)](#owasp-top-10-coverage)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.jasminguberinic/scanner-core.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.jasminguberinic/scanner-core)
 
-**Kotlin SAST — Detekt plugin with 178 rules that detects OWASP Top 10 security vulnerabilities in Spring Boot, Quarkus, Dropwizard, Ktor, and Micronaut applications at compile time, in your IDE, with zero infrastructure.**
+**Kotlin SAST — Detekt plugin with 201 rules that detects OWASP Top 10 security vulnerabilities in Spring Boot, Quarkus, Dropwizard, Ktor, and Micronaut applications at compile time, in your IDE, with zero infrastructure.**
 
 > **FindSecBugs** works on JVM bytecode and misses Kotlin-specific patterns: coroutines, scope functions, Kotlin DSLs.  
 > **SonarQube** security rules require a paid tier or a running server.  
@@ -77,8 +77,10 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 
 ## OWASP Top 10 coverage
 
-**178 rules** across 6 modules. Every rule has positive, negative, and cross-rule isolation tests
-(1090 tests, all green). The tables below highlight representative rules per module.
+**201 rules** across 6 modules. Every rule has positive, negative, and cross-rule isolation tests
+(1251 tests, all green) and is verified end-to-end against intentionally vulnerable fixtures with a
+companion safe-code fixture proving zero false positives. The tables below highlight representative
+rules per module.
 
 ### Core — any Kotlin project (`scanner-core`)
 
@@ -111,7 +113,19 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 | `XmlMapperUnsafeRule` | A08 | `XmlMapper()` constructor — unsafe XML deserialization |
 | `KotlinxSerializationSensitiveFieldRule` | A08 | `@Serializable` class with password/secret field missing `@Transient` |
 | `SensitiveDataLoggingRule` | A09 | Passwords or tokens interpolated into log statements |
+| `LogForgingRule` | A09 | Request input interpolated into logs — CR/LF log forging |
 | `SsrfRule` | A10 | `URL()` / `URI()` constructed from a non-literal value |
+| `GoogleApiKeyRule` | A07 | Hardcoded Google/Firebase API key (`AIza…`) |
+| `SlackTokenRule` | A07 | Hardcoded Slack token (`xoxb-`/`xoxp-`/…) |
+| `GitHubTokenRule` | A07 | Hardcoded GitHub token (`ghp_`/`github_pat_`) |
+| `StripeSecretKeyRule` | A07 | Hardcoded Stripe live secret key (`sk_live_`) |
+| `HardcodedJwtTokenRule` | A07 | Signed JWT bearer token literal in source |
+| `HardcodedJdbcCredentialsRule` | A07 | JDBC URL embedding user/password |
+| `InsecureSslContextRule` | A02 | `SSLContext.getInstance("SSLv3"\|"TLSv1.1")` |
+| `ZipSlipRule` | A03 | ZipEntry name resolved into a path — archive traversal |
+| `RegexInjectionRule` | A06 | `Pattern.compile(userInput)` — ReDoS via injected pattern |
+| `InsecureFilePermissionsRule` | A05 | `PosixFilePermissions.fromString("rwxrwxrwx")` / world-writable |
+| `PredictableTempFileRule` | A01 | `File("/tmp/…")` — predictable temp file location |
 
 ### Spring Boot (`scanner-spring-boot`)
 

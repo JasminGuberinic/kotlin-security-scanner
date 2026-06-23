@@ -11,11 +11,14 @@ import com.jasmin.security.detekt.a02.KtorWeakJwtSecretRule
 import com.jasmin.security.detekt.a03.KtorExposedOrmInjectionRule
 import com.jasmin.security.detekt.a03.KtorExposedRawSqlConcatRule
 import com.jasmin.security.detekt.a03.KtorFileUploadTraversalRule
+import com.jasmin.security.detekt.a03.KtorRespondFileTraversalRule
 import com.jasmin.security.detekt.a03.KtorSensitiveRouteParamRule
 import com.jasmin.security.detekt.a03.KtorUnvalidatedQueryParamRule
 import com.jasmin.security.detekt.a03.KtorXssResponseRule
 import com.jasmin.security.detekt.a04.KtorRawCallReceiveRule
 import com.jasmin.security.detekt.a05.KtorClearTextCookieRule
+import com.jasmin.security.detekt.a05.KtorCorsAnyHeaderRule
+import com.jasmin.security.detekt.a05.KtorDevelopmentModeRule
 import com.jasmin.security.detekt.a05.KtorExposedSchemaAutoCreateRule
 import com.jasmin.security.detekt.a05.KtorForwardedHeaderTrustRule
 import com.jasmin.security.detekt.a05.KtorInsecureCookieSessionRule
@@ -58,10 +61,13 @@ class KtorRuleSetProvider : RuleSetProvider {
             KtorSensitiveRouteParamRule(config),
             KtorFileUploadTraversalRule(config),
             KtorUnvalidatedQueryParamRule(config),
+            KtorRespondFileTraversalRule(config),
             // A04 Insecure Design
             KtorRawCallReceiveRule(config),
             // A05 Security Misconfiguration
             KtorExposedSchemaAutoCreateRule(config),
+            KtorDevelopmentModeRule(config),
+            KtorCorsAnyHeaderRule(config),
             KtorInsecureCookieSessionRule(config),
             KtorPermissiveCorsRule(config),
             KtorClearTextCookieRule(config),

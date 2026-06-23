@@ -10,15 +10,29 @@ class KtorSslRedirectMissingRuleTest {
     private val rule = KtorSslRedirectMissingRule(Config.empty)
 
     @Test
-    fun `flags routing without HttpsRedirect in file`() {
+    fun `flags routing in app setup that installs plugins but no HttpsRedirect`() {
         val code = """
-            fun Application.configureRouting() {
+            fun Application.module() {
+                install(ContentNegotiation) { json() }
+                install(CallLogging)
                 routing {
                     get("/health") { call.respond("ok") }
                 }
             }
         """.trimIndent()
         assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores file that only declares routes`() {
+        val code = """
+            fun Application.routes() {
+                routing {
+                    get("/") {}
+                }
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
     }
 
     @Test

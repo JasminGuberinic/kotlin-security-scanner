@@ -31,6 +31,25 @@ class QuarkusInsecureCookieRuleTest {
     }
 
     @Test
+    fun `flags fully-qualified NewCookie_Builder without secure flags`() {
+        val code = """
+            fun setCookie(): Response {
+                val cookie = jakarta.ws.rs.core.NewCookie.Builder("SESSION").path("/").build()
+                return Response.ok().cookie(cookie).build()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores fully-qualified NewCookie_Builder with secure and httpOnly`() {
+        val code = """
+            val cookie = jakarta.ws.rs.core.NewCookie.Builder("SESSION").secure(true).httpOnly(true).build()
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores NewCookie_Builder with secure and httpOnly`() {
         val code = """
             val cookie = NewCookie.Builder("SESSION").secure(true).httpOnly(true).build()

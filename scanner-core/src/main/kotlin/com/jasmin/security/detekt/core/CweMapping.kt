@@ -16,8 +16,10 @@ object CweMapping {
     private val MAP: Map<String, String> = mapOf(
         // A01 Broken Access Control
         "JaxrsOpenRedirect" to "CWE-601",
+        "PredictableTempFile" to "CWE-377",
         // A02 Cryptographic Failures
         "HardcodedAesKey" to "CWE-321",
+        "InsecureSslContext" to "CWE-326",
         "HardcodedPrivateKey" to "CWE-321",
         "InsecureRandomSeed" to "CWE-335",
         "TrustAllHostnames" to "CWE-297",
@@ -40,11 +42,19 @@ object CweMapping {
         "CommandInjection" to "CWE-78",
         "XxeInjection" to "CWE-611",
         "GroovyScriptInjection" to "CWE-94",
+        "ZipSlip" to "CWE-22",
         "RegexDenialOfService" to "CWE-1333",
+        "RegexInjection" to "CWE-1333",
         // A07 Identification and Authentication Failures
         "HardcodedCredentials" to "CWE-798",
         "InsecureRandom" to "CWE-330",
         "HardcodedAwsCredentials" to "CWE-798",
+        "GoogleApiKey" to "CWE-798",
+        "SlackToken" to "CWE-798",
+        "GitHubToken" to "CWE-798",
+        "StripeSecretKey" to "CWE-798",
+        "HardcodedJwtToken" to "CWE-798",
+        "HardcodedJdbcCredentials" to "CWE-798",
         // A08 Software and Data Integrity
         "InsecureDeserialization" to "CWE-502",
         "JacksonUnsafeDeserialization" to "CWE-502",
@@ -52,8 +62,10 @@ object CweMapping {
         "KotlinxSerializationSensitiveField" to "CWE-312",
         // A05 Security Misconfiguration
         "CorsWildcardOrigins" to "CWE-942",
+        "InsecureFilePermissions" to "CWE-732",
         // A09 Logging
         "SensitiveDataLogging" to "CWE-532",
+        "LogForging" to "CWE-117",
         // A10 SSRF
         "Ssrf" to "CWE-918",
 
@@ -125,6 +137,10 @@ object CweMapping {
         "SpringBootInsecureFileUpload" to "CWE-22",
         "SpringBootRequestBodyAnyType" to "CWE-502",
         "SpringBootExceptionBodyLeak" to "CWE-209",
+        "SpringFrameOptionsDisabled" to "CWE-1021",
+        "SpringContentTypeOptionsDisabled" to "CWE-693",
+        "SpringSessionFixationNone" to "CWE-384",
+        "SpringCsrfIgnoringMatchers" to "CWE-352",
 
         // ── Quarkus rules ─────────────────────────────────────────────────────
 
@@ -174,6 +190,7 @@ object CweMapping {
         "QuarkusJsonbUnsafeDeserialization" to "CWE-502",
         "QuarkusExceptionMessageLeak" to "CWE-209",
         "QuarkusPasswordInLog" to "CWE-532",
+        "QuarkusCacheResultSensitive" to "CWE-285",
 
         // ── Dropwizard rules ──────────────────────────────────────────────────
 
@@ -240,6 +257,9 @@ object CweMapping {
         "KtorMultipartInsecureUpload" to "CWE-400",
         "KtorInsecureContentNegotiation" to "CWE-502",
         "KtorStatusPageLeakDetails" to "CWE-209",
+        "KtorRespondFileTraversal" to "CWE-22",
+        "KtorDevelopmentMode" to "CWE-489",
+        "KtorCorsAnyHeader" to "CWE-942",
 
         // ── Micronaut rules ───────────────────────────────────────────────────
 
@@ -254,6 +274,8 @@ object CweMapping {
         "MicronautBodyAnyType" to "CWE-20",
         "MicronautHardcodedSecret" to "CWE-798",
         "MicronautExceptionMessageLeak" to "CWE-209",
+        "MicronautAnonymousAccess" to "CWE-285",
+        "MicronautInsecureCookie" to "CWE-614",
     )
 
     /** Returns the CWE tag string for a given rule ID, e.g. "CWE-89". Null if not mapped. */

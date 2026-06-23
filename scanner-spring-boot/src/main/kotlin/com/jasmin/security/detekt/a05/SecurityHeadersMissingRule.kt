@@ -25,6 +25,8 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
  */
 class SecurityHeadersMissingRule(config: Config) : SecurityRule(config) {
 
+    private val HEADERS_CONFIG = Regex("""\.headers\s*[({]""")
+
     override val issue = Issue(
         id = "SecurityHeadersMissing",
         severity = Severity.Security,
@@ -39,7 +41,9 @@ class SecurityHeadersMissingRule(config: Config) : SecurityRule(config) {
         val returnType = function.typeReference?.text ?: return
         if ("SecurityFilterChain" !in returnType) return
         val body = function.bodyExpression?.text ?: return
-        if ("headers" in body) return
+        // Require an actual headers config call (.headers { } or .headers(...)), not just the
+        // substring "headers" appearing somewhere (e.g. a variable name or comment).
+        if (HEADERS_CONFIG.containsMatchIn(body)) return
         reportAt(
             function,
             "SecurityFilterChain has no .headers{} block — add frameOptions, contentSecurityPolicy, hsts",

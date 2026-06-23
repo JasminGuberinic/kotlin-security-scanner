@@ -22,8 +22,7 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
  *   ctx.search("ou=users", filter, SearchControls())   // parameterised
  *
  * Non-compliant:
- *   val filter = "(uid=${'$'}username)"
- *   ctx.search("ou=users", filter, SearchControls())   // interpolated
+ *   ctx.search("ou=users", "(uid=${'$'}username)", controls)   // inline interpolated filter
  */
 class LdapInjectionRule(config: Config) : SecurityRule(config) {
 

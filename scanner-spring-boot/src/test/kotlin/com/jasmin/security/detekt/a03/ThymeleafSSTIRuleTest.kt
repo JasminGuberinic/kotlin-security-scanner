@@ -52,6 +52,14 @@ class ThymeleafSSTIRuleTest {
     }
 
     @Test
+    fun `ignores process with constant string concatenation template name`() {
+        val code = """
+            fun render(ctx: Context): String = templateEngine.process("user" + "-profile", ctx)
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores process called on unrelated receiver`() {
         val code = """
             fun handle(data: String): String = queryProcessor.process(data, ctx)

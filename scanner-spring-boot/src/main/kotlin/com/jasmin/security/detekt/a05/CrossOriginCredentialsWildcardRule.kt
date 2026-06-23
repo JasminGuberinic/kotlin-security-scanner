@@ -49,7 +49,16 @@ class CrossOriginCredentialsWildcardRule(config: Config) : SecurityRule(config) 
         val text = annotation.text
         val hasCredentials = "allowCredentials" in text && "\"true\"" in text
         if (!hasCredentials) return
-        val hasWildcard = "\"*\"" in text || "origins" !in text
+        // Only inspect the `origins` argument for a wildcard — `methods=["*"]` etc. must not trip this.
+        val originsArg = annotation.valueArguments.firstOrNull {
+            it.getArgumentName()?.asName?.asString() == "origins"
+        }
+        val hasWildcard = if (originsArg == null) {
+            // No explicit origins → Spring reflects the Origin header, which is itself unsafe with credentials.
+            true
+        } else {
+            "\"*\"" in (originsArg.getArgumentExpression()?.text ?: "")
+        }
         if (!hasWildcard) return
         reportAt(
             annotation,

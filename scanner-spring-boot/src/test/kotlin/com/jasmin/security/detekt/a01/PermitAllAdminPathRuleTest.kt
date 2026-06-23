@@ -50,6 +50,29 @@ class PermitAllAdminPathRuleTest {
     }
 
     @Test
+    fun `flags requestMatchers admin wildcard permitAll`() {
+        val code = """
+            http.authorizeHttpRequests {
+                it.requestMatchers("/admin/**").permitAll()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores public permitAll when an admin line sits nearby`() {
+        // The /admin matcher uses hasRole; the /public matcher uses permitAll. Only the
+        // permitAll call's own receiver chain must be inspected, so this is NOT flagged.
+        val code = """
+            http.authorizeHttpRequests {
+                it.requestMatchers("/admin/**").hasRole("ADMIN")
+                it.requestMatchers("/public/**").permitAll()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores admin path with hasRole`() {
         val code = """
             http.authorizeHttpRequests {

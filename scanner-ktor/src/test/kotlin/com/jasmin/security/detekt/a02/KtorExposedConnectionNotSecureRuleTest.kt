@@ -43,6 +43,16 @@ class KtorExposedConnectionNotSecureRuleTest {
     }
 
     @Test
+    fun `flags fully-qualified Database connect with useSSL=false`() {
+        val code = """
+            fun connectDb() {
+                org.jetbrains.exposed.sql.Database.connect("jdbc:mysql://h/db?useSSL=false")
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
     fun `ignores Database connect with ssl enabled`() {
         val code = """
             fun connectDb() {

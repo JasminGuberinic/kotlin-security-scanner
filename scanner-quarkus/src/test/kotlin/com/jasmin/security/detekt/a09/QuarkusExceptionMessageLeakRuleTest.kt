@@ -32,6 +32,39 @@ class QuarkusExceptionMessageLeakRuleTest {
     }
 
     @Test
+    fun `flags @Provider ExceptionMapper returning e_message via serverError`() {
+        val code = """
+            @Provider
+            fun toResponse(e: Exception): Response {
+                return Response.serverError().entity(e.message).build()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores @Provider ExceptionMapper using a field ending in message`() {
+        val code = """
+            @Provider
+            fun toResponse(e: Exception): Response {
+                return Response.ok(service.message).build()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores @Provider ExceptionMapper using a field calling toString`() {
+        val code = """
+            @Provider
+            fun toResponse(e: Exception): Response {
+                return Response.ok(cache.toString()).build()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores @Provider ExceptionMapper returning generic message`() {
         val code = """
             @Provider

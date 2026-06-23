@@ -34,6 +34,54 @@ class QuarkusSensitiveQueryParamRuleTest {
     }
 
     @Test
+    fun `flags @QueryParam with apiKey camelCase name`() {
+        val code = """
+            @GET
+            @Path("/fetch")
+            fun fetch(@QueryParam("apiKey") apiKey: String): Response {
+                return service.fetch(apiKey)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores @QueryParam named author (substring of auth)`() {
+        val code = """
+            @GET
+            @Path("/books")
+            fun books(@QueryParam("author") author: String): List<Book> {
+                return bookService.byAuthor(author)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores @QueryParam named authority (substring of auth)`() {
+        val code = """
+            @GET
+            @Path("/lookup")
+            fun lookup(@QueryParam("authority") authority: String): Response {
+                return service.lookup(authority)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores @QueryParam named sortKey (substring of key)`() {
+        val code = """
+            @GET
+            @Path("/list")
+            fun list(@QueryParam("sortKey") sortKey: String): List<Item> {
+                return service.list(sortKey)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores @QueryParam with non-sensitive name`() {
         val code = """
             @GET

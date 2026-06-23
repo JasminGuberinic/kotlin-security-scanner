@@ -60,6 +60,17 @@ class KotlinxSerializationSensitiveFieldRuleTest {
     }
 
     @Test
+    fun `ignores computed body property with custom getter`() {
+        val code = """
+            @Serializable
+            class Foo(val id: String) {
+                val passwordHint: String get() = "x"
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores Serializable class with non-sensitive fields`() {
         val code = """
             @Serializable

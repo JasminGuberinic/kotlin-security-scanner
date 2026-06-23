@@ -36,6 +36,32 @@ class MicronautBodyAnyTypeRuleTest {
     }
 
     @Test
+    fun `flags Body typed as nullable Any`() {
+        val code = """
+            import io.micronaut.http.annotation.Post
+            import io.micronaut.http.annotation.Body
+            class DataController {
+                @Post("/data")
+                fun receive(@Body body: Any?): String = "ok"
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `flags Body typed as nullable MutableMap`() {
+        val code = """
+            import io.micronaut.http.annotation.Post
+            import io.micronaut.http.annotation.Body
+            class DataController {
+                @Post("/data")
+                fun receive(@Body body: MutableMap<String, Any>?): String = "ok"
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
     fun `ignores Body typed as concrete DTO`() {
         val code = """
             import io.micronaut.http.annotation.Post
@@ -44,6 +70,20 @@ class MicronautBodyAnyTypeRuleTest {
             class UserController {
                 @Post("/users")
                 fun create(@Body request: CreateUserRequest): String = "ok"
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores Body typed as nullable concrete DTO`() {
+        val code = """
+            import io.micronaut.http.annotation.Post
+            import io.micronaut.http.annotation.Body
+            data class CreateUserRequest(val name: String, val email: String)
+            class UserController {
+                @Post("/users")
+                fun create(@Body request: CreateUserRequest?): String = "ok"
             }
         """.trimIndent()
         assertThat(rule.lint(code)).isEmpty()

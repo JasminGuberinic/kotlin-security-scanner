@@ -50,6 +50,7 @@ class XxeInjectionRule(config: Config) : SecurityRule(config) {
         if (expression.calleeExpression?.text != "newInstance") return false
         val receiver = (expression.parent as? KtDotQualifiedExpression)
             ?.receiverExpression?.text ?: return false
-        return receiver in DetectionPatterns.XXE_FACTORY_CLASSES
+        // FQN-tolerant: javax.xml.parsers.DocumentBuilderFactory.newInstance() → DocumentBuilderFactory
+        return receiver.substringAfterLast(".") in DetectionPatterns.XXE_FACTORY_CLASSES
     }
 }

@@ -30,8 +30,10 @@ class QuarkusInsecureCookieRule(config: Config) : SecurityRule(config) {
         val dotExpr = expression.parent as? KtDotQualifiedExpression
 
         val isNewCookieCtor = callee == "NewCookie"
+        // Accept both the simple name "NewCookie.Builder(...)" and the fully-qualified
+        // form "jakarta.ws.rs.core.NewCookie.Builder(...)" by comparing the last segment.
         val isNewCookieBuilder = callee == "Builder" &&
-            dotExpr?.receiverExpression?.text == "NewCookie"
+            dotExpr?.receiverExpression?.text?.substringAfterLast(".") == "NewCookie"
 
         if (!isNewCookieCtor && !isNewCookieBuilder) return
 

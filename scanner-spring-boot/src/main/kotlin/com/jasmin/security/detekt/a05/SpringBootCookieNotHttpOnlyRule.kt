@@ -28,6 +28,10 @@ class SpringBootCookieNotHttpOnlyRule(config: Config) : SecurityRule(config) {
         val right = expression.right?.text ?: return
         if (!left.endsWith("isHttpOnly") && !left.endsWith("httpOnly")) return
         if (right != "false") return
+        // Require the assignment target to reference a cookie — avoids flagging unrelated
+        // properties like `featureToggle.httpOnly = false`.
+        val receiver = left.substringBeforeLast(".")
+        if (!receiver.contains("ookie")) return
         reportAt(expression, "Cookie HttpOnly disabled — set isHttpOnly = true to prevent JS access")
     }
 

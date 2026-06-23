@@ -201,3 +201,52 @@ fun buildInsecureRng(): java.security.SecureRandom {
     // VULNERABLE: SecureRandom seeded with constant [InsecureRandomSeed, CWE-335]
     return java.security.SecureRandom(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8))
 }
+
+// ── Batch: secrets, crypto, injection, misconfig (rules 179–190) ──────────────
+
+// VULNERABLE: hardcoded Google API key [GoogleApiKey, CWE-798]
+val googleApiKey = "AIzaSyDuMmYkEy0123456789abcdefABCDEFghi"
+
+// NOTE: SlackToken and StripeSecretKey have NO e2e fixture here on purpose. Their
+// real token formats (xoxb-…, sk_live_…) trip GitHub's secret-scanning push
+// protection, so a contiguous literal must not live in this repository. Both rules
+// are fully covered by unit tests (positive + negative) in scanner-core.
+
+// VULNERABLE: hardcoded GitHub token [GitHubToken, CWE-798]
+val githubToken = "ghp_0123456789abcdefghijklmnopqrstuvwxyz"
+
+// VULNERABLE: hardcoded JWT bearer token [HardcodedJwtToken, CWE-798]
+val jwtToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dummysignature123"
+
+// VULNERABLE: JDBC URL embeds credentials [HardcodedJdbcCredentials, CWE-798]
+val jdbcUrl = "jdbc:postgresql://admin:s3cr3t@db.internal:5432/app"
+
+fun weakSslContext(): javax.net.ssl.SSLContext {
+    // VULNERABLE: deprecated TLS protocol [InsecureSslContext, CWE-326]
+    return javax.net.ssl.SSLContext.getInstance("SSLv3")
+}
+
+fun extractEntry(dir: java.io.File, entry: java.util.zip.ZipEntry): java.io.File {
+    // VULNERABLE: zip entry name resolved into output path [ZipSlip, CWE-22]
+    return java.io.File(dir, entry.name)
+}
+
+fun compileUserPattern(userPattern: String): java.util.regex.Pattern {
+    // VULNERABLE: regex compiled from user input [RegexInjection, CWE-1333]
+    return java.util.regex.Pattern.compile(userPattern)
+}
+
+fun logRequestPath(request: Map<String, String>, log: org.slf4j.Logger) {
+    // VULNERABLE: request input logged unsanitized [LogForging, CWE-117]
+    log.info("Requested path: ${request["path"]}")
+}
+
+fun openWorldWritable(): java.util.Set<java.nio.file.attribute.PosixFilePermission> {
+    // VULNERABLE: world-accessible file permissions [InsecureFilePermissions, CWE-732]
+    return java.nio.file.attribute.PosixFilePermissions.fromString("rwxrwxrwx")
+}
+
+fun predictableTemp(): java.io.File {
+    // VULNERABLE: fixed temp path [PredictableTempFile, CWE-377]
+    return java.io.File("/tmp/session-data.txt")
+}

@@ -6,6 +6,7 @@ import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 
 // OWASP A04 — Insecure Design
 // call.receive<Any>() or call.receive<Map<*,*>>() bypasses type safety and
@@ -29,6 +30,11 @@ class KtorRawCallReceiveRule(config: Config) : SecurityRule(config) {
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
         if (expression.calleeExpression?.text != "receive") return
+        // Only flag Ktor's `call.receive<...>()` — not unrelated receive() calls
+        // (e.g. channel/eventBus). The receiver must be `call` or `ApplicationCall`.
+        val receiver = (expression.parent as? KtDotQualifiedExpression)
+            ?.receiverExpression?.text ?: return
+        if (receiver.substringAfterLast(".") !in setOf("call", "ApplicationCall")) return
         val typeArg = expression.typeArguments.firstOrNull()?.text ?: return
         val baseType = typeArg.substringBefore("<").trim()
         if (baseType !in unsafeTypes) return

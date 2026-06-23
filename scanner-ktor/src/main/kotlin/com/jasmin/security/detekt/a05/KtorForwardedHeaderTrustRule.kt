@@ -31,6 +31,13 @@ class KtorForwardedHeaderTrustRule(config: Config) : SecurityRule(config) {
         if (expression.calleeExpression?.text != "install") return
         val firstArg = expression.valueArguments.firstOrNull()?.getArgumentExpression()?.text ?: return
         if (firstArg !in forwardedPlugins) return
+        // Compliant when the trailing config lambda restricts trust to known proxies.
+        val lambdaText = expression.lambdaArguments.firstOrNull()?.text ?: ""
+        if ("trustProxyHeaders" in lambdaText || "useFirstProxy" in lambdaText ||
+            "useLastProxy" in lambdaText || "skipLastProxies" in lambdaText
+        ) {
+            return
+        }
         reportAt(
             expression,
             "install($firstArg) without proxy restrictions — an attacker can spoof X-Forwarded-For to bypass IP-based controls",

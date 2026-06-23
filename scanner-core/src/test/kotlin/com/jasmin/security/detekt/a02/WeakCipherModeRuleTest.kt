@@ -27,6 +27,15 @@ class WeakCipherModeRuleTest {
     }
 
     @Test
+    fun `flags bare DES algorithm`() {
+        val code = """
+            import javax.crypto.Cipher
+            val cipher = Cipher.getInstance("DES")
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
     fun `flags RC4 algorithm`() {
         val code = """
             import javax.crypto.Cipher

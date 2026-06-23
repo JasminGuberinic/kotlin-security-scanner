@@ -29,6 +29,11 @@ class KtorSslRedirectMissingRule(config: Config) : SecurityRule(config) {
         val parent = expression.parent ?: return
         val fileText = parent.containingFile?.text ?: return
         if ("HttpsRedirect" in fileText || "httpsRedirect" in fileText) return
+        // Only fire when the SAME file sets up the application/server with other
+        // plugins (an install(...) call) but no HttpsRedirect. A file that only
+        // declares routes (plain Routing.kt) must NOT trigger — plugins are
+        // commonly installed in a separate file.
+        if (!Regex("""\binstall\s*\(""").containsMatchIn(fileText)) return
         reportAt(
             expression,
             "Ktor routing without HttpsRedirect — install(HttpsRedirect) to enforce TLS",

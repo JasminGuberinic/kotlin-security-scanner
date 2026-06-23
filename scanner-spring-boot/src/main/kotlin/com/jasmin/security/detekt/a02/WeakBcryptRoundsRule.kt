@@ -43,8 +43,18 @@ class WeakBcryptRoundsRule(config: Config) : SecurityRule(config) {
         super.visitCallExpression(expression)
         val callee = expression.calleeExpression?.text ?: return
         if (callee != DetectionPatterns.BCRYPT_ENCODER_CLASS) return
-        val firstArg = expression.valueArguments.firstOrNull()?.getArgumentExpression() ?: return
-        val rounds = firstArg.text.toIntOrNull() ?: return
+        // BCryptPasswordEncoder(strength), BCryptPasswordEncoder(version, strength),
+        // and BCryptPasswordEncoder(strength = n) — locate the strength argument explicitly.
+        val named = expression.valueArguments.firstOrNull {
+            it.getArgumentName()?.asName?.asString() == "strength"
+        }
+        val rounds = if (named != null) {
+            named.getArgumentExpression()?.text?.toIntOrNull() ?: return
+        } else {
+            expression.valueArguments
+                .mapNotNull { it.getArgumentExpression()?.text?.toIntOrNull() }
+                .firstOrNull() ?: return
+        }
         if (rounds >= minStrength) return
         reportAt(
             expression,

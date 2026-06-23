@@ -7,6 +7,8 @@ import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDeclaration
+import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 
 /**
  * OWASP A02 — Cryptographic Failures
@@ -35,6 +37,10 @@ class InsecureRedisConnectionRule(config: Config) : SecurityRule(config) {
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
         if (expression.calleeExpression?.text !in DetectionPatterns.REDIS_CONNECTION_CONSTRUCTORS) return
+        // Skip when SSL is enabled in the same declaration/chain, e.g.
+        // RedisStandaloneConfiguration(...).also { it.useSsl() }
+        val scopeText = expression.getParentOfType<KtDeclaration>(strict = true)?.text ?: expression.text
+        if ("useSsl" in scopeText) return
         reportAt(
             expression,
             "Redis connection without TLS — enable SSL via LettuceClientConfiguration.builder().useSsl()",

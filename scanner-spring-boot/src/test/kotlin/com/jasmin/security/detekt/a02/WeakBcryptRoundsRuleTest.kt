@@ -35,6 +35,22 @@ class WeakBcryptRoundsRuleTest {
         assertThat(rule.lint(code)).hasSize(1)
     }
 
+    @Test
+    fun `flags BCryptPasswordEncoder with version and weak strength at arg 1`() {
+        val code = """
+            fun encoder() = BCryptPasswordEncoder(BCryptVersion.${'$'}2A, 4)
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `flags BCryptPasswordEncoder with named strength argument`() {
+        val code = """
+            fun encoder() = BCryptPasswordEncoder(strength = 4)
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
 
     @Test

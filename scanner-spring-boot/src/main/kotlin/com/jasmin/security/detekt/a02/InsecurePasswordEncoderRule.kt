@@ -54,13 +54,14 @@ class InsecurePasswordEncoderRule(config: Config) : SecurityRule(config) {
         if (callee != "getInstance") return false
         val receiver = (expression.parent as? KtDotQualifiedExpression)
             ?.receiverExpression?.text ?: return false
-        return receiver in DetectionPatterns.WEAK_PASSWORD_ENCODERS
+        // Tolerate fully-qualified receivers, e.g. ...password.NoOpPasswordEncoder.getInstance().
+        return receiver.substringAfterLast(".") in DetectionPatterns.WEAK_PASSWORD_ENCODERS
     }
 
     private fun resolveEncoderName(expression: KtCallExpression, callee: String): String {
         if (callee == "getInstance") {
             return (expression.parent as? KtDotQualifiedExpression)
-                ?.receiverExpression?.text ?: callee
+                ?.receiverExpression?.text?.substringAfterLast(".") ?: callee
         }
         return callee
     }

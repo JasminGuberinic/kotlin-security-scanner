@@ -21,6 +21,15 @@ class InsecurePasswordEncoderRuleTest {
     }
 
     @Test
+    fun `flags fully-qualified NoOpPasswordEncoder getInstance`() {
+        val code = """
+            fun encoder() =
+                org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance()
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
     fun `flags Md5PasswordEncoder constructor`() {
         val code = """
             import org.springframework.security.authentication.encoding.Md5PasswordEncoder

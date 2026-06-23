@@ -131,6 +131,44 @@ object RemediationHints {
         "Ssrf" to
             "Validate URL host against a hardcoded allowlist before opening any URL/URI connection",
 
+        // ── Core — additional rules (secrets, crypto, misconfig) ─────────────
+
+        "PredictableTempFile" to
+            "val tmp = Files.createTempFile(\"prefix\", \".tmp\") // unpredictable name, owner-only perms",
+
+        "InsecureSslContext" to
+            """SSLContext.getInstance("TLSv1.3") // or "TLS" to negotiate the highest supported version""",
+
+        "ZipSlip" to
+            "val t = dir.resolve(entry.name).normalize(); require(t.startsWith(dir)) { \"Zip Slip\" }",
+
+        "RegexInjection" to
+            "Match user input against a fixed pattern: Pattern.compile(\"^[a-z0-9]+\$\").matcher(input)",
+
+        "GoogleApiKey" to
+            """val key = System.getenv("GOOGLE_API_KEY") ?: error("GOOGLE_API_KEY not set")""",
+
+        "SlackToken" to
+            """val token = System.getenv("SLACK_TOKEN") ?: error("SLACK_TOKEN not set")""",
+
+        "GitHubToken" to
+            """val token = System.getenv("GITHUB_TOKEN") ?: error("GITHUB_TOKEN not set")""",
+
+        "StripeSecretKey" to
+            """Stripe.apiKey = System.getenv("STRIPE_SECRET_KEY") ?: error("STRIPE_SECRET_KEY not set")""",
+
+        "HardcodedJwtToken" to
+            "Issue tokens at runtime from your auth server — never embed a signed JWT in source or fixtures",
+
+        "HardcodedJdbcCredentials" to
+            """jdbc:postgresql://db/app + DriverManager.getConnection(url, user, System.getenv("DB_PASS"))""",
+
+        "InsecureFilePermissions" to
+            "PosixFilePermissions.fromString(\"rw-------\") or file.setReadable(true, true) // owner only",
+
+        "LogForging" to
+            "log.info(\"path={}\", input.replace(\"[\\r\\n]\".toRegex(), \"_\")) // strip CR/LF, use parameters",
+
         // ── Spring Boot — A01 Broken Access Control ──────────────────────────
 
         "MissingAuthorization" to
@@ -640,6 +678,44 @@ object RemediationHints {
 
         "MicronautExceptionMessageLeak" to
             "log.error(\"Unhandled error\", e); HttpResponse.serverError(\"Internal error\") — log cause, return generic message",
+
+        // ── Spring Boot — header / session hardening (new batch) ──────────────
+
+        "SpringFrameOptionsDisabled" to
+            "http.headers { frameOptions { sameOrigin() } } — keep X-Frame-Options to block clickjacking",
+
+        "SpringContentTypeOptionsDisabled" to
+            "Leave contentTypeOptions enabled (default) so browsers honor the declared Content-Type (nosniff)",
+
+        "SpringSessionFixationNone" to
+            "http.sessionManagement { sessionFixation { migrateSession() } } — rotate the session ID on login",
+
+        "SpringCsrfIgnoringMatchers" to
+            "Exclude only stateless token APIs from CSRF; keep protection on cookie/session-authenticated routes",
+
+        // ── Quarkus — caching (new batch) ─────────────────────────────────────
+
+        "QuarkusCacheResultSensitive" to
+            "Include the principal in the @CacheResult key with @CacheKey, or remove caching from per-user methods",
+
+        // ── Ktor — file serving / config (new batch) ──────────────────────────
+
+        "KtorRespondFileTraversal" to
+            "val f = baseDir.resolve(name).normalize(); require(f.startsWith(baseDir)); call.respondFile(f)",
+
+        "KtorDevelopmentMode" to
+            "developmentMode = System.getenv(\"KTOR_DEV\") == \"true\" // false in production",
+
+        "KtorCorsAnyHeader" to
+            "allowHeader(HttpHeaders.Authorization); allowHeader(HttpHeaders.ContentType) // list only what you need",
+
+        // ── Micronaut — access control / cookies (new batch) ──────────────────
+
+        "MicronautAnonymousAccess" to
+            "@Secured(SecurityRule.IS_AUTHENTICATED) on write endpoints — reserve IS_ANONYMOUS for public reads",
+
+        "MicronautInsecureCookie" to
+            "Cookie.of(\"SESSION\", id).secure(true).httpOnly(true) — only send the cookie over HTTPS",
     )
 
     /** Returns the fix hint for a given rule ID, or null if not mapped. */

@@ -6,7 +6,9 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
+import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
 /**
@@ -39,10 +41,22 @@ class EntityManagerJpqlInjectionRule(config: Config) : SecurityRule(config) {
         val callee = expression.calleeExpression?.text ?: return
         if (callee !in DetectionPatterns.ENTITY_MANAGER_QUERY_METHODS) return
         val firstArg = expression.valueArguments.firstOrNull()?.getArgumentExpression() ?: return
-        if (firstArg is KtStringTemplateExpression && !firstArg.hasInterpolation()) return
+        if (isConstantString(firstArg)) return
         reportAt(
             expression,
             "$callee() with dynamic string — use named params: .setParameter(\"name\", value)",
         )
+    }
+
+    // A bare non-interpolated string literal OR a '+' concatenation of constant strings is safe.
+    private fun isConstantString(expr: KtExpression): Boolean = when (expr) {
+        is KtStringTemplateExpression -> !expr.hasInterpolation()
+        is KtBinaryExpression -> {
+            val left = expr.left
+            val right = expr.right
+            left != null && right != null &&
+                isConstantString(left) && isConstantString(right)
+        }
+        else -> false
     }
 }

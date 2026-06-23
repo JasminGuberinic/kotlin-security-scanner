@@ -28,7 +28,15 @@ class MicronautBodyAnyTypeRule(config: Config) : SecurityRule(config) {
         super.visitParameter(parameter)
         if ("Body" !in parameter.annotationNames()) return
         val typeText = parameter.typeReference?.text ?: return
-        val baseType = typeText.substringBefore("<").trim()
+        // Strip generic args, a trailing nullable marker, and any package qualifier:
+        //   kotlin.Any?            -> Any
+        //   MutableMap<String, Any>? -> MutableMap
+        val baseType = typeText
+            .substringBefore("<")
+            .trim()
+            .removeSuffix("?")
+            .trim()
+            .substringAfterLast(".")
         if (baseType !in unsafeTypes) return
         reportAt(
             parameter,

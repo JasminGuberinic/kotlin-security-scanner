@@ -64,6 +64,16 @@ class ResponseSplittingRuleTest {
     }
 
     @Test
+    fun `ignores setHeader with constant string concatenation value`() {
+        val code = """
+            fun setNoCache(response: HttpServletResponse) {
+                response.setHeader("Cache-Control", "no-store, " + "no-cache")
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores setHeader with only one argument`() {
         val code = """
             fun resetStatus(response: HttpServletResponse) {

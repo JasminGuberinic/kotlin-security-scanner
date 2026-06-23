@@ -40,10 +40,19 @@ class SpringDataSortInjectionRule(config: Config) : SecurityRule(config) {
         // so calleeExpression.text is "by", not "Sort.by"
         if (expression.calleeExpression?.text != "by") return
         val dotExpr = expression.parent as? KtDotQualifiedExpression ?: return
-        if (dotExpr.receiverExpression.text != "Sort") return
-        val firstArg = expression.valueArguments.firstOrNull()?.getArgumentExpression() ?: return
-        if (firstArg is KtStringTemplateExpression && !firstArg.hasInterpolation()) return
-        if ("Sort.Direction" in (firstArg.text)) return
+        // Tolerate fully-qualified receivers, e.g. org.springframework.data.domain.Sort.by(...).
+        if (dotExpr.receiverExpression.text.substringAfterLast(".") != "Sort") return
+        val args = expression.valueArguments.mapNotNull { it.getArgumentExpression() }
+        if (args.isEmpty()) return
+        // Sort.by(Direction, String...) — the field names are the args after the Direction.
+        val fieldArgs = if ("Sort.Direction" in args[0].text || ".Direction." in args[0].text) {
+            args.drop(1)
+        } else {
+            args
+        }
+        if (fieldArgs.isEmpty()) return
+        // Safe only when every field name is a literal string.
+        if (fieldArgs.all { it is KtStringTemplateExpression && !it.hasInterpolation() }) return
         reportAt(
             dotExpr,
             "Sort.by() with dynamic field name — validate against an allowlist of known field names",

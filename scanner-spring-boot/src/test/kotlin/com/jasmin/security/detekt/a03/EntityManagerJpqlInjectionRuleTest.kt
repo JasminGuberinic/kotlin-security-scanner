@@ -59,6 +59,17 @@ class EntityManagerJpqlInjectionRuleTest {
     }
 
     @Test
+    fun `ignores createQuery built from constant string concatenation`() {
+        val code = """
+            class UserRepo(private val em: EntityManager) {
+                fun findAll() =
+                    em.createQuery("SELECT u " + "FROM User u").resultList
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `does not interfere with SpEL injection code`() {
         val code = """
             class Service(private val parser: SpelExpressionParser) {

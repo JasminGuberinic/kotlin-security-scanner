@@ -6,7 +6,9 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
+import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
 /**
@@ -38,13 +40,28 @@ class ELInjectionRule(config: Config) : SecurityRule(config) {
         super.visitCallExpression(expression)
         val callee = expression.calleeExpression?.text ?: return
         if (callee !in DetectionPatterns.EL_EVAL_METHODS) return
-        val firstArg = expression.valueArguments.firstOrNull()?.getArgumentExpression() ?: return
-        val isSafe = firstArg is KtStringTemplateExpression && !firstArg.hasInterpolation()
+        // createValueExpression(elContext, expression, expectedType) — EL string is arg[1].
+        // eval(expression) — EL string is arg[0].
+        val elArgIndex = if (callee == "createValueExpression") 1 else 0
+        val elArg = expression.valueArguments.getOrNull(elArgIndex)?.getArgumentExpression() ?: return
+        val isSafe = isConstantString(elArg)
         if (!isSafe) {
             reportAt(
                 expression,
                 "$callee() with dynamic EL expression — use a sandbox or literal expressions only",
             )
         }
+    }
+
+    // A bare non-interpolated string literal OR a '+' concatenation of constant strings is safe.
+    private fun isConstantString(expr: KtExpression): Boolean = when (expr) {
+        is KtStringTemplateExpression -> !expr.hasInterpolation()
+        is KtBinaryExpression -> {
+            val left = expr.left
+            val right = expr.right
+            left != null && right != null &&
+                isConstantString(left) && isConstantString(right)
+        }
+        else -> false
     }
 }

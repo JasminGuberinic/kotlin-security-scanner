@@ -47,6 +47,20 @@ class SecurityHeadersMissingRuleTest {
         assertThat(rule.lint(code)).hasSize(1)
     }
 
+    @Test
+    fun `flags chain that mentions the word headers but never calls dot headers`() {
+        // The substring "headers" appears (variable name) but there is no real .headers{} call.
+        val code = """
+            @Bean
+            fun filterChain(http: HttpSecurity): SecurityFilterChain {
+                val headersConfigured = false
+                http.authorizeHttpRequests { it.anyRequest().authenticated() }
+                return http.build()
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
 
     @Test

@@ -256,3 +256,10 @@ class AuthService {
 @io.quarkus.rest.common.runtime.exceptionmappers.ServerExceptionMapper
 fun mapGlobalException(e: Exception): Response =
     Response.serverError().entity(e.message).build()
+
+// VULNERABLE: @CacheResult on a secured method leaks per-user data [QuarkusCacheResultSensitive, CWE-285]
+class CachedProfileService {
+    @io.quarkus.cache.CacheResult(cacheName = "profile")
+    @jakarta.annotation.security.RolesAllowed("user")
+    fun profile(id: Long): String = "profile-$id"
+}

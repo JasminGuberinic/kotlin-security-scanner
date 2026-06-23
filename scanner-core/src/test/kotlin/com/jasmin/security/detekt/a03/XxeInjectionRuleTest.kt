@@ -58,6 +58,17 @@ class XxeInjectionRuleTest {
         assertThat(rule.lint(code)).hasSize(1)
     }
 
+    @Test
+    fun `flags fully-qualified DocumentBuilderFactory newInstance`() {
+        val code = """
+            fun parse(xml: String) {
+                val dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+                dbf.newDocumentBuilder().parse(xml)
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
 
     @Test

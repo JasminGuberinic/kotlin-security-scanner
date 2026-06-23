@@ -34,6 +34,12 @@ class KtorHardcodedPasswordComparisonRule(config: Config) : SecurityRule(config)
         val rightLiteral = right is KtStringTemplateExpression && !right.hasInterpolation()
         val leftLiteral = left is KtStringTemplateExpression && !left.hasInterpolation()
         if (!rightLiteral && !leftLiteral) return
+        // A blank check (password == "") is not a hardcoded credential — skip it.
+        val literalSide = when {
+            rightLiteral -> right as KtStringTemplateExpression
+            else -> left as KtStringTemplateExpression
+        }
+        if (literalSide.rawValue().isEmpty()) return
         reportAt(
             expression,
             "Password compared against a literal string — hash passwords with BCrypt and use secure comparison",

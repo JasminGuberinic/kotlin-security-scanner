@@ -296,3 +296,27 @@ class ProxyController {
         org.springframework.web.reactive.function.client.WebClient.create(url)
             .get().retrieve().bodyToMono(String::class.java).block() ?: ""
 }
+
+// ── Batch: security header / session hardening ────────────────────────────────
+
+// VULNERABLE: X-Frame-Options disabled [SpringFrameOptionsDisabled, CWE-1021]
+fun configFrameOptions(http: Any) {
+    http.headers { frameOptions { disable() } }
+}
+
+// VULNERABLE: X-Content-Type-Options disabled [SpringContentTypeOptionsDisabled, CWE-693]
+fun configContentType(http: Any) {
+    http.headers { contentTypeOptions { disable() } }
+}
+
+// VULNERABLE: session fixation protection disabled [SpringSessionFixationNone, CWE-384]
+fun configSessionFixation(http: Any) {
+    http.sessionManagement { sessionFixation { none() } }
+}
+
+// VULNERABLE: CSRF excluded for matched paths [SpringCsrfIgnoringMatchers, CWE-352]
+fun configCsrfIgnoring(http: Any) {
+    http.csrf { it.ignoringRequestMatchers(apiPathPattern) }
+}
+
+private const val apiPathPattern = "/api/everything"

@@ -67,6 +67,41 @@ class KtorFileUploadTraversalRuleTest {
     }
 
     @Test
+    fun `flags Paths get with originalFileName`() {
+        val code = """
+            post("/upload") {
+                val multipart = call.receiveMultipart()
+                multipart.forEachPart { part ->
+                    if (part is PartData.FileItem) {
+                        val path = Paths.get(uploadDir, part.originalFileName!!)
+                    }
+                }
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores File with inline-sanitized originalFileName`() {
+        val code = """
+            post("/upload") {
+                val file = File(uploadDir, part.originalFileName!!.replace("..", "").substringAfterLast("/"))
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores Paths get with sanitized originalFileName via substringAfterLast`() {
+        val code = """
+            post("/upload") {
+                val path = Paths.get(uploadDir, part.originalFileName!!.substringAfterLast("/"))
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `does not interfere with exposed ORM concat code`() {
         val code = """
             fun findUser(id: Long) {

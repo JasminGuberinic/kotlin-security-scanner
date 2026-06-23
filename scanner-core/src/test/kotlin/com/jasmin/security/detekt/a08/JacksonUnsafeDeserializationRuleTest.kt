@@ -47,7 +47,26 @@ class JacksonUnsafeDeserializationRuleTest {
         assertThat(rule.lint(code)).hasSize(1)
     }
 
+    @Test
+    fun `flags JsonTypeInfo with positional Id CLASS argument`() {
+        val code = """
+            @JsonTypeInfo(JsonTypeInfo.Id.CLASS, include = As.PROPERTY, property = "@c")
+            open class Animal(val name: String)
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
+
+    @Test
+    fun `ignores JsonTypeInfo with positional Id NAME argument`() {
+        val code = """
+            @JsonTypeInfo(JsonTypeInfo.Id.NAME, include = As.PROPERTY, property = "type")
+            open class Shape
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
 
     @Test
     fun `ignores ObjectMapper without enableDefaultTyping`() {

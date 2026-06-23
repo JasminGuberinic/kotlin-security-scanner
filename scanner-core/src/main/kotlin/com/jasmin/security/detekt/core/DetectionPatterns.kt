@@ -32,7 +32,7 @@ object DetectionPatterns {
 
     val WEAK_CIPHER_ALGORITHMS = listOf(
         Regex("""/ECB/""", RegexOption.IGNORE_CASE),
-        Regex("""^DES[^e]""", RegexOption.IGNORE_CASE),
+        Regex("""^DES([^e]|$)""", RegexOption.IGNORE_CASE),
         Regex("""^DESede""", RegexOption.IGNORE_CASE),
         Regex("""^RC2""", RegexOption.IGNORE_CASE),
         Regex("""^RC4""", RegexOption.IGNORE_CASE),
@@ -248,6 +248,9 @@ object DetectionPatterns {
         Regex("""\(\[.*\]\+\)\*"""),
         Regex("""\(.*\|.*\)\+"""),
         Regex("""\(.*\+\)\*"""),
+        // Any parenthesised group that itself contains a quantifier (+ * {n,}) and is
+        // immediately followed by another quantifier — e.g. (\w+\.)+ , (a*)+.
+        Regex("""\([^)]*[+*}][^)]*\)[+*]"""),
     )
 
     // ── A10 WebClient SSRF ────────────────────────────────────────────────────
@@ -402,4 +405,66 @@ object DetectionPatterns {
 
     val MICRONAUT_HTTP_METHODS = setOf("Get", "Post", "Put", "Delete", "Patch", "Options", "Head")
     val MICRONAUT_AUTH_ANNOTATIONS = setOf("Secured")
+
+    // ── A07 Provider-specific secret tokens ───────────────────────────────────
+
+    // Google / Firebase / GCP API keys — fixed "AIza" prefix + 35 url-safe chars.
+    val GOOGLE_API_KEY_PATTERN = Regex("""AIza[0-9A-Za-z_\-]{35}""")
+
+    // Slack tokens — xoxb (bot), xoxp (user), xoxa (app), xoxr (refresh), xoxs (legacy).
+    val SLACK_TOKEN_PATTERN = Regex("""xox[baprs]-[0-9A-Za-z\-]{10,}""")
+
+    // GitHub tokens — ghp_/gho_/ghu_/ghs_/ghr_ (40-char) and fine-grained github_pat_.
+    val GITHUB_TOKEN_PATTERN = Regex("""(gh[pousr]_[0-9A-Za-z]{36}|github_pat_[0-9A-Za-z_]{22,})""")
+
+    // Stripe live secret/restricted keys — sk_live_ / rk_live_ + 24+ chars.
+    val STRIPE_SECRET_KEY_PATTERN = Regex("""(sk|rk)_live_[0-9A-Za-z]{24,}""")
+
+    // A signed JWT literal — three base64url segments separated by dots, header begins eyJ.
+    val JWT_LITERAL_PATTERN = Regex("""eyJ[A-Za-z0-9_\-]{10,}\.eyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}""")
+
+    // JDBC URL embedding credentials — jdbc:...//user:pass@host or ?password=secret / &user=...
+    val JDBC_CREDENTIAL_PATTERN = Regex(
+        """jdbc:[a-z0-9]+://[^/\s]*:[^@\s/]+@|[?&](password|user)=[^&\s"]+""",
+        RegexOption.IGNORE_CASE,
+    )
+
+    // ── A02 Insecure SSLContext protocol ──────────────────────────────────────
+
+    const val SSL_CONTEXT_CLASS = "SSLContext"
+    val WEAK_SSL_PROTOCOLS = listOf(
+        Regex("""^SSL$""", RegexOption.IGNORE_CASE),
+        Regex("""^SSLv2""", RegexOption.IGNORE_CASE),
+        Regex("""^SSLv3""", RegexOption.IGNORE_CASE),
+        Regex("""^TLSv1$""", RegexOption.IGNORE_CASE),
+        Regex("""^TLSv1\.0$""", RegexOption.IGNORE_CASE),
+        Regex("""^TLSv1\.1$""", RegexOption.IGNORE_CASE),
+    )
+
+    // ── A03 Zip Slip ──────────────────────────────────────────────────────────
+
+    // Path sinks where a ZipEntry name lands during archive extraction.
+    val PATH_SINK_METHODS = setOf("File", "resolve", "get", "of")
+
+    // ── A06 Regex injection (dynamic pattern compilation) ─────────────────────
+
+    const val PATTERN_COMPILE_METHOD = "compile"
+    const val PATTERN_CLASS = "Pattern"
+
+    // ── A09 Log forging (CR/LF from external input) ───────────────────────────
+
+    val LOG_INPUT_KEYWORDS = setOf(
+        "request", "param", "query", "header", "input", "username",
+        "url", "useragent", "user_agent", "referer", "referrer", "cookie",
+    )
+
+    // ── A05 Insecure file permissions ─────────────────────────────────────────
+
+    const val POSIX_FROM_STRING = "fromString"
+    const val POSIX_PERMISSIONS_CLASS = "PosixFilePermissions"
+    val WORLD_ACCESS_SETTERS = setOf("setWritable", "setReadable", "setExecutable")
+
+    // ── A01 Predictable temp file location ────────────────────────────────────
+
+    val INSECURE_TEMP_PATH_PREFIXES = listOf("/tmp/", "/var/tmp/", "/dev/shm/")
 }

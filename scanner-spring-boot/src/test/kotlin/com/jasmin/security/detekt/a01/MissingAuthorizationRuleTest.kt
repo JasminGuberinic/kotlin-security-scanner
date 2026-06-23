@@ -56,6 +56,19 @@ class MissingAuthorizationRuleTest {
     }
 
     @Test
+    fun `ignores handler when class has PreAuthorize`() {
+        val code = """
+            @RestController
+            @PreAuthorize("hasRole('A')")
+            class C {
+                @GetMapping("/x")
+                fun x(): String = "ok"
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores function with no endpoint annotation`() {
         val code = """
             fun helperFunction(): String = "ok"

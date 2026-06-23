@@ -34,6 +34,39 @@ class QuarkusConfigPasswordLeakRuleTest {
     }
 
     @Test
+    fun `flags ConfigProperty with secret name and defaultValue on constructor parameter`() {
+        val code = """
+            @ApplicationScoped
+            class Svc(
+                @ConfigProperty(name = "app.secret", defaultValue = "changeme") val s: String
+            )
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `ignores ConfigProperty on constructor parameter with non-sensitive name`() {
+        val code = """
+            @ApplicationScoped
+            class Svc(
+                @ConfigProperty(name = "app.greeting", defaultValue = "Hello") val greeting: String
+            )
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores ConfigProperty on constructor parameter with sensitive name but no defaultValue`() {
+        val code = """
+            @ApplicationScoped
+            class Svc(
+                @ConfigProperty(name = "app.secret") val s: String
+            )
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
     fun `ignores ConfigProperty with sensitive name but no defaultValue`() {
         val code = """
             @ApplicationScoped

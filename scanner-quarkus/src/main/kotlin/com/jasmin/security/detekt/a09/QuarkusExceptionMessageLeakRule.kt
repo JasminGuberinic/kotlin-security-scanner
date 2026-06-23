@@ -21,11 +21,14 @@ class QuarkusExceptionMessageLeakRule(config: Config) : SecurityRule(config) {
         debt = Debt.TWENTY_MINS,
     )
 
+    // A left boundary (?<![A-Za-z0-9_$]) ensures the receiver is a standalone identifier,
+    // so "service.message" / "cache.toString()" do NOT match inside a longer identifier —
+    // only bare "e", "ex", "exception", or "it" receivers are flagged.
     private val exceptionLeakPatterns = listOf(
-        Regex("""ex\.(message|localizedMessage|stackTraceToString|toString)\b"""),
-        Regex("""e\.(message|localizedMessage|stackTraceToString|toString)\b"""),
-        Regex("""exception\.(message|localizedMessage|stackTraceToString|toString)\b"""),
-        Regex("""it\.(message|localizedMessage|stackTraceToString|toString)\b"""),
+        Regex("""(?<![A-Za-z0-9_$])ex\.(message|localizedMessage|stackTraceToString|toString)\b"""),
+        Regex("""(?<![A-Za-z0-9_$])e\.(message|localizedMessage|stackTraceToString|toString)\b"""),
+        Regex("""(?<![A-Za-z0-9_$])exception\.(message|localizedMessage|stackTraceToString|toString)\b"""),
+        Regex("""(?<![A-Za-z0-9_$])it\.(message|localizedMessage|stackTraceToString|toString)\b"""),
     )
 
     @Suppress("ReturnCount")

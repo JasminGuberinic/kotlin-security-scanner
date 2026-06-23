@@ -8,6 +8,7 @@ import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtConstantExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 
 /**
  * OWASP A02 — Cryptographic Failures (Weak Key Size)
@@ -45,6 +46,7 @@ class WeakRsaKeyRule(config: Config) : SecurityRule(config) {
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
         if (expression.calleeExpression?.text != DetectionPatterns.KEY_GEN_INIT_METHOD) return
+        if (receivesNonRsaAlgorithm(expression)) return
         val firstArg = expression.valueArguments.firstOrNull()?.getArgumentExpression() ?: return
         val sizeExpr = firstArg as? KtConstantExpression ?: return
         val size = sizeExpr.text.toIntOrNull() ?: return
@@ -53,5 +55,20 @@ class WeakRsaKeyRule(config: Config) : SecurityRule(config) {
             expression,
             "Key size $size is too small — use ≥ $minKeySize bits for RSA, ≥ 256 bits for EC",
         )
+    }
+
+    /**
+     * The RSA threshold only applies to RSA keys. EC/EdDSA curves are secure at much
+     * smaller sizes (e.g. EC-256), so skip when the receiver chain names a non-RSA
+     * algorithm — e.g. KeyPairGenerator.getInstance("EC").initialize(256).
+     */
+    private fun receivesNonRsaAlgorithm(expression: KtCallExpression): Boolean {
+        val receiverText = (expression.parent as? KtDotQualifiedExpression)
+            ?.receiverExpression?.text ?: return false
+        return NON_RSA_ALGORITHM_INDICATORS.any { receiverText.contains("\"$it\"") }
+    }
+
+    private companion object {
+        val NON_RSA_ALGORITHM_INDICATORS = listOf("ECDSA", "EdDSA", "Ed25519", "X25519", "EC")
     }
 }

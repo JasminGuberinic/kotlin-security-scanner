@@ -1,5 +1,6 @@
 package com.jasmin.security.detekt
 
+import com.jasmin.security.detekt.a01.QuarkusCacheResultSensitiveRule
 import com.jasmin.security.detekt.a01.QuarkusFormCsrfMissingRule
 import com.jasmin.security.detekt.a01.QuarkusGraphQLNoAuthRule
 import com.jasmin.security.detekt.a01.QuarkusJsonBeforeAuthRule
@@ -59,6 +60,7 @@ class QuarkusRuleSetProvider : RuleSetProvider {
             QuarkusReactiveRouteNoAuthRule(config),
             QuarkusFormCsrfMissingRule(config),
             QuarkusUnsafeSecurityContextRule(config),
+            QuarkusCacheResultSensitiveRule(config),
             // A02 Cryptographic Failures
             QuarkusSmallryeJwtInsecureRule(config),
             QuarkusRedisInsecureRule(config),

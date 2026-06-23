@@ -22,7 +22,7 @@ class DropwizardDatabasePasswordRule(config: Config) : PropertiesSecurityRule(co
         debt = Debt.TEN_MINS,
     )
 
-    private val passwordKeys = listOf("database.password", "database.user")
+    private val passwordKeys = listOf("database.password")
 
     @Suppress("ReturnCount")
     override fun scanProperties(props: Properties): List<Pair<String, String>> =

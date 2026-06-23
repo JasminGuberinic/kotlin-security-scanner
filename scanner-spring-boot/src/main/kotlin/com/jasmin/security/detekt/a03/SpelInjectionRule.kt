@@ -6,7 +6,9 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
+import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
 /**
@@ -50,7 +52,18 @@ class SpelInjectionRule(config: Config) : SecurityRule(config) {
     private fun hasNonLiteralArg(expression: KtCallExpression): Boolean {
         val first = expression.valueArguments.firstOrNull()
             ?.getArgumentExpression() ?: return true
-        return first !is KtStringTemplateExpression ||
-            (first as KtStringTemplateExpression).hasInterpolation()
+        return !isConstantString(first)
+    }
+
+    // A bare non-interpolated string literal OR a '+' concatenation of constant strings is safe.
+    private fun isConstantString(expr: KtExpression): Boolean = when (expr) {
+        is KtStringTemplateExpression -> !expr.hasInterpolation()
+        is KtBinaryExpression -> {
+            val left = expr.left
+            val right = expr.right
+            left != null && right != null &&
+                isConstantString(left) && isConstantString(right)
+        }
+        else -> false
     }
 }

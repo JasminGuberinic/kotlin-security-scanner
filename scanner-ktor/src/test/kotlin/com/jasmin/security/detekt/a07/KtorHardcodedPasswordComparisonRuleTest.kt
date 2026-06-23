@@ -57,6 +57,18 @@ class KtorHardcodedPasswordComparisonRuleTest {
         assertThat(rule.lint(code)).isEmpty()
     }
 
+    @Test
+    fun `ignores blank password check`() {
+        val code = """
+            fun validate(user: User) {
+                if (user.password == "") {
+                    error("password must not be blank")
+                }
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
     // ── Isolation ─────────────────────────────────────────────────────────────
 
     @Test

@@ -21,9 +21,29 @@ class InsecureCookieRuleTest {
 
     @Test
     fun `flags NewCookie 8-arg with secure=false`() {
+        // Jakarta: NewCookie(name, value, path, domain, comment, maxAge, secure, httpOnly)
         val code = """
             fun insecureCookie(token: String) =
-                NewCookie("session", token, "/", null, 1, "", -1, false)
+                NewCookie("s", token, "/", null, "", 3600, false, true)
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `flags NewCookie 6-arg — secure defaults to false`() {
+        // NewCookie(name, value, path, domain, comment, maxAge) — no secure parameter
+        val code = """
+            fun insecureCookie(token: String) =
+                NewCookie("s", token, "/", "example.com", "", 3600)
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
+    @Test
+    fun `flags NewCookie 7-arg with secure=false`() {
+        val code = """
+            fun insecureCookie(token: String) =
+                NewCookie("s", token, "/", "example.com", "", 3600, false)
         """.trimIndent()
         assertThat(rule.lint(code)).hasSize(1)
     }
@@ -41,9 +61,19 @@ class InsecureCookieRuleTest {
 
     @Test
     fun `ignores NewCookie 8-arg with secure=true`() {
+        // secure=true at index 6, httpOnly=false at index 7 — still secure on the wire
         val code = """
             fun secureCookie(token: String) =
-                NewCookie("session", token, "/", null, 1, "", -1, true)
+                NewCookie("s", token, "/", null, "", 3600, true, false)
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores NewCookie 7-arg with secure=true`() {
+        val code = """
+            fun secureCookie(token: String) =
+                NewCookie("s", token, "/", "example.com", "", 3600, true)
         """.trimIndent()
         assertThat(rule.lint(code)).isEmpty()
     }

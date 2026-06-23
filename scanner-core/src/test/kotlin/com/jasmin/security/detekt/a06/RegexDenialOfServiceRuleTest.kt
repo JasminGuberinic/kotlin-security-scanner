@@ -43,12 +43,28 @@ class RegexDenialOfServiceRuleTest {
         assertThat(rule.lint(code)).hasSize(1)
     }
 
+    @Test
+    fun `flags grouped quantifier followed by quantifier (word dot)+`() {
+        val code = """
+            val r = Regex("(\\w+\\.)+\\w+")
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
 
     @Test
     fun `ignores simple character class`() {
         val code = """
             val r = Regex("[a-z]+")
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores alphanumeric character class`() {
+        val code = """
+            val r = Regex("[a-z0-9]+")
         """.trimIndent()
         assertThat(rule.lint(code)).isEmpty()
     }

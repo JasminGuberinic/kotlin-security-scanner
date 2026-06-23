@@ -39,7 +39,23 @@ class InsecureRedisConnectionRuleTest {
         assertThat(rule.lint(code)).hasSize(2)
     }
 
+    @Test
+    fun `flags RedisStandaloneConfiguration without SSL`() {
+        val code = """
+            val config = RedisStandaloneConfiguration("redis.internal", 6379)
+        """.trimIndent()
+        assertThat(rule.lint(code)).hasSize(1)
+    }
+
     // ── Negative — must NOT flag ──────────────────────────────────────────────
+
+    @Test
+    fun `ignores Redis configuration when SSL is enabled in the same declaration`() {
+        val code = """
+            val config = RedisStandaloneConfiguration("redis.internal", 6380).also { it.useSsl() }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
 
     @Test
     fun `ignores unrelated constructors`() {

@@ -7,6 +7,7 @@ import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 
 // OWASP A01 — Broken Access Control
 // permitAll() on admin/actuator paths removes authentication entirely.
@@ -25,7 +26,9 @@ class PermitAllAdminPathRule(config: Config) : SecurityRule(config) {
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
         if (expression.calleeExpression?.text != "permitAll") return
-        val chainText = expression.parent?.parent?.text ?: return
+        // Only this call's own receiver chain, e.g. it.requestMatchers("/admin/**") in
+        // it.requestMatchers("/admin/**").permitAll() — not sibling statements nearby.
+        val chainText = (expression.parent as? KtDotQualifiedExpression)?.receiverExpression?.text ?: return
         val hasSensitivePath = DetectionPatterns.ADMIN_PATHS.any { it in chainText }
         if (!hasSensitivePath) return
         reportAt(expression, "permitAll() on admin/actuator path — use hasRole('ADMIN') or hasAuthority('SCOPE_admin')")

@@ -43,8 +43,25 @@ class QuarkusBuildTimeSecretLeakRule(config: Config) : PropertiesSecurityRule(co
         return issues
     }
 
-    private fun isSecretKey(keyLower: String): Boolean =
-        DetectionPatterns.CREDENTIAL_VARIABLE_KEYWORDS.any { it in keyLower }
+    // Dot/dash-delimited key SEGMENTS are matched against secret keywords, so a key like
+    // "quarkus.oidc.auth-server-url" is NOT flagged just because it contains "auth". The
+    // over-broad bare "auth"/"token" tokens are deliberately excluded from this property
+    // scan; "api-key" splits to [api, key] so its joined form "apikey" is also accepted.
+    private val secretKeySegments = setOf(
+        "password", "passwd", "pwd", "secret", "apikey", "api_key", "apisecret",
+        "credential", "credentials", "private_key", "privatekey",
+        "access_key", "accesskey", "client_secret", "clientsecret",
+    )
+
+    private fun isSecretKey(keyLower: String): Boolean {
+        val segments = keyLower.split('.', '-').filter { it.isNotEmpty() }
+        if (segments.any { it in secretKeySegments }) return true
+        // Also accept adjacent segment pairs joined, so "api-key" → "apikey" matches.
+        for (i in 0 until segments.size - 1) {
+            if (segments[i] + segments[i + 1] in secretKeySegments) return true
+        }
+        return false
+    }
 
     @Suppress("ReturnCount")
     private fun isHardcodedValue(value: String): Boolean {

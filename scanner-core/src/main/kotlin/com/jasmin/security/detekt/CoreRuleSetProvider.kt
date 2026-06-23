@@ -1,10 +1,12 @@
 package com.jasmin.security.detekt
 
 import com.jasmin.security.detekt.a01.JaxrsOpenRedirectRule
+import com.jasmin.security.detekt.a01.PredictableTempFileRule
 import com.jasmin.security.detekt.a02.HardcodedAesKeyRule
 import com.jasmin.security.detekt.a02.HardcodedIvRule
 import com.jasmin.security.detekt.a02.HardcodedPrivateKeyRule
 import com.jasmin.security.detekt.a02.InsecureRandomSeedRule
+import com.jasmin.security.detekt.a02.InsecureSslContextRule
 import com.jasmin.security.detekt.a02.TrustAllHostnamesRule
 import com.jasmin.security.detekt.a02.InsecurePasswordStorageRule
 import com.jasmin.security.detekt.a02.JwtNoneAlgorithmRule
@@ -23,16 +25,26 @@ import com.jasmin.security.detekt.a03.ReflectionInjectionRule
 import com.jasmin.security.detekt.a03.SqlInjectionRule
 import com.jasmin.security.detekt.a03.XpathInjectionRule
 import com.jasmin.security.detekt.a03.XxeInjectionRule
+import com.jasmin.security.detekt.a03.ZipSlipRule
 import com.jasmin.security.detekt.a06.RegexDenialOfServiceRule
+import com.jasmin.security.detekt.a06.RegexInjectionRule
+import com.jasmin.security.detekt.a07.GitHubTokenRule
+import com.jasmin.security.detekt.a07.GoogleApiKeyRule
 import com.jasmin.security.detekt.a07.HardcodedAwsCredentialsRule
 import com.jasmin.security.detekt.a07.HardcodedCredentialsRule
+import com.jasmin.security.detekt.a07.HardcodedJdbcCredentialsRule
+import com.jasmin.security.detekt.a07.HardcodedJwtTokenRule
 import com.jasmin.security.detekt.a07.InsecureRandomRule
+import com.jasmin.security.detekt.a07.SlackTokenRule
+import com.jasmin.security.detekt.a07.StripeSecretKeyRule
 import com.jasmin.security.detekt.a08.InsecureDeserializationRule
 import com.jasmin.security.detekt.a08.JacksonUnsafeDeserializationRule
 import com.jasmin.security.detekt.a08.KotlinxSerializationSensitiveFieldRule
 import com.jasmin.security.detekt.a08.XmlMapperUnsafeRule
+import com.jasmin.security.detekt.a09.LogForgingRule
 import com.jasmin.security.detekt.a09.SensitiveDataLoggingRule
 import com.jasmin.security.detekt.a05.CorsWildcardOriginsRule
+import com.jasmin.security.detekt.a05.InsecureFilePermissionsRule
 import com.jasmin.security.detekt.a10.SsrfRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.RuleSet
@@ -57,10 +69,12 @@ class CoreRuleSetProvider : RuleSetProvider {
         listOf(
             // A01 Broken Access Control
             JaxrsOpenRedirectRule(config),
+            PredictableTempFileRule(config),
             // A02 Cryptographic Failures
             HardcodedAesKeyRule(config),
             HardcodedPrivateKeyRule(config),
             InsecureRandomSeedRule(config),
+            InsecureSslContextRule(config),
             TrustAllHostnamesRule(config),
             WeakCipherModeRule(config),
             WeakHashAlgorithmRule(config),
@@ -81,12 +95,20 @@ class CoreRuleSetProvider : RuleSetProvider {
             CommandInjectionRule(config),
             XxeInjectionRule(config),
             GroovyScriptInjectionRule(config),
+            ZipSlipRule(config),
             // A06 Vulnerable Components / ReDoS
             RegexDenialOfServiceRule(config),
+            RegexInjectionRule(config),
             // A07 Authentication Failures
             HardcodedCredentialsRule(config),
             InsecureRandomRule(config),
             HardcodedAwsCredentialsRule(config),
+            GoogleApiKeyRule(config),
+            SlackTokenRule(config),
+            GitHubTokenRule(config),
+            StripeSecretKeyRule(config),
+            HardcodedJwtTokenRule(config),
+            HardcodedJdbcCredentialsRule(config),
             // A08 Software and Data Integrity
             InsecureDeserializationRule(config),
             JacksonUnsafeDeserializationRule(config),
@@ -94,8 +116,10 @@ class CoreRuleSetProvider : RuleSetProvider {
             KotlinxSerializationSensitiveFieldRule(config),
             // A05 Security Misconfiguration
             CorsWildcardOriginsRule(config),
+            InsecureFilePermissionsRule(config),
             // A09 Logging Failures
             SensitiveDataLoggingRule(config),
+            LogForgingRule(config),
             // A10 Server-Side Request Forgery
             SsrfRule(config),
         )
