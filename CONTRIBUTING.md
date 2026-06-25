@@ -19,6 +19,9 @@ A change is ready when `./gradlew clean build` is green.
 
 ## Adding a rule
 
+> See **[docs/RULE-DEVELOPMENT.md](docs/RULE-DEVELOPMENT.md)** for the full guide: how rules are
+> implemented, the rule archetypes, the quality bar, and the sane cadence for adding rules.
+
 Rules live in the module that matches their scope:
 
 | Scope | Module |
