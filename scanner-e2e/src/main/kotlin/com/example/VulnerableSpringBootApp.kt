@@ -320,3 +320,22 @@ fun configCsrfIgnoring(http: Any) {
 }
 
 private const val apiPathPattern = "/api/everything"
+
+// ── Batch: WebFlux (reactive) ─────────────────────────────────────────────────
+
+// VULNERABLE: ThreadLocal SecurityContextHolder in reactive code [ReactiveSecurityContextHolder, CWE-863]
+fun reactiveMe(): reactor.core.publisher.Mono<String> {
+    val auth = org.springframework.security.core.context.SecurityContextHolder.getContext().authentication
+    return reactor.core.publisher.Mono.just(auth.name)
+}
+
+// VULNERABLE: reactive authorizeExchange permits everything [ReactivePermitAllExchange, CWE-285]
+fun reactiveSecurity(http: Any) {
+    http.authorizeExchange { it.anyExchange().permitAll() }
+}
+
+// VULNERABLE: blocking call inside a reactive method [WebFluxBlockingCall, CWE-400]
+fun reactiveHandler(repo: Any, id: Long): reactor.core.publisher.Mono<String> {
+    val user = repo.findById(id).block()
+    return reactor.core.publisher.Mono.just(user.toString())
+}

@@ -7,6 +7,7 @@ include(
     "scanner-quarkus",
     "scanner-ktor",
     "scanner-micronaut",
+    "scanner-vertx",
     "scanner-all",
     "scanner-e2e",
 )

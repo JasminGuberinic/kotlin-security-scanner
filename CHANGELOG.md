@@ -4,6 +4,27 @@ All notable changes to kotlin-security-scanner are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — Reactive security
+
+Adds a new **`scanner-vertx`** module and **WebFlux (reactive Spring)** rules — 209 rules
+across 7 modules, 1289 tests.
+
+### Added
+- **WebFlux (scanner-spring-boot):**
+  - `ReactiveSecurityContextHolder` (CWE-863) — ThreadLocal `SecurityContextHolder` in reactive
+    code returns an empty context; use `ReactiveSecurityContextHolder`.
+  - `ReactivePermitAllExchange` (CWE-285) — reactive `anyExchange().permitAll()` / admin
+    `pathMatchers(...).permitAll()`.
+  - `WebFluxBlockingCall` (CWE-400) — `.block()` inside a `Mono`/`Flux` method starves the event loop.
+- **New `scanner-vertx` module** (`io.github.jasminguberinic:scanner-vertx`):
+  - `VertxTrustAllCerts` (CWE-295), `VertxCorsWildcard` (CWE-942),
+    `VertxBodyHandlerNoLimit` (CWE-400), `VertxEventBusBridgeOpen` (CWE-862),
+    `VertxInsecureCookie` (CWE-614).
+- `scanner-all` now bundles `scanner-vertx`.
+
+Every rule ships with positive/negative/isolation tests and an e2e fixture; the safe-code
+fixture stays at zero findings.
+
 ## [0.2.0] — 2026-06-23
 
 First public release on Maven Central:

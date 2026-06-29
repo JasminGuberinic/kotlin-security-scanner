@@ -4,10 +4,10 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.0.10-purple.svg)](https://kotlinlang.org)
 [![Detekt](https://img.shields.io/badge/detekt-1.23.7-blue.svg)](https://detekt.dev)
-[![Rules](https://img.shields.io/badge/rules-201-brightgreen.svg)](#owasp-top-10-coverage)
+[![Rules](https://img.shields.io/badge/rules-209-brightgreen.svg)](#owasp-top-10-coverage)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.jasminguberinic/scanner-core.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.jasminguberinic/scanner-core)
 
-**Kotlin SAST — Detekt plugin with 201 rules that detects OWASP Top 10 security vulnerabilities in Spring Boot, Quarkus, Dropwizard, Ktor, and Micronaut applications at compile time, in your IDE, with zero infrastructure.**
+**Kotlin SAST — Detekt plugin with 209 rules that detects OWASP Top 10 security vulnerabilities in Spring Boot, Quarkus, Dropwizard, Ktor, Micronaut, and Vert.x applications at compile time, in your IDE, with zero infrastructure.**
 
 > **FindSecBugs** works on JVM bytecode and misses Kotlin-specific patterns: coroutines, scope functions, Kotlin DSLs.  
 > **SonarQube** security rules require a paid tier or a running server.  
@@ -28,17 +28,18 @@ plugins {
 
 dependencies {
     // Core rules — works with any Kotlin project
-    detektPlugins("io.github.jasminguberinic:scanner-core:0.2.0")
+    detektPlugins("io.github.jasminguberinic:scanner-core:0.3.0")
 
     // Pick the module(s) for your framework — combine as many as you like
-    detektPlugins("io.github.jasminguberinic:scanner-spring-boot:0.2.0")
-    // detektPlugins("io.github.jasminguberinic:scanner-quarkus:0.2.0")
-    // detektPlugins("io.github.jasminguberinic:scanner-dropwizard:0.2.0")
-    // detektPlugins("io.github.jasminguberinic:scanner-ktor:0.2.0")
-    // detektPlugins("io.github.jasminguberinic:scanner-micronaut:0.2.0")
+    detektPlugins("io.github.jasminguberinic:scanner-spring-boot:0.3.0")
+    // detektPlugins("io.github.jasminguberinic:scanner-quarkus:0.3.0")
+    // detektPlugins("io.github.jasminguberinic:scanner-dropwizard:0.3.0")
+    // detektPlugins("io.github.jasminguberinic:scanner-ktor:0.3.0")
+    // detektPlugins("io.github.jasminguberinic:scanner-micronaut:0.3.0")
+    // detektPlugins("io.github.jasminguberinic:scanner-vertx:0.3.0")
 
     // ...or pull everything in one go:
-    // detektPlugins("io.github.jasminguberinic:scanner-all:0.2.0")
+    // detektPlugins("io.github.jasminguberinic:scanner-all:0.3.0")
 }
 
 detekt {
@@ -86,8 +87,8 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 
 ## OWASP Top 10 coverage
 
-**201 rules** across 6 modules. Every rule has positive, negative, and cross-rule isolation tests
-(1262 tests, all green) and is verified end-to-end against intentionally vulnerable fixtures with a
+**209 rules** across 7 modules. Every rule has positive, negative, and cross-rule isolation tests
+(1289 tests, all green) and is verified end-to-end against intentionally vulnerable fixtures with a
 companion safe-code fixture proving zero false positives. The tables below highlight representative
 rules per module.
 
@@ -143,6 +144,9 @@ rules per module.
 |---|---|---|
 | `MissingAuthorizationRule` | A01 | `@GetMapping` etc. without `@PreAuthorize` or `@Secured` |
 | `DisabledHttpSecurityRule` | A01 | `anyRequest().permitAll()` in `SecurityFilterChain` |
+| `ReactiveSecurityContextHolderRule` | A01 | ThreadLocal `SecurityContextHolder` in WebFlux — empty context, broken auth |
+| `ReactivePermitAllExchangeRule` | A01 | `anyExchange().permitAll()` / admin `pathMatchers(...).permitAll()` (reactive) |
+| `WebFluxBlockingCallRule` | A05 | `.block()` inside a `Mono`/`Flux` method — starves the event loop (DoS) |
 | `OpenRedirectRule` | A01 | `"redirect:" + variable` in `@Controller` methods |
 | `CsrfTokenLeakRule` | A01 | `model.addAttribute("csrf/xsrf...", token)` exposes CSRF token |
 | `CoroutineSecurityContextLossRule` | A01 | `suspend fun` with `@PreAuthorize` — security context silently dropped |
@@ -236,6 +240,16 @@ rules per module.
 | `MicronautExceptionMessageLeakRule` | A09 | `@Error` handler returning `exception.message` — internals leak |
 | `MicronautBodyAnyTypeRule` | A04 | `@Body body: Any` — unbounded deserialization target |
 
+### Vert.x (`scanner-vertx`)
+
+| Rule | OWASP 2021 | What it catches |
+|---|---|---|
+| `VertxEventBusBridgeOpenRule` | A01 | SockJS bridge `setAddressRegex(".*")` — exposes the whole event bus |
+| `VertxTrustAllCertsRule` | A02 | `setTrustAll(true)` / `setVerifyHost(false)` — disables TLS verification |
+| `VertxCorsWildcardRule` | A05 | `CorsHandler.create(".*")` / `addOrigin("*")` — any-origin CORS |
+| `VertxBodyHandlerNoLimitRule` | A05 | `BodyHandler.create()` without `setBodyLimit` — unbounded body (DoS) |
+| `VertxInsecureCookieRule` | A05 | `Cookie.cookie(...).setSecure(false)` — cookie over plain HTTP |
+
 ---
 
 ## Why not FindSecBugs / SonarQube?
@@ -245,7 +259,7 @@ rules per module.
 | Kotlin-native (PSI/AST) | ❌ Bytecode only | ⚠️ Partial | ✅ |
 | Coroutine security patterns | ❌ Impossible | ❌ | ✅ |
 | `let`/`run`/`apply` taint tracking | ❌ | ❌ | ✅ |
-| Spring Boot / Quarkus / Dropwizard / Ktor / Micronaut rules | ⚠️ Java only | ⚠️ Paid tier | ✅ |
+| Spring Boot / Quarkus / Dropwizard / Ktor / Micronaut / Vert.x rules | ⚠️ Java only | ⚠️ Paid tier | ✅ |
 | Config file scanning (`.properties`/`.yml`) | ❌ | ❌ | ✅ |
 | Infrastructure needed | ❌ | ✅ Server | ❌ |
 | Cost | Free | Free / Paid | Free |
@@ -297,6 +311,7 @@ kotlin-security-scanner/
 ├── scanner-dropwizard/      # Dropwizard / JAX-RS rules
 ├── scanner-ktor/            # Ktor routing / session / CORS rules
 ├── scanner-micronaut/       # Micronaut security / config / client rules
+├── scanner-vertx/           # Vert.x TLS / CORS / event-bus / cookie rules
 └── scanner-all/             # Convenience bundle (all modules)
 ```
 

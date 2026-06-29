@@ -217,6 +217,10 @@ security-spring-boot:
   # A01 Broken Access Control
   MissingAuthorization:
     active: true
+  ReactiveSecurityContextHolder:
+    active: true
+  ReactivePermitAllExchange:
+    active: true
   OpenRedirect:
     active: true
   DisabledHttpSecurity:
@@ -332,6 +336,8 @@ security-spring-boot:
   SpringSessionFixationNone:
     active: true
   SpringCsrfIgnoringMatchers:
+    active: true
+  WebFluxBlockingCall:
     active: true
   # A10 Server-Side Request Forgery
   WebClientSSRF:
@@ -590,4 +596,21 @@ security-micronaut:
     active: true
   # A09 Security Logging and Monitoring Failures
   MicronautExceptionMessageLeak:
+    active: true
+
+# ─── VERT.X SECURITY RULES (scanner-vertx) ───────────────────────────────────
+security-vertx:
+  active: true
+  # A01 Broken Access Control
+  VertxEventBusBridgeOpen:
+    active: true
+  # A02 Cryptographic Failures
+  VertxTrustAllCerts:
+    active: true
+  # A05 Security Misconfiguration
+  VertxCorsWildcard:
+    active: true
+  VertxBodyHandlerNoLimit:
+    active: true
+  VertxInsecureCookie:
     active: true

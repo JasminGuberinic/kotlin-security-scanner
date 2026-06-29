@@ -53,3 +53,30 @@ fun safeFrameOptions(http: Any) {
 fun safeSessionFixation(http: Any) {
     http.sessionManagement { sessionFixation { migrateSession() } }
 }
+
+// WebFlux (reactive) — done correctly.
+fun safeReactiveMe(): reactor.core.publisher.Mono<String> =
+    ReactiveSecurityContextHolder.getContext().map { it.authentication.name }
+
+fun safeReactiveSecurity(http: Any) {
+    http.authorizeExchange { it.anyExchange().authenticated() }
+}
+
+fun safeReactiveHandler(repo: Any, id: Long): reactor.core.publisher.Mono<String> =
+    repo.findById(id).map { it.toString() } // composed, no block()
+
+// Vert.x — done correctly.
+fun safeVertxClient() =
+    io.vertx.ext.web.client.WebClientOptions().setTrustAll(false).setVerifyHost(true)
+
+fun safeVertxCors() =
+    io.vertx.ext.web.handler.CorsHandler.create().addOrigin("https://app.example.com")
+
+fun safeVertxBody(router: io.vertx.ext.web.Router) =
+    router.route().handler(io.vertx.ext.web.handler.BodyHandler.create().setBodyLimit(10485760))
+
+fun safeVertxBridge() =
+    io.vertx.ext.bridge.PermittedOptions().setAddress("news.updates")
+
+fun safeVertxCookie(id: String) =
+    io.vertx.core.http.Cookie.cookie("session", id).setSecure(true)

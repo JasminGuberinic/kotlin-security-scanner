@@ -716,6 +716,34 @@ object RemediationHints {
 
         "MicronautInsecureCookie" to
             "Cookie.of(\"SESSION\", id).secure(true).httpOnly(true) — only send the cookie over HTTPS",
+
+        // ── WebFlux (reactive) ────────────────────────────────────────────────
+
+        "ReactiveSecurityContextHolder" to
+            "ReactiveSecurityContextHolder.getContext().map { it.authentication } // reads the Reactor Context",
+
+        "ReactivePermitAllExchange" to
+            "http.authorizeExchange { it.anyExchange().authenticated() } — scope public paths explicitly",
+
+        "WebFluxBlockingCall" to
+            "Compose reactively: repo.findById(id).flatMap { ... } — never .block() inside a Mono/Flux method",
+
+        // ── Vert.x ────────────────────────────────────────────────────────────
+
+        "VertxTrustAllCerts" to
+            "WebClientOptions().setTrustStoreOptions(...).setVerifyHost(true) — never setTrustAll(true)",
+
+        "VertxCorsWildcard" to
+            "CorsHandler.create().addOrigin(\"https://app.example.com\") — list trusted origins, not \".*\"",
+
+        "VertxBodyHandlerNoLimit" to
+            "BodyHandler.create().setBodyLimit(10 * 1024 * 1024) // cap request body size",
+
+        "VertxEventBusBridgeOpen" to
+            "PermittedOptions().setAddress(\"news.updates\") — permit only the exact addresses the client needs",
+
+        "VertxInsecureCookie" to
+            "Cookie.cookie(\"session\", id).setSecure(true).setHttpOnly(true)",
     )
 
     /** Returns the fix hint for a given rule ID, or null if not mapped. */

@@ -8,6 +8,8 @@ import com.jasmin.security.detekt.a01.FeignClientInsecureUrlRule
 import com.jasmin.security.detekt.a01.MissingAuthorizationRule
 import com.jasmin.security.detekt.a01.OpenRedirectRule
 import com.jasmin.security.detekt.a01.PermitAllAdminPathRule
+import com.jasmin.security.detekt.a01.ReactivePermitAllExchangeRule
+import com.jasmin.security.detekt.a01.ReactiveSecurityContextHolderRule
 import com.jasmin.security.detekt.a01.UnvalidatedForwardRule
 import com.jasmin.security.detekt.a02.InsecurePasswordEncoderRule
 import com.jasmin.security.detekt.a02.InsecureRedisConnectionRule
@@ -45,6 +47,7 @@ import com.jasmin.security.detekt.a05.SpringCsrfIgnoringMatchersRule
 import com.jasmin.security.detekt.a05.SpringFrameOptionsDisabledRule
 import com.jasmin.security.detekt.a05.SpringSecurityDebugEnabledRule
 import com.jasmin.security.detekt.a05.SpringSessionFixationNoneRule
+import com.jasmin.security.detekt.a05.WebFluxBlockingCallRule
 import com.jasmin.security.detekt.a07.HardcodedDatasourcePasswordRule
 import com.jasmin.security.detekt.a07.InsecureRememberMeRule
 import com.jasmin.security.detekt.a07.SpringBootHardcodedValueDefaultRule
@@ -73,6 +76,8 @@ class SpringBootRuleSetProvider : RuleSetProvider {
         listOf(
             // A01 Broken Access Control
             MissingAuthorizationRule(config),
+            ReactiveSecurityContextHolderRule(config),
+            ReactivePermitAllExchangeRule(config),
             OpenRedirectRule(config),
             DisabledHttpSecurityRule(config),
             CsrfTokenLeakRule(config),
@@ -118,6 +123,7 @@ class SpringBootRuleSetProvider : RuleSetProvider {
             SpringBootCookieNotHttpOnlyRule(config),
             SpringBootInsecureFileUploadRule(config),
             SpringFrameOptionsDisabledRule(config),
+            WebFluxBlockingCallRule(config),
             SpringContentTypeOptionsDisabledRule(config),
             SpringSessionFixationNoneRule(config),
             SpringCsrfIgnoringMatchersRule(config),

@@ -141,6 +141,10 @@ object CweMapping {
         "SpringContentTypeOptionsDisabled" to "CWE-693",
         "SpringSessionFixationNone" to "CWE-384",
         "SpringCsrfIgnoringMatchers" to "CWE-352",
+        // WebFlux (reactive)
+        "ReactiveSecurityContextHolder" to "CWE-863",
+        "ReactivePermitAllExchange" to "CWE-285",
+        "WebFluxBlockingCall" to "CWE-400",
 
         // ── Quarkus rules ─────────────────────────────────────────────────────
 
@@ -276,6 +280,14 @@ object CweMapping {
         "MicronautExceptionMessageLeak" to "CWE-209",
         "MicronautAnonymousAccess" to "CWE-285",
         "MicronautInsecureCookie" to "CWE-614",
+
+        // ── Vert.x rules ──────────────────────────────────────────────────────
+
+        "VertxTrustAllCerts" to "CWE-295",
+        "VertxCorsWildcard" to "CWE-942",
+        "VertxBodyHandlerNoLimit" to "CWE-400",
+        "VertxEventBusBridgeOpen" to "CWE-862",
+        "VertxInsecureCookie" to "CWE-614",
     )
 
     /** Returns the CWE tag string for a given rule ID, e.g. "CWE-89". Null if not mapped. */

@@ -6,7 +6,7 @@ plugins {
 
 allprojects {
     group = "io.github.jasminguberinic"
-    version = "0.2.0"
+    version = "0.3.0"
     repositories { mavenCentral() }
 }
 
@@ -46,6 +46,7 @@ project(":scanner-e2e") {
         "detektPlugins"(project(":scanner-dropwizard"))
         "detektPlugins"(project(":scanner-ktor"))
         "detektPlugins"(project(":scanner-micronaut"))
+        "detektPlugins"(project(":scanner-vertx"))
         "detektPlugins"("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
     }
 
