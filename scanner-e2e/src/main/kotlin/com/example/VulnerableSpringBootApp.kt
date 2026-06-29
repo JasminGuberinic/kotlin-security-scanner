@@ -339,3 +339,9 @@ fun reactiveHandler(repo: Any, id: Long): reactor.core.publisher.Mono<String> {
     val user = repo.findById(id).block()
     return reactor.core.publisher.Mono.just(user.toString())
 }
+
+// VULNERABLE: WebClient trusts all certificates [WebClientInsecureSsl, CWE-295]
+fun reactiveInsecureSsl() =
+    io.netty.handler.ssl.SslContextBuilder.forClient()
+        .trustManager(io.netty.handler.ssl.util.InsecureTrustManagerFactory.INSTANCE)
+        .build()

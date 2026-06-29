@@ -6,8 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0] — Reactive security
 
-Adds a new **`scanner-vertx`** module and **WebFlux (reactive Spring)** rules — 209 rules
-across 7 modules, 1289 tests.
+Adds a new **`scanner-vertx`** module and **WebFlux (reactive Spring)** rules — 15 new rules,
+for 216 across 7 modules, 1306 tests.
 
 ### Added
 - **WebFlux (scanner-spring-boot):**
@@ -16,10 +16,15 @@ across 7 modules, 1289 tests.
   - `ReactivePermitAllExchange` (CWE-285) — reactive `anyExchange().permitAll()` / admin
     `pathMatchers(...).permitAll()`.
   - `WebFluxBlockingCall` (CWE-400) — `.block()` inside a `Mono`/`Flux` method starves the event loop.
+  - `WebClientInsecureSsl` (CWE-295) — Reactor-Netty WebClient trusting all certs
+    (`InsecureTrustManagerFactory`).
 - **New `scanner-vertx` module** (`io.github.jasminguberinic:scanner-vertx`):
   - `VertxTrustAllCerts` (CWE-295), `VertxCorsWildcard` (CWE-942),
     `VertxBodyHandlerNoLimit` (CWE-400), `VertxEventBusBridgeOpen` (CWE-862),
-    `VertxInsecureCookie` (CWE-614).
+    `VertxInsecureCookie` (CWE-614), `VertxCookieNoHttpOnly` (CWE-1004),
+    `VertxSessionCookieInsecure` (CWE-614), `VertxStaticHandlerDirectoryListing` (CWE-548),
+    `VertxStaticHandlerRootFs` (CWE-22), `VertxJwtNoneAlgorithm` (CWE-347),
+    `VertxHardcodedJwtSecret` (CWE-798).
 - `scanner-all` now bundles `scanner-vertx`.
 
 Every rule ships with positive/negative/isolation tests and an e2e fixture; the safe-code

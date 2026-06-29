@@ -145,6 +145,7 @@ object CweMapping {
         "ReactiveSecurityContextHolder" to "CWE-863",
         "ReactivePermitAllExchange" to "CWE-285",
         "WebFluxBlockingCall" to "CWE-400",
+        "WebClientInsecureSsl" to "CWE-295",
 
         // ── Quarkus rules ─────────────────────────────────────────────────────
 
@@ -288,6 +289,12 @@ object CweMapping {
         "VertxBodyHandlerNoLimit" to "CWE-400",
         "VertxEventBusBridgeOpen" to "CWE-862",
         "VertxInsecureCookie" to "CWE-614",
+        "VertxCookieNoHttpOnly" to "CWE-1004",
+        "VertxSessionCookieInsecure" to "CWE-614",
+        "VertxStaticHandlerDirectoryListing" to "CWE-548",
+        "VertxStaticHandlerRootFs" to "CWE-22",
+        "VertxJwtNoneAlgorithm" to "CWE-347",
+        "VertxHardcodedJwtSecret" to "CWE-798",
     )
 
     /** Returns the CWE tag string for a given rule ID, e.g. "CWE-89". Null if not mapped. */

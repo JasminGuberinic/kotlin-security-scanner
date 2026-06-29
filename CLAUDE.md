@@ -4,7 +4,7 @@ Detekt plugin that detects OWASP Top 10 security vulnerabilities in
 Kotlin applications at compile time — with module-level picks for
 Spring Boot, Quarkus, Dropwizard, Ktor, Micronaut, Vert.x, or any Kotlin project.
 
-**209 rules across 7 modules, 1289 tests. Published to Maven Central as
+**216 rules across 7 modules, 1306 tests. Published to Maven Central as
 `io.github.jasminguberinic:scanner-*:0.3.0`.** Rules are active by default
 (`SecurityRule.active` defaults to true); disable any with `active: false`.
 

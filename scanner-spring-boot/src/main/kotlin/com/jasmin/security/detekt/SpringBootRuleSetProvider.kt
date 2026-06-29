@@ -48,6 +48,7 @@ import com.jasmin.security.detekt.a05.SpringFrameOptionsDisabledRule
 import com.jasmin.security.detekt.a05.SpringSecurityDebugEnabledRule
 import com.jasmin.security.detekt.a05.SpringSessionFixationNoneRule
 import com.jasmin.security.detekt.a05.WebFluxBlockingCallRule
+import com.jasmin.security.detekt.a02.WebClientInsecureSslRule
 import com.jasmin.security.detekt.a07.HardcodedDatasourcePasswordRule
 import com.jasmin.security.detekt.a07.InsecureRememberMeRule
 import com.jasmin.security.detekt.a07.SpringBootHardcodedValueDefaultRule
@@ -88,6 +89,7 @@ class SpringBootRuleSetProvider : RuleSetProvider {
             PermitAllAdminPathRule(config),
             // A02 Cryptographic Failures
             InsecurePasswordEncoderRule(config),
+            WebClientInsecureSslRule(config),
             WeakBcryptRoundsRule(config),
             JwtExpirationMissingRule(config),
             JwtSecretInPropertiesRule(config),

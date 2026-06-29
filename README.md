@@ -4,10 +4,10 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.0.10-purple.svg)](https://kotlinlang.org)
 [![Detekt](https://img.shields.io/badge/detekt-1.23.7-blue.svg)](https://detekt.dev)
-[![Rules](https://img.shields.io/badge/rules-209-brightgreen.svg)](#owasp-top-10-coverage)
+[![Rules](https://img.shields.io/badge/rules-216-brightgreen.svg)](#owasp-top-10-coverage)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.jasminguberinic/scanner-core.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.jasminguberinic/scanner-core)
 
-**Kotlin SAST — Detekt plugin with 209 rules that detects OWASP Top 10 security vulnerabilities in Spring Boot, Quarkus, Dropwizard, Ktor, Micronaut, and Vert.x applications at compile time, in your IDE, with zero infrastructure.**
+**Kotlin SAST — Detekt plugin with 216 rules that detects OWASP Top 10 security vulnerabilities in Spring Boot, Quarkus, Dropwizard, Ktor, Micronaut, and Vert.x applications at compile time, in your IDE, with zero infrastructure.**
 
 > **FindSecBugs** works on JVM bytecode and misses Kotlin-specific patterns: coroutines, scope functions, Kotlin DSLs.  
 > **SonarQube** security rules require a paid tier or a running server.  
@@ -87,8 +87,8 @@ Results appear inline on pull request diffs — no account, no server, no cost (
 
 ## OWASP Top 10 coverage
 
-**209 rules** across 7 modules. Every rule has positive, negative, and cross-rule isolation tests
-(1289 tests, all green) and is verified end-to-end against intentionally vulnerable fixtures with a
+**216 rules** across 7 modules. Every rule has positive, negative, and cross-rule isolation tests
+(1306 tests, all green) and is verified end-to-end against intentionally vulnerable fixtures with a
 companion safe-code fixture proving zero false positives. The tables below highlight representative
 rules per module.
 
@@ -147,6 +147,7 @@ rules per module.
 | `ReactiveSecurityContextHolderRule` | A01 | ThreadLocal `SecurityContextHolder` in WebFlux — empty context, broken auth |
 | `ReactivePermitAllExchangeRule` | A01 | `anyExchange().permitAll()` / admin `pathMatchers(...).permitAll()` (reactive) |
 | `WebFluxBlockingCallRule` | A05 | `.block()` inside a `Mono`/`Flux` method — starves the event loop (DoS) |
+| `WebClientInsecureSslRule` | A02 | `trustManager(InsecureTrustManagerFactory)` — WebClient trusts all certificates |
 | `OpenRedirectRule` | A01 | `"redirect:" + variable` in `@Controller` methods |
 | `CsrfTokenLeakRule` | A01 | `model.addAttribute("csrf/xsrf...", token)` exposes CSRF token |
 | `CoroutineSecurityContextLossRule` | A01 | `suspend fun` with `@PreAuthorize` — security context silently dropped |
@@ -249,6 +250,12 @@ rules per module.
 | `VertxCorsWildcardRule` | A05 | `CorsHandler.create(".*")` / `addOrigin("*")` — any-origin CORS |
 | `VertxBodyHandlerNoLimitRule` | A05 | `BodyHandler.create()` without `setBodyLimit` — unbounded body (DoS) |
 | `VertxInsecureCookieRule` | A05 | `Cookie.cookie(...).setSecure(false)` — cookie over plain HTTP |
+| `VertxCookieNoHttpOnlyRule` | A05 | `Cookie.setHttpOnly(false)` — readable by JavaScript (XSS theft) |
+| `VertxSessionCookieInsecureRule` | A05 | `SessionHandler.setCookieSecureFlag(false)` — session cookie over HTTP |
+| `VertxStaticHandlerDirectoryListingRule` | A05 | `StaticHandler.setDirectoryListing(true)` — browsable file index |
+| `VertxStaticHandlerRootFsRule` | A03 | `StaticHandler.create("/")` / root FS access — arbitrary file disclosure |
+| `VertxJwtNoneAlgorithmRule` | A02 | `setAlgorithm("none")` — unsigned JWTs accepted |
+| `VertxHardcodedJwtSecretRule` | A07 | `PubSecKeyOptions().setBuffer(literal)` — hardcoded JWT secret |
 
 ---
 

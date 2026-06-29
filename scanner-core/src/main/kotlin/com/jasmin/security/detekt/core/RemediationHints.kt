@@ -728,6 +728,9 @@ object RemediationHints {
         "WebFluxBlockingCall" to
             "Compose reactively: repo.findById(id).flatMap { ... } — never .block() inside a Mono/Flux method",
 
+        "WebClientInsecureSsl" to
+            "SslContextBuilder.forClient().trustManager(File(\"ca.pem\")) — load a real CA, never InsecureTrustManagerFactory",
+
         // ── Vert.x ────────────────────────────────────────────────────────────
 
         "VertxTrustAllCerts" to
@@ -744,6 +747,24 @@ object RemediationHints {
 
         "VertxInsecureCookie" to
             "Cookie.cookie(\"session\", id).setSecure(true).setHttpOnly(true)",
+
+        "VertxCookieNoHttpOnly" to
+            "Cookie.cookie(\"session\", id).setHttpOnly(true) — keep it out of reach of JavaScript",
+
+        "VertxSessionCookieInsecure" to
+            "SessionHandler.create(store).setCookieSecureFlag(true).setCookieHttpOnlyFlag(true)",
+
+        "VertxStaticHandlerDirectoryListing" to
+            "StaticHandler.create(\"webroot\") // leave setDirectoryListing at its default (false)",
+
+        "VertxStaticHandlerRootFs" to
+            "StaticHandler.create(\"webroot\") — serve a dedicated directory, never \"/\" or root FS access",
+
+        "VertxJwtNoneAlgorithm" to
+            "PubSecKeyOptions().setAlgorithm(\"RS256\") — verify signatures with a real algorithm",
+
+        "VertxHardcodedJwtSecret" to
+            "PubSecKeyOptions().setBuffer(System.getenv(\"JWT_SECRET\")) — load the key from the environment",
     )
 
     /** Returns the fix hint for a given rule ID, or null if not mapped. */

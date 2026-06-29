@@ -80,3 +80,21 @@ fun safeVertxBridge() =
 
 fun safeVertxCookie(id: String) =
     io.vertx.core.http.Cookie.cookie("session", id).setSecure(true)
+
+fun safeVertxCookieHttpOnly(id: String) =
+    io.vertx.core.http.Cookie.cookie("session", id).setHttpOnly(true)
+
+fun safeVertxSession(store: Any) =
+    io.vertx.ext.web.handler.SessionHandler.create(store).setCookieSecureFlag(true)
+
+fun safeVertxStatic() =
+    io.vertx.ext.web.handler.StaticHandler.create("webroot").setDirectoryListing(false)
+
+fun safeVertxJwt() =
+    io.vertx.ext.auth.PubSecKeyOptions().setAlgorithm("RS256")
+
+fun safeVertxJwtSecret() =
+    io.vertx.ext.auth.PubSecKeyOptions().setBuffer(System.getenv("JWT_SECRET"))
+
+fun safeWebClientSsl() =
+    io.netty.handler.ssl.SslContextBuilder.forClient().trustManager(java.io.File("ca.pem")).build()

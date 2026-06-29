@@ -232,6 +232,8 @@ security-spring-boot:
   # A02 Cryptographic Failures
   InsecurePasswordEncoder:
     active: true
+  WebClientInsecureSsl:
+    active: true
   WeakBcryptRounds:
     active: true
     minStrength: 10     # Spring default; raise to 12 for higher security (doubles compute per +1)
@@ -607,10 +609,24 @@ security-vertx:
   # A02 Cryptographic Failures
   VertxTrustAllCerts:
     active: true
+  VertxJwtNoneAlgorithm:
+    active: true
+  # A03 Injection
+  VertxStaticHandlerRootFs:
+    active: true
   # A05 Security Misconfiguration
   VertxCorsWildcard:
     active: true
   VertxBodyHandlerNoLimit:
     active: true
   VertxInsecureCookie:
+    active: true
+  VertxCookieNoHttpOnly:
+    active: true
+  VertxSessionCookieInsecure:
+    active: true
+  VertxStaticHandlerDirectoryListing:
+    active: true
+  # A07 Identification and Authentication Failures
+  VertxHardcodedJwtSecret:
     active: true
