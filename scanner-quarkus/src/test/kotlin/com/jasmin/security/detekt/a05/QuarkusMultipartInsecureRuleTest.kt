@@ -64,4 +64,15 @@ class QuarkusMultipartInsecureRuleTest {
         }
         assertThat(rule.scanProperties(props)).isEmpty()
     }
+
+    @Test
+    fun `ignores a non-Quarkus properties file`() {
+        // A Spring/plain application.properties has no quarkus.* keys; the rule
+        // must stay silent instead of reporting "unset" (the spring-petclinic bug).
+        val props = Properties().also {
+            it["server.port"] = "8080"
+            it["management.endpoints.web.exposure.include"] = "*"
+        }
+        assertThat(rule.scanProperties(props)).isEmpty()
+    }
 }

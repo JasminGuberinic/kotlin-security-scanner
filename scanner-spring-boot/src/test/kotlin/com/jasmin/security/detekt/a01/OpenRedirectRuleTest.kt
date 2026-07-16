@@ -36,17 +36,44 @@ class OpenRedirectRuleTest {
     }
 
     @Test
-    fun `flags redirect with interpolated path segment`() {
+    fun `flags protocol-relative redirect (single leading slash)`() {
+        // "redirect:/" + x yields "/x"; if x starts with "/", the browser sees
+        // a protocol-relative "//x" and can leave the site — so this is unsafe.
         val code = """
             @Controller
-            class UserController {
-                fun afterCreate(id: Long): String = "redirect:/users/${'$'}id/profile"
+            class AuthController {
+                fun login(next: String): String = "redirect:/" + next
             }
         """.trimIndent()
         assertThat(rule.lint(code)).hasSize(1)
     }
 
     // ── Negative — must NOT flag ──────────────────────────────────────────────
+
+    @Test
+    fun `ignores fixed same-site path with interpolated segment`() {
+        // "redirect:/users/${'$'}id/profile" always stays under /users/ — same-site,
+        // not an open redirect.
+        val code = """
+            @Controller
+            class UserController {
+                fun afterCreate(id: Long): String = "redirect:/users/${'$'}id/profile"
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
+
+    @Test
+    fun `ignores concatenation onto a fixed same-site path`() {
+        // The real spring-petclinic pattern: "redirect:/owners/" + owner.id.
+        val code = """
+            @Controller
+            class OwnerController {
+                fun save(id: Long): String = "redirect:/owners/" + id
+            }
+        """.trimIndent()
+        assertThat(rule.lint(code)).isEmpty()
+    }
 
     @Test
     fun `ignores literal redirect path`() {

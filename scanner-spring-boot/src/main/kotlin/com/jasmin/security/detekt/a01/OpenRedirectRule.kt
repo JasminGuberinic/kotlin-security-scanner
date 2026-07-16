@@ -37,9 +37,9 @@ class OpenRedirectRule(config: Config) : SecurityRule(config) {
         super.visitStringTemplateExpression(expression)
         if (!expression.hasInterpolation()) return
         val firstText = expression.entries.firstOrNull()?.text ?: return
-        if (firstText.startsWith(DetectionPatterns.REDIRECT_PREFIX)) {
-            reportAt(expression, "Redirect target contains interpolated input — validate against a safe path allowlist")
-        }
+        if (!firstText.startsWith(DetectionPatterns.REDIRECT_PREFIX)) return
+        if (isFixedInternalPath(firstText)) return
+        reportAt(expression, "Redirect target contains interpolated input — validate against a safe path allowlist")
     }
 
     @Suppress("ReturnCount")
@@ -48,8 +48,23 @@ class OpenRedirectRule(config: Config) : SecurityRule(config) {
         if (expression.operationReference.text != "+") return
         val left = expression.left as? KtStringTemplateExpression ?: return
         if (!left.isLiteral()) return
-        if (left.rawValue().startsWith(DetectionPatterns.REDIRECT_PREFIX)) {
-            reportAt(expression, "Redirect target built by concatenation — validate against a safe path allowlist")
-        }
+        val literal = left.rawValue()
+        if (!literal.startsWith(DetectionPatterns.REDIRECT_PREFIX)) return
+        if (isFixedInternalPath(literal)) return
+        reportAt(expression, "Redirect target built by concatenation — validate against a safe path allowlist")
+    }
+
+    /**
+     * True when the literal prefix pins the redirect to a fixed same-site path,
+     * e.g. "redirect:/owners/". Appending a value to such a path (an id, a slug)
+     * cannot leave the site, so it is not an open redirect.
+     *
+     * Still treated as unsafe (returns false): a bare "redirect:" (the whole
+     * target is dynamic) and "redirect:/" (a following "/xyz" yields the
+     * protocol-relative "//xyz", which CAN go off-site).
+     */
+    private fun isFixedInternalPath(literalPrefix: String): Boolean {
+        val path = literalPrefix.removePrefix(DetectionPatterns.REDIRECT_PREFIX)
+        return path.length >= 2 && path[0] == '/' && path[1] != '/'
     }
 }

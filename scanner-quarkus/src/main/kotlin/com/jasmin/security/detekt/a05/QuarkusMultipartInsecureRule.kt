@@ -28,6 +28,12 @@ class QuarkusMultipartInsecureRule(config: Config) : PropertiesSecurityRule(conf
 
     @Suppress("ReturnCount")
     override fun scanProperties(props: Properties): List<Pair<String, String>> {
+        // Only applies to Quarkus projects. A Spring/Dropwizard/plain properties
+        // file has no quarkus.* keys, so the "unset" warning below must not fire
+        // there — otherwise every non-Quarkus app gets a bogus finding.
+        val isQuarkusProject = props.stringPropertyNames().any { it.startsWith("quarkus.") }
+        if (!isQuarkusProject) return emptyList()
+
         val key = "quarkus.http.limits.max-body-size"
         val rawValue = props.getProperty(key)
         // Unset key: Quarkus still accepts uploads (default ~10M), but an explicit limit
