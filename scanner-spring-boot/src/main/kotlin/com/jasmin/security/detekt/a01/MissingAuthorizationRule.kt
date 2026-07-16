@@ -21,6 +21,15 @@ class MissingAuthorizationRule(config: Config = Config.empty) : SecurityRule(con
         debt = Debt.TWENTY_MINS
     )
 
+    // Off by default (opt-in). A per-file rule cannot see whether an endpoint is
+    // already protected by a URL-based SecurityFilterChain
+    // (http.authorizeHttpRequests { ... }), which is how many Spring apps enforce
+    // authorization. Leaving it on would flag EVERY endpoint of a properly secured
+    // app that uses URL-based security. Teams that standardize on method security
+    // (@PreAuthorize/@Secured) can enable it with `active: true` in detekt.yml.
+    override val active: Boolean
+        get() = valueOrDefault(Config.ACTIVE_KEY, false)
+
     override fun visitNamedFunction(function: KtNamedFunction) {
         super.visitNamedFunction(function)
         val annotations = function.annotationNames()

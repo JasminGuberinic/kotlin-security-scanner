@@ -1,12 +1,14 @@
 package com.jasmin.security.detekt.a01
 
+import io.gitlab.arturbosch.detekt.test.TestConfig
 import io.gitlab.arturbosch.detekt.test.assertThat
 import io.gitlab.arturbosch.detekt.test.lint
 import org.junit.jupiter.api.Test
 
 class MissingAuthorizationRuleTest {
 
-    private val rule = MissingAuthorizationRule()
+    // The rule is opt-in (off by default), so enable it explicitly for these tests.
+    private val rule = MissingAuthorizationRule(TestConfig("active" to "true"))
 
     @Test
     fun `flags GetMapping without security annotation`() {
